@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6a23eb72-cbd3-48b5-a177-6813e0fa30e7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../Cerberus-airflow-test.pem" beforeDir="false" afterPath="$PROJECT_DIR$/../Cerberus-airflow-test.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Resso-0.14.1.13390-mac.dmg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ab_user_role.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dbt-red/dbt_red/models/customers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../dbt-red/dbt_red/models/customers.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dbt-red/dbt_red/models/orders.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../dbt-red/dbt_red/models/orders.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dbt-red/dbt_red/models/payments.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../dbt-red/dbt_red/models/payments.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dev-ruggable" beforeDir="false" afterPath="$PROJECT_DIR$/../dev-ruggable" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gsheet_report" beforeDir="false" afterPath="$PROJECT_DIR$/../gsheet_report" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rm-project/bing_ads_web_app" beforeDir="false" afterPath="$PROJECT_DIR$/../rm-project/bing_ads_web_app" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../salesoft" beforeDir="false" afterPath="$PROJECT_DIR$/../salesoft" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/analyze/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/extract/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/load/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/meltano.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/model/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/notebook/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/orchestrate/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shopify-users/shopify-users/transform/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-cj" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-cj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-flexport/meltano.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/meltano.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-recharge" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-recharge" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/tap-linkedin" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="ProjectId" id="2MHPBBPxpKsyi13epnYSTSeNksc" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6a23eb72-cbd3-48b5-a177-6813e0fa30e7" name="Changes" comment="" />
+      <created>1677421398531</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1677421398531</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+</project>
