@@ -12,6 +12,36 @@ Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
 pipx install tap-linkedin
 ```
 
+## LinkedIn Reporting Data Insights
+
+LinkedIn Reporting API provides these below data
+
+* Clicks 
+
+* Impressions 
+
+* Ad spend 
+
+* Demographics information such as metrics by demographic values at the account, campaign, and creative levels.
+
+* To retrieve  the above data you need r_ads_reporting permission.
+
+To retrieve  the above data you need r_ads_reporting permission.
+
+## Ad Analytics API 
+
+API Endpoint : https://api.linkedin.com/rest/adAnalytics  
+
+Stream Ad Analytics by Campaign : [Ad Analytics by Campaign](https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting?view=li-lms-2023-02&tabs=http#analytics-finder)
+
+The adAnalytics endpoint does not support pagination and it is using date range to retrieve the data.
+ 
+**Sample URL for requesting the Data**
+
+GET https://api.linkedin.com/rest/adAnalytics?q=analytics&pivot={pivot}&timeGranularity={time}
+
+
+
 ## Configuration
 
 ### Accepted Config Options
