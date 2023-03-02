@@ -44,7 +44,7 @@ class Taplinkedin(Tap):
         th.Property(
             "api_url",
             th.StringType,
-            default="https://api.mysample.com",
+            default="https://api.linkedin.com/rest/adAnalytics",
             description="The url for the API service"
         ),
     ).to_dict()
