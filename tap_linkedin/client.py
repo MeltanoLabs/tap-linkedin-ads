@@ -19,7 +19,7 @@ class linkedinStream(RESTStream):
     """linkedin stream class."""
 
     # TODO: Set the API's base URL here:
-    url_base = "https://api.mysample.com"
+    url_base = "https://api.linkedin.com/rest/adAnalytics"
 
     # OR use a dynamic url_base:
     # @property

@@ -17,15 +17,14 @@ class linkedinAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
             'resource': 'https://analysis.windows.net/powerbi/api',
             'scope': self.oauth_scopes,
             'client_id': self.config["client_id"],
-            'username': self.config["username"],
-            'password': self.config["password"],
-            'grant_type': 'password',
+            'client_secret': self.config["client_secret"],
+            'grant_type': 'Authorization Code',
         }
 
     @classmethod
     def create_for_stream(cls, stream) -> "linkedinAuthenticator":
         return cls(
             stream=stream,
-            auth_endpoint="TODO: OAuth Endpoint URL",
-            oauth_scopes="TODO: OAuth Scopes",
+            auth_endpoint="https://www.linkedin.com/oauth/v2/authorization",
+            oauth_scopes="r_ads,r_ads_reporting,r_basicprofile",
         )
