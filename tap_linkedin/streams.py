@@ -6,7 +6,7 @@ from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
-from tap_linkedin_sdk.client import LinkedInStream
+from tap_linkedin.client import LinkedInStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
