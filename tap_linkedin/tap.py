@@ -1,54 +1,58 @@
-"""linkedin tap class."""
+"""LinkedIn tap class."""
 
-from typing import List
+from __future__ import annotations
 
-from singer_sdk import Tap, Stream
+from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
+
 # TODO: Import your custom stream types here:
-from tap_linkedin.streams import (
-    linkedinStream,
-    UsersStream,
-    GroupsStream,
-)
-# TODO: Compile a list of custom stream types here
-#       OR rewrite discover_streams() below with your custom logic.
-STREAM_TYPES = [
-    UsersStream,
-    GroupsStream,
-]
+from tap_linkedin.streams import (LinkedInStream)
 
+STREAM_TYPES = [LinkedInStream]
 
-class Taplinkedin(Tap):
-    """linkedin tap class."""
-    name = "tap-linkedin"
+class TapLinkedIn(Tap):
+    """LinkedIn tap class."""
+
+    name = "tap-linkedin-sdk"
 
     # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
         th.Property(
-            "auth_token",
+            "access_token",
             th.StringType,
             required=True,
-            description="The token to authenticate against the API service"
-        ),
-        th.Property(
-            "project_ids",
-            th.ArrayType(th.StringType),
-            required=True,
-            description="Project IDs to replicate"
+            description="The token to authenticate against the API service",
         ),
         th.Property(
             "start_date",
             th.DateTimeType,
-            description="The earliest record date to sync"
+            required=True,
+            description="The earliest record date to sync",
         ),
         th.Property(
-            "api_url",
+            "user_agent",
             th.StringType,
-            default="https://api.linkedin.com/rest/adAnalytics",
-            description="The url for the API service"
+            default="tap-linkedin-ads <api_user_email@your_company.com>",
+            description="TODO",
         ),
+        th.Property(
+            "accounts",
+            th.StringType,
+            default="510799602",
+            description="LinkedIn Account ID",
+        )
     ).to_dict()
 
-    def discover_streams(self) -> List[Stream]:
-        """Return a list of discovered streams."""
-        return [stream_class(tap=self) for stream_class in STREAM_TYPES]
+    def discover_streams(self) -> list[streams.LinkedInStream]:
+        """Return a list of discovered streams.
+
+        Returns:
+            A list of discovered streams.
+        """
+        return [
+            streams.LinkedInAds(self)
+        ]
+
+
+if __name__ == "__main__":
+    TapLinkedIn.cli()
