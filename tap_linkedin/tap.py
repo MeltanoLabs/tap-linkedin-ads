@@ -7,6 +7,7 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 
 # TODO: Import your custom stream types here:
 from tap_linkedin.streams import (LinkedInStream)
+import tap_linkedin.streams as streams
 
 STREAM_TYPES = [LinkedInStream]
 
@@ -24,10 +25,21 @@ class TapLinkedIn(Tap):
             description="The token to authenticate against the API service",
         ),
         th.Property(
+            "refresh_token",
+            th.StringType,
+            required=True,
+            description="TODO",
+        ),
+        th.Property(
             "start_date",
             th.DateTimeType,
             required=True,
             description="The earliest record date to sync",
+        ),th.Property(
+            "client_secret",
+            th.DateTimeType,
+            required=True,
+            description="TODO",
         ),
         th.Property(
             "user_agent",
@@ -50,7 +62,7 @@ class TapLinkedIn(Tap):
             A list of discovered streams.
         """
         return [
-            streams.LinkedInAds(self)
+            streams.Accounts(self)
         ]
 
 
