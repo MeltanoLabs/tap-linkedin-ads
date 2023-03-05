@@ -35,7 +35,8 @@ class TapLinkedIn(Tap):
             th.DateTimeType,
             required=True,
             description="The earliest record date to sync",
-        ),th.Property(
+        ),
+        th.Property(
             "client_secret",
             th.DateTimeType,
             required=True,

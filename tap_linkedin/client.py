@@ -17,7 +17,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class LinkedInStream(RESTStream):
     """LinkedIn stream class."""
 
-    url_base = "https://api.linkedin.com/"
+    url_base = "https://api.linkedin.com/rest"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
