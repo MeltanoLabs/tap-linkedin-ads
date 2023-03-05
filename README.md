@@ -1,6 +1,33 @@
-# edward-tap-linkedin-sdk
+# `tap-linkedin-sdk`
 
-`edward-tap-linkedin-sdk` is a Singer tap for LinkedIn.
+LinkedIn tap class.
+
+Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
+
+## Capabilities
+
+* `catalog`
+* `state`
+* `discover`
+* `about`
+* `stream-maps`
+* `schema-flattening`
+
+## Settings
+
+| Setting             | Required | Default | Description |
+|:--------------------|:--------:|:-------:|:------------|
+| access_token        | True     | None    | The token to authenticate against the API service |
+| start_date          | True     | None    | The earliest record date to sync |
+| user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | TODO        |
+| accounts            | False    | 510799602 | LinkedIn Account ID |
+| stream_maps         | False    | None    | Config object for stream maps capability. |
+| stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
+| flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth| False    | None    | The max depth to flatten schemas. |
+
+A full list of supported settings and capabilities is available by running: `tap-linkedin-sdk --about`
+
 
 Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
 
