@@ -17,14 +17,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class LinkedInStream(RESTStream):
     """LinkedIn stream class."""
 
-    # TODO: Set the API's base URL here:
-    url_base = "https://api.mysample.com"
-
-    # OR use a dynamic url_base:
-    # @property
-    # def url_base(self) -> str:
-    #     """Return the API URL root, configurable via tap settings."""
-    #     return self.config["api_url"]
+    url_base = "https://api.linkedin.com/"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
