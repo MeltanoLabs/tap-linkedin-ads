@@ -31,7 +31,7 @@ class LinkedInStream(RESTStream):
         """
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("refresh_token", ""),
+            token=self.config.get("access_token", ""),
         )
 
     @property
@@ -44,6 +44,7 @@ class LinkedInStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
+            headers["LinkedIn-Version"] = self.config.get("linkedin_version")
         # If not using an authenticator, you may also provide inline auth headers:
         # headers["Private-Token"] = self.config.get("refresh_token")
         return headers
@@ -90,7 +91,11 @@ class LinkedInStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {}
+        params: dict = {"start": 0,
+                        "count": 100,
+                        "q": "search",
+                        "sort.field": "ID",
+                        "sort.order": "ASCENDING"}
         if next_page_token:
             params["page"] = next_page_token
         if self.replication_key:

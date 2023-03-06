@@ -38,7 +38,7 @@ class TapLinkedIn(Tap):
         ),
         th.Property(
             "client_secret",
-            th.DateTimeType,
+            th.StringType,
             required=True,
             description="client secret key",
         ),
@@ -47,6 +47,12 @@ class TapLinkedIn(Tap):
             th.StringType,
             default="tap-linkedin-ads <api_user_email@your_company.com>",
             description="API ID",
+        ),
+        th.Property(
+            "LinkedIn-Version",
+            th.StringType,
+            default="202207",
+            description="LinkedIn API Version",
         ),
         th.Property(
             "accounts",
