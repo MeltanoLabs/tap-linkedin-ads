@@ -28,7 +28,7 @@ class TapLinkedIn(Tap):
             "refresh_token",
             th.StringType,
             required=True,
-            description="TODO",
+            description="Generated token, bearer auth",
         ),
         th.Property(
             "start_date",
@@ -40,13 +40,13 @@ class TapLinkedIn(Tap):
             "client_secret",
             th.DateTimeType,
             required=True,
-            description="TODO",
+            description="client secret key",
         ),
         th.Property(
             "user_agent",
             th.StringType,
             default="tap-linkedin-ads <api_user_email@your_company.com>",
-            description="TODO",
+            description="API ID",
         ),
         th.Property(
             "accounts",
