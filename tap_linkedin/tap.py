@@ -69,7 +69,8 @@ class Taplinkedin(Tap):
             A list of discovered streams.
         """
         return [
-            streams.Accounts(self)
+            streams.Accounts(self),
+            streams.VideoAds(self)
         ]
 
 

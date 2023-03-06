@@ -95,14 +95,24 @@ class LinkedInStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {
-                        "q": "search"}
+        params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
+
+        print("\n\n ==== PARAM OUTPUT ===== \n\n")
+        print("PATH: " + str(self.path))
+        path = str(self.path)
+        if str(self.path) == "adDirectSponsoredContents":
+            params["q"] = "account"
+
+        else:
+            params["q"] = "search"
+
         print("THESE ARE THE PARAMS" + str(params))
+
         return params
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:

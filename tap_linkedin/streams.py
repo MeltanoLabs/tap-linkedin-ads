@@ -29,3 +29,20 @@ class Accounts(LinkedInStream):
     params = {
         "q": "search"
     }
+
+class VideoAds(LinkedInStream):
+    """
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
+    """
+    name = "video_ads"
+    replication_keys = ["last_modified_time"]
+    replication_method = "INCREMENTAL"
+    key_properties = ["content_reference"]
+    schema_filepath = SCHEMAS_DIR / "video_ads.json"
+    foreign_key = "id"
+    path = "adDirectSponsoredContents"
+    data_key = "elements"
+    parent = "accounts"
+    params = {
+        "q": "account"
+    }
