@@ -16,13 +16,13 @@ class Accounts(LinkedInStream):
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
     name = "accounts"
+    path = "adAccounts"
+    primary_keys = ["id"]
+    replication_keys = ["last_modified_time"]
     schema_filepath = "tap_linkedin/schemas/accounts.json"
     tap_stream_id = "accounts"
     replication_method = "INCREMENTAL"
-    replication_keys = ["last_modified_time"]
-    key_properties = ["id"]
     account_filter = "search_id_values_param"
-    path = "adAccounts"
     data_key = "elements"
     children = ["video_ads"]
     params = {
