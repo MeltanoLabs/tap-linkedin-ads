@@ -29,11 +29,34 @@
       <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/meltano.yml" beforeDir="false" afterPath="$PROJECT_DIR$/meltano.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tap_linkedin/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tap_linkedin/schemas/accounts.json" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/schemas/accounts.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tap_linkedin/streams.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/streams.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tap_linkedin/tap.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/tap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.secrets/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.secrets/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/.circleci/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/.github/pull_request_template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/Makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/config.json.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/state.json.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/base.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_all_fields.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_automatic_fields.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_bookmark.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_discovery.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_pagination.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_parent_child_independent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_start_date.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/test_sync_without_refresh_token.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_discover.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_exception_handling.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_streams.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_sync.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_timeout.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/tests/unittests/test_transform.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-recharge" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-recharge" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" afterDir="false" />
     </list>
