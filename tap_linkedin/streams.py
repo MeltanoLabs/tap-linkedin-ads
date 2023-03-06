@@ -19,14 +19,13 @@ class Accounts(LinkedInStream):
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
-    schema_filepath = "tap_linkedin/schemas/accounts.json"
+    #schema_filepath = "tap_linkedin/schemas/accounts.json"
+    schema_filepath = SCHEMAS_DIR / "accounts.json"
     tap_stream_id = "accounts"
-    replication_method = "INCREMENTAL"
+    #replication_method = "INCREMENTAL"
     account_filter = "search_id_values_param"
     data_key = "elements"
     children = ["video_ads"]
     params = {
-        "q": "search",
-        "sort.field": "ID",
-        "sort.order": "ASCENDING"
+        "q": "search"
     }

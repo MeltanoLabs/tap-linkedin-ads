@@ -19,8 +19,8 @@ class LinkedInStream(RESTStream):
 
     url_base = "https://api.linkedin.com/rest/"
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
+    records_jsonpath = "$.elements[*]"  # Or override `parse_response`.
+    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -45,6 +45,10 @@ class LinkedInStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
             headers["LinkedIn-Version"] = self.config.get("linkedin_version")
+            headers["X-Restli-Protocol-Version"]= self.config.get("x-restli-protocol-version")
+            headers["Content-Type"] = self.config.get("application/json")
+
+            
         # If not using an authenticator, you may also provide inline auth headers:
         # headers["Private-Token"] = self.config.get("refresh_token")
         return headers
@@ -91,13 +95,10 @@ class LinkedInStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {"start": 0,
-                        "count": 100,
-                        "q": "search",
-                        "sort.field": "ID",
-                        "sort.order": "ASCENDING"}
+        params: dict = {
+                        "q": "search"}
         if next_page_token:
-            params["page"] = next_page_token
+            params["start"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key

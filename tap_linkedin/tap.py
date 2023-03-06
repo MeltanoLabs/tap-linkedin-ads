@@ -11,7 +11,7 @@ import tap_linkedin.streams as streams
 
 STREAM_TYPES = [LinkedInStream]
 
-class TapLinkedIn(Tap):
+class Taplinkedin(Tap):
     """LinkedIn tap class."""
 
     name = "tap-linkedin-sdk"

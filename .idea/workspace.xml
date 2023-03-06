@@ -28,6 +28,12 @@
       <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/schema/booking_line_items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-flexport/tap_flexport/tap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/meltano.yml" beforeDir="false" afterPath="$PROJECT_DIR$/meltano.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tap_linkedin/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tap_linkedin/schemas/accounts.json" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/schemas/accounts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tap_linkedin/streams.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/streams.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tap_linkedin/tap.py" beforeDir="false" afterPath="$PROJECT_DIR$/tap_linkedin/tap.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-recharge" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-recharge" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../tap-yotpo/.idea/csv-plugin.xml" afterDir="false" />
     </list>
@@ -42,7 +48,7 @@
         <entry key="$PROJECT_DIR$/tap-linkedin" value="main" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="ProjectId" id="2MHPBBPxpKsyi13epnYSTSeNksc" />
