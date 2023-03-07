@@ -109,16 +109,24 @@ class LinkedInStream(RESTStream):
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
 
-        elif str(self.path) == "accounts":
+        elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
+            params["sort.field"] = "ID"
+            params["sort.order"] = "ASCENDING"
+
+        elif str(self.path) == "adAccountUsers":
+            params["q"] = "accounts"
+
+        elif str(self.path) == "creatives":
+            params["q"] = "criteria"
+            params["campaigns"] = "List(urn%3Ali%3AsponsoredCampaign%3A{})"
+            params["sortOrder"] = "ASCENDING"
 
         elif str(self.path) == "adAnalytics":
-            params["q"] = "search"
+            params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
             params["count"] = 10000
-        else:
-            params["q"] = "search"
 
         print("THESE ARE THE PARAMS" + str(params))
 
