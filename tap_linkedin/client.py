@@ -105,9 +105,18 @@ class LinkedInStream(RESTStream):
         print("\n\n ==== PARAM OUTPUT ===== \n\n")
         print("PATH: " + str(self.path))
         path = str(self.path)
+
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
 
+        elif str(self.path) == "accounts":
+            params["q"] = "search"
+
+        elif str(self.path) == "adAnalytics":
+            params["q"] = "search"
+            params["pivot"] = "CAMPAIGN"
+            params["timeGranularity"] = "DAILY"
+            params["count"] = 10000
         else:
             params["q"] = "search"
 
