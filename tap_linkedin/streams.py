@@ -48,7 +48,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
         "q": "analytics",
         "pivot": "CAMPAIGN",
         "timeGranularity": "DAILY",
-        "count": 10000
+        #"count": 10000
     }
 
 class VideoAds(LinkedInStream):
