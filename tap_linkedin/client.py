@@ -45,7 +45,7 @@ class LinkedInStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
             headers["LinkedIn-Version"] = self.config.get("linkedin_version")
-            headers["X-Restli-Protocol-Version"]= self.config.get("1.0.0")
+            headers["X-Restli-Protocol-Version"]= self.config.get("x-restli-protocol-version")
             headers["Content-Type"] = self.config.get("application/json; charset=utf-8")
 
             
