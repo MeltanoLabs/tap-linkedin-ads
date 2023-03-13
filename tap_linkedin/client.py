@@ -108,6 +108,10 @@ class LinkedInStream(RESTStream):
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
+            params["start"] = "0"
+            params["count"] = "100"
+            params["account"] = "urn:li:sponsoredAccount:510799602"
+            params["owner"] = "urn:li:organization:40706439"
 
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
@@ -116,15 +120,29 @@ class LinkedInStream(RESTStream):
 
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
+            params["accounts"] = "urn:li:sponsoredAccount:510799602"
+
 
         elif str(self.path) == "creatives":
+            params["campaigns"] = "List(urn:li:sponsoredCampaign:211290954)"
             params["q"] = "criteria"
-            params["campaigns"] = "List(urn%3Ali%3AsponsoredCampaign%3A{})"
-            params["sortOrder"] = "ASCENDING"
 
-        elif str(self.path) == "adAnalytics":
+
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
+            params["timeGranularity"] = "DAILY"
+            params["dateRange.start.day"] = "24"
+            params["dateRange.start.month"] = "2"
+            params["dateRange.start.year"] = "2023"
+            params["dateRange.end.day"] = "10"
+            params["dateRange.end.month"] = "3"
+            params["dateRange.end.year"] = "2023"
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
+
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
+            params["q"] = "analytics"
+            params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"
             params["dateRange.start.day"] = "24"
             params["dateRange.start.month"] = "2"
