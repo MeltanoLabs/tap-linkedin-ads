@@ -46,7 +46,7 @@ class LinkedInStream(RESTStream):
             headers["User-Agent"] = self.config.get("user_agent")
             headers["LinkedIn-Version"] = self.config.get("linkedin_version")
             headers["X-Restli-Protocol-Version"]= self.config.get("x-restli-protocol-version")
-            headers["Content-Type"] = self.config.get("application/json; charset=utf-8")
+            headers["Content-Type"] = self.config.get("application/json")
 
             
         # If not using an authenticator, you may also provide inline auth headers:
@@ -106,10 +106,11 @@ class LinkedInStream(RESTStream):
         print("PATH: " + str(self.path))
         path = str(self.path)
 
+        params["start"] = "1"
+        params["count"] = "10"
+
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
-            params["start"] = "0"
-            params["count"] = "100"
             params["account"] = "urn:li:sponsoredAccount:510799602"
             params["owner"] = "urn:li:organization:40706439"
 
