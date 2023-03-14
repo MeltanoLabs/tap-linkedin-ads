@@ -59,11 +59,9 @@ class LinkedInStream(RESTStream):
         previous_token: Any | None,
     ) -> Any | None:
         """Return a token for identifying next page or None if no more pages.
-
         Args:
             response: The HTTP ``requests.Response`` object.
             previous_token: The previous page token value.
-
         Returns:
             The next pagination token.
         """
@@ -98,6 +96,7 @@ class LinkedInStream(RESTStream):
         params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
+            print( "page", params["start"] )
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
@@ -108,15 +107,25 @@ class LinkedInStream(RESTStream):
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
+            params["account"]= "urn:li:sponsoredAccount:510799602"
+            params["owner"]= "urn:li:organization:40706439"
 
         elif str(self.path) == "accounts":
             params["q"] = "search"
 
         elif str(self.path) == "adAnalytics":
-            params["q"] = "search"
+            params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
-            params["count"] = 10000
+            params["campaigns"] = "urn:li:sponsoredCampaign:211290954"
+            params["count"] = 10
+            params["dateRange.start.month"]= 2
+            params["dateRange.start.day"]= 24
+            params["dateRange.start.year"]= 2023
+            params["dateRange.end.month"]= 3
+            params["dateRange.end.day"]= 10
+            params["dateRange.end.year"]= 2023
+
         else:
             params["q"] = "search"
 

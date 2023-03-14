@@ -18,7 +18,6 @@ class Accounts(LinkedInStream):
     name = "accounts"
     path = "adAccounts"
     primary_keys = ["id"]
-
     replication_keys = ["last_modified_time"]
     schema_filepath = SCHEMAS_DIR / "accounts.json"
     tap_stream_id = "accounts"
@@ -35,9 +34,9 @@ class AdAnalyticsByCampaign(LinkedInStream):
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
     name = "ad_analytics_by_campaign"
-    replication_method = "INCREMENTAL"
+    #replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
-    replication_keys = ["end_at"]
+    #replication_keys = ["end_at"]
     key_properties = ["campaign_id", "start_at"]
     account_filter = "accounts_param"
     path = "adAnalytics"
@@ -45,10 +44,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     data_key = "elements"
     parent = "campaigns"
     params = {
-        "q": "analytics",
-        "pivot": "CAMPAIGN",
-        "timeGranularity": "DAILY",
-        "count": 10000
+        "q": "analytics"
     }
 
 class VideoAds(LinkedInStream):

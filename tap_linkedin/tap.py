@@ -71,7 +71,8 @@ class Taplinkedin(Tap):
 
         return [
             streams.Accounts(self),
-            streams.AdAnalyticsByCampaign(self)
+            streams.AdAnalyticsByCampaign(self),
+            streams.VideoAds(self)
         ]
 
 
