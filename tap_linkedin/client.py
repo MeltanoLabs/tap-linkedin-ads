@@ -106,8 +106,9 @@ class LinkedInStream(RESTStream):
         print("PATH: " + str(self.path))
         path = str(self.path)
 
-        params["start"] = "1"
-        params["count"] = "10"
+        #params["start"] = "1"
+        #params["count"] = "10"
+
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
@@ -125,7 +126,7 @@ class LinkedInStream(RESTStream):
 
 
         elif str(self.path) == "creatives":
-            params["campaigns"] = "List(urn:li:sponsoredCampaign:211290954)"
+            params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
             params["q"] = "criteria"
 
 
