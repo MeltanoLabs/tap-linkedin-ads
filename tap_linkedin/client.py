@@ -106,25 +106,62 @@ class LinkedInStream(RESTStream):
         print("PATH: " + str(self.path))
         path = str(self.path)
 
+        #params["start"] = "1"
+        #params["count"] = "10"
+
+
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
+            params["account"] = "urn:li:sponsoredAccount:510799602"
+            params["owner"] = "urn:li:organization:40706439"
 
-        elif str(self.path) == "accounts":
+        elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
+            params["sort.field"] = "ID"
+            params["sort.order"] = "ASCENDING"
 
-        elif str(self.path) == "adAnalytics":
-            params["q"] = "search"
+        elif str(self.path) == "adAccountUsers":
+            params["q"] = "accounts"
+            params["accounts"] = "urn:li:sponsoredAccount:510799602"
+
+
+        elif str(self.path) == "creatives":
+            params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
+            params["q"] = "criteria"
+
+
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
+            params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
-            params["count"] = 10000
-        else:
-            params["q"] = "search"
+            params["dateRange.start.day"] = "24"
+            params["dateRange.start.month"] = "2"
+            params["dateRange.start.year"] = "2023"
+            params["dateRange.end.day"] = "10"
+            params["dateRange.end.month"] = "3"
+            params["dateRange.end.year"] = "2023"
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
+
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
+            params["q"] = "analytics"
+            params["pivot"] = "CREATIVE"
+            params["timeGranularity"] = "DAILY"
+            params["dateRange.start.day"] = "24"
+            params["dateRange.start.month"] = "2"
+            params["dateRange.start.year"] = "2023"
+            params["dateRange.end.day"] = "10"
+            params["dateRange.end.month"] = "3"
+            params["dateRange.end.year"] = "2023"
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
+
+
 
         print("THESE ARE THE PARAMS" + str(params))
 
         return params
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
+
         """Parse the response and return an iterator of result records.
 
         Args:
