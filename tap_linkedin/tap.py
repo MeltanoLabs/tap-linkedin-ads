@@ -70,9 +70,9 @@ class Taplinkedin(Tap):
         """
 
         return [
-            streams.Accounts(self),
+            #streams.Accounts(self),
             streams.VideoAds(self),
-            streams.AccountUsers(self),
+            #streams.AccountUsers(self),
             #streams.Creatives(self),
             streams.Campaigns(self),
             streams.CampaignGroups(self),
