@@ -52,7 +52,7 @@ class LinkedInStream(RESTStream):
         # If not using an authenticator, you may also provide inline auth headers:
         # headers["Private-Token"] = self.config.get("refresh_token")
 
-        print("HEADERS" + str(headers))
+        
         return headers
 
     def get_next_page_token(
@@ -104,8 +104,7 @@ class LinkedInStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        print("\n\n ==== PARAM OUTPUT ===== \n\n")
-        print("PATH: " + str(self.path))
+        
         path = str(self.path)
 
         #params["start"] = "1"
