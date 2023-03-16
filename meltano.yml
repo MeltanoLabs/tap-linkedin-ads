@@ -28,7 +28,7 @@ plugins:
       linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
       x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
       content-type: TAP_LINKEDIN_CONTENT_TYPE
-  - name: linkedin-accounts
+  - name: linkedin-Accounts
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
@@ -40,13 +40,13 @@ plugins:
       x-restli-protocol-version: '1.0.0'
     select:
       - account_users
-  - name: linkedin-creatives
+  - name: linkedin-Creatives
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '2.0.0'
     select:
       - creatives
-  - name: linkedin-campaigns
+  - name: linkedin-Campaigns
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
