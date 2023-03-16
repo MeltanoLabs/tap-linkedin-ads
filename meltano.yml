@@ -28,49 +28,49 @@ plugins:
       linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
       x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
       content-type: TAP_LINKEDIN_CONTENT_TYPE
-  - name: linkedin-Accounts
+  - name: Linkedin-Accounts
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - accounts
-  - name: linkedin-AdAccountsUsers
+  - name: Linkedin-AdAccountsUsers
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - account_users
-  - name: linkedin-Creatives
+  - name: Linkedin-Creatives
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '2.0.0'
     select:
       - creatives
-  - name: linkedin-Campaigns
+  - name: Linkedin-Campaigns
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - campaigns
-  - name: linkedin-CampaignGroups
+  - name: Linkedin-CampaignGroups
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - campaign_group
-  - name: linkedin-AdAnalyticsByCreative
+  - name: Linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - ad_analytics_by_creative
-  - name: linkedin-AdAnalyticsByCampaign
+  - name: Linkedin-AdAnalyticsByCampaign
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
     select:
       - ad_analytics_by_campaign
-  - name: linkedin-VideoAds
+  - name: Linkedin-VideoAds
     inherit_from: tap-linkedin
     config:
       x-restli-protocol-version: '1.0.0'
