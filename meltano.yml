@@ -18,16 +18,64 @@ plugins:
     - name: start_date
       value: '2010-01-01T00:00:00Z'
     config:
-      start_date: '2023-01-01T00:00:00Z'
-      client_secret: LINKEDIN_CLIENT_SECRET
-      access_token: LINKEDIN_ACCESS_TOKEN
-      refresh_token: LINKEDIN_REFRESH_TOKEN
-      accounts: '510799602'
-      client_id: 78d6ev13uoy6fy
-      user_agent: 'neil'
-      linkedin_version: '202207'
+      start_date: TAP_LINKEDIN_START_DATE
+      client_secret: TAP_LINKEDIN_CLIENT_SECRET
+      access_token: TAP_LINKEDIN_ACCESS_TOKEN
+      refresh_token: TAP_LINKEDIN_REFRESH_TOKEN
+      accounts: TAP_LINKEDIN_ACCOUNTS
+      client_id: TAP_LINKEDIN_CLIENT_ID
+      user_agent: TAP_LINKEDIN_USER_AGENT
+      linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
+      x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
+      content-type: TAP_LINKEDIN_CONTENT_TYPE
+  - name: linkedin-accounts
+    inherit_from: tap-linkedin
+    config:
       x-restli-protocol-version: '1.0.0'
-      content-type: 'text/plain'
+    select:
+      - accounts
+  - name: linkedin-AdAccountsUsers
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - account_users
+  - name: linkedin-creatives
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '2.0.0'
+    select:
+      - creatives
+  - name: linkedin-campaigns
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - campaigns
+  - name: linkedin-CampaignGroups
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - campaign_group
+  - name: linkedin-AdAnalyticsByCreative
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - ad_analytics_by_creative
+  - name: linkedin-AdAnalyticsByCampaign
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - ad_analytics_by_campaign
+  - name: linkedin-VideoAds
+    inherit_from: tap-linkedin
+    config:
+      x-restli-protocol-version: '1.0.0'
+    select:
+      - video_ads
   loaders:
   - name: target-jsonl
     variant: andyh1203
@@ -36,7 +84,12 @@ plugins:
     variant: hotgluexyz
     pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
     config:
-      destination_path: /Users/monika/Documents/tap-linkedin/output
+      destination_path: /Users/neilgorman/Documents/GitHub/tap-linkedin-sdk/output
+  - name: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
+    config:
+      batch_size: 5
 environments:
 - name: dev
   config:
