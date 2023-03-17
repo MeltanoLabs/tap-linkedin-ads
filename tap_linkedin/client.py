@@ -127,8 +127,11 @@ class LinkedInStream(RESTStream):
 
 
         elif str(self.path) == "creatives":
-            params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
-            params["q"] = "criteria"
+            #params["campaigns"] = "urn:li:sponsoredCampaign:211290954)"
+            params= {'campaigns': 'List(urn:li:sponsoredCampaign:211290954)', 'q' : 'criteria'}
+            params= urllib.parse.urlencode(params, safe="()")
+            print("params........",params)
+            return params
 
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
