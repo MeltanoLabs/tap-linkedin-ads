@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
+import urllib.parse
 
 import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
