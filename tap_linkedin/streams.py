@@ -15,7 +15,7 @@ class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
-    name = "accounts"
+    name = "account_history"
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
@@ -33,7 +33,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    name = "ad_analytics_by_campaign"
+    name = "ad_analytics_by_campaign_history"
     #replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
     replication_keys = ["end_at"]
@@ -71,8 +71,8 @@ class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
-    name = "account_users"
-    replication_keys = ["last_modified_time"]
+    name = "account_user_history"
+    #replication_keys = ["last_modified_time"]
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
     account_filter = "accounts_param"
@@ -87,7 +87,7 @@ class CampaignGroups(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
     """
-    name = "campaign_groups"
+    name = "campaign_group_history"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
@@ -105,7 +105,7 @@ class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
-    name = "campaigns"
+    name = "campaign_history"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
@@ -147,7 +147,7 @@ class AdAnalyticsByCreative(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    name = "ad_analytics_by_creative"
+    name = "ad_analytics_by_creative_history"
     #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
