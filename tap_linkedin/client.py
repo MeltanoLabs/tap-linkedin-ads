@@ -131,7 +131,7 @@ class LinkedInStream(RESTStream):
             params["q"] = "criteria"
 
 
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign_history":
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
@@ -143,7 +143,7 @@ class LinkedInStream(RESTStream):
             params["dateRange.end.year"] = "2023"
             params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
 
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative_history":
             params["q"] = "analytics"
             params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"

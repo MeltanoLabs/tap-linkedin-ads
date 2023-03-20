@@ -1,76 +1,12 @@
 {
         "type": "object",
         "properties": {
-            "start": {
-                "type": "integer"
-            },
-            "count": {
-                "type": "integer"
-            },
-            "links": {
-                "type": "array"
-            },
-            "total": {
-                "type": "integer"
-            },
-            "test": {
-                "type": "boolean"
-            },
-            "notifiedOnCreativeRejection": {
-                "type": "boolean"
-            },
-            "notifiedOnEndOfCampaign": {
-                "type": "boolean"
-            },
-            "servingStatuses": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "notifiedOnCampaignOptimization": {
-                "type": "boolean"
-            },
-            "type": {
-                "type": "string"
-            },
-            "version": {
-                "type": "object",
-                "properties": {
-                    "versionTag": {
-                        "type": "string"
-                    }
-                }
-            },
-            "reference": {
-                "type": "string"
-            },
-            "notifiedOnCreativeApproval": {
-                "type": "boolean"
-            },
-            "changeAuditStamps": {
-                "type": "object",
-                "properties": {
-                    "created": {
-                        "type": "object",
-                        "properties": {
-                            "time": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "lastModified": {
-                        "type": "object",
-                        "properties": {
-                            "time": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                }
-            },
-            "name": {
-                "type": "string"
+            "created_time": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "format": "date-time"
             },
             "currency": {
                 "type": "string"
@@ -78,8 +14,44 @@
             "id": {
                 "type": "integer"
             },
+            "last_modified_time": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "format": "date-time"
+            },
+            "name": {
+                "type": "string"
+            },
+            "notified_On_Campaign_Optimization": {
+                "type": "boolean"
+            },
+            "notified_On_Creative_Approval": {
+                "type": "boolean"
+            },
+            "notified_On_Creative_Rejection": {
+                "type": "boolean"
+            },
+            "notified_On_End_Of_Campaign": {
+                "type": "boolean"
+            },
+            "reference": {
+                "type": "string"
+            },
             "status": {
                 "type": "string"
+            },
+            "type": {
+                "type": "string"
+            },
+            "version_tag": {
+                "type": "object",
+                "properties": {
+                    "Tag": {
+                        "type": "string"
+                    }
+                }
             }
         }
 }

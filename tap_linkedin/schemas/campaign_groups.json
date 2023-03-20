@@ -5,69 +5,17 @@
   ],
   "additionalProperties": false,
   "properties": {
-    "run_schedule": {
+    "account_id": {
       "type": [
         "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "start": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "format": "date-time"
-        },
-        "end": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "format": "date-time"
-        }
-      }
+        "integer"
+      ]
     },
-    "change_audit_stamps": {
+    "backfilled": {
       "type": [
         "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "created": {
-          "type": [
-            "null",
-            "object"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "time": {
-              "type": [
-                "null",
-                "string"
-              ],
-              "format": "date-time"
-            }
-          }
-        },
-        "last_modified": {
-          "type": [
-            "null",
-            "object"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "time": {
-              "type": [
-                "null",
-                "string"
-              ],
-              "format": "date-time"
-            }
-          }
-        }
-      }
+        "boolean"
+      ]
     },
     "created_time": {
       "type": [
@@ -75,6 +23,12 @@
         "string"
       ],
       "format": "date-time"
+    },
+    "id": {
+      "type": [
+        "null",
+        "integer"
+      ]
     },
     "last_modified_time": {
       "type": [
@@ -89,88 +43,26 @@
         "string"
       ]
     },
-    "serving_statuses": {
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "backfilled": {
-      "type": [
-        "null",
-        "boolean"
-      ]
-    },
-    "id": {
-      "type": [
-        "null",
-        "integer"
-      ]
-    },
-    "account": {
+    "run_schedule_end": {
       "type": [
         "null",
         "string"
-      ]
+      ],
+      "format": "date-time"
     },
-    "account_id": {
+    "run_schedule_start": {
       "type": [
         "null",
-        "integer"
-      ]
+        "string"
+      ],
+      "format": "date-time"
     },
     "status": {
       "type": [
         "null",
         "string"
       ]
-    },
-    "total_budget": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "currency_code": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "amount": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "format": "singer.decimal"
-        }
-      }
-    },
-    "test": {
-      "type": [
-        "null",
-        "boolean"
-      ]
-    },
-    "allowed_campaign_types": {
-      "type": [
-        "null",
-        "array"
-      ],
-      "items": {
-        "type": [
-          "null",
-          "string"
-        ]
-      }
     }
   }
 }
+
