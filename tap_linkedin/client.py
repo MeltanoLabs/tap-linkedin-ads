@@ -55,33 +55,24 @@ class LinkedInStream(RESTStream):
         
         return headers
 
-    def get_next_page_token(
-        self,
-        response: requests.Response,
-        previous_token: Any | None,
-    ) -> Any | None:
-        """Return a token for identifying next page or None if no more pages.
+        def get_next_page_token(
+            self, response: requests.Response, previous_token: Optional[Any]
+        ) -> Optional[Any]:
+            """Return a token for identifying next page or None if no more pages."""
+            # If pagination is required, return a token which can be used to get the
+            #       next page. If this is the final page, return "None" to end the
+            #       pagination loop.
 
-        Args:
-            response: The HTTP ``requests.Response`` object.
-            previous_token: The previous page token value.
+            resp_json = response.json()
+            if (previous_token == None):
+                previous_token = 1
 
-        Returns:
-            The next pagination token.
-        """
-        # TODO: If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
-        if self.next_page_token_jsonpath:
-            all_matches = extract_jsonpath(
-                self.next_page_token_jsonpath, response.json()
-            )
-            first_match = next(iter(all_matches), None)
-            next_page_token = first_match
-        else:
-            next_page_token = response.headers.get("X-Next-Page", None)
+            if (resp_json.get("elements"))== []:
+                next_page_token = None
+            else:
+                next_page_token = previous_token + 1
 
-        return next_page_token
+            return next_page_token
 
     def get_url_params(
         self,
