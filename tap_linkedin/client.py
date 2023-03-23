@@ -9,6 +9,19 @@ import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
+LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
+LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
+StartDateMonth = os.getenv("TAP_LINKEDIN_START_DATE_MONTH")
+StartDateDay = os.getenv("TAP_LINKEDIN_START_DATE_DAY")
+StartDateYear = os.getenv("TAP_LINKEDIN_START_DATE_YEAR")
+EndDateMonth = os.getenv("TAP_LINKEDIN_END_DATE_MONTH")
+EndDateDay = os.getenv("TAP_LINKEDIN_END_DATE_DAY")
+EndDateYear = os.getenv("TAP_LINKEDIN_END_DATE_YEAR")
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -99,55 +112,50 @@ class LinkedInStream(RESTStream):
         path = str(self.path)
 
 
-        # TODO: Dynamically add the params
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
-            params["account"] = "urn:li:sponsoredAccount:510799602"
-            params["owner"] = "urn:li:organization:40706439"
+            params["account"] = ("urn:li:sponsoredAccount:" + str(LinkedInAccounts))
+            params["owner"] = ("urn:li:organization:" + str(LinkedInOwner))
 
-        # TODO: Dynamically add the params
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
             params["sort.field"] = "ID"
             params["sort.order"] = "ASCENDING"
 
-        # TODO: Dynamically add the params
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
-            params["accounts"] = "urn:li:sponsoredAccount:510799602"
+            params["accounts"] = ("urn:li:sponsoredAccount:" + str(LinkedInAccounts))
 
         # TODO: Add method to prevent encoding of params["campaigns"]
         #       and pass the URN as a list without encoding
         elif str(self.path) == "creatives":
-            params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
+            params["campaigns"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
             params["q"] = "criteria"
 
-        # TODO: Dynamically add the params
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = "24"
-            params["dateRange.start.month"] = "2"
-            params["dateRange.start.year"] = "2023"
-            params["dateRange.end.day"] = "10"
-            params["dateRange.end.month"] = "3"
-            params["dateRange.end.year"] = "2023"
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
+            params["dateRange.start.day"] = str(StartDateDay)
+            params["dateRange.start.month"] = str(StartDateMonth)
+            params["dateRange.start.year"] = str(StartDateYear)
+            params["dateRange.end.day"] = str(EndDateDay)
+            params["dateRange.end.month"] = str(EndDateMonth)
+            params["dateRange.end.year"] = str(EndDateYear)
+            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
 
-        # TODO: Dynamically add the date params
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
             params["q"] = "analytics"
             params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = "24"
-            params["dateRange.start.month"] = "2"
-            params["dateRange.start.year"] = "2023"
-            params["dateRange.end.day"] = "10"
-            params["dateRange.end.month"] = "3"
-            params["dateRange.end.year"] = "2023"
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
+            params["dateRange.start.day"] = str(StartDateDay)
+            params["dateRange.start.month"] = str(StartDateMonth)
+            params["dateRange.start.year"] = str(StartDateYear)
+            params["dateRange.end.day"] = str(EndDateDay)
+            params["dateRange.end.month"] = str(EndDateMonth)
+            params["dateRange.end.year"] = str(EndDateYear)
+            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
 
 
 
