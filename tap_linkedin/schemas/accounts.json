@@ -1,57 +1,205 @@
 {
-        "type": "object",
-        "properties": {
-            "created_time": {
+  "type": [
+    "null",
+    "object"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "change_audit_stamps": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "created": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "time": {
               "type": [
                 "null",
                 "string"
               ],
               "format": "date-time"
-            },
-            "currency": {
-                "type": "string"
-            },
-            "id": {
-                "type": "integer"
-            },
-            "last_modified_time": {
-              "type": [
-                "null",
-                "string"
-              ],
-              "format": "date-time"
-            },
-            "name": {
-                "type": "string"
-            },
-            "notified_On_Campaign_Optimization": {
-                "type": "boolean"
-            },
-            "notified_On_Creative_Approval": {
-                "type": "boolean"
-            },
-            "notified_On_Creative_Rejection": {
-                "type": "boolean"
-            },
-            "notified_On_End_Of_Campaign": {
-                "type": "boolean"
-            },
-            "reference": {
-                "type": "string"
-            },
-            "status": {
-                "type": "string"
-            },
-            "type": {
-                "type": "string"
-            },
-            "version_tag": {
-                "type": "object",
-                "properties": {
-                    "Tag": {
-                        "type": "string"
-                    }
-                }
             }
+          }
+        },
+        "last_modified": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "time": {
+              "type": [
+                "null",
+                "string"
+              ],
+              "format": "date-time"
+            }
+          }
         }
+      }
+    },
+    "created_time": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "last_modified_time": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "currency": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "id": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "name": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "notified_on_campaign_optimization": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "notified_on_creative_approval": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "notified_on_creative_rejection": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "notified_on_end_of_campaign": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "notified_on_new_features_enabled": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "reference": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "reference_organization_id": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "reference_person_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "serving_statuses": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "total_budget": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "format": "singer.decimal"
+        },
+        "currency_code": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "total_budget_ends_at": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "test": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "version": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version_tag": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    }
+  }
 }
