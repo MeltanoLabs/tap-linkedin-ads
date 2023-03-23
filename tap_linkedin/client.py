@@ -114,8 +114,8 @@ class LinkedInStream(RESTStream):
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
-            params["account"] = ("urn:li:sponsoredAccount:" + str(LinkedInAccounts))
-            params["owner"] = ("urn:li:organization:" + str(LinkedInOwner))
+            params["account"] = ("urn:li:sponsoredAccount:" + LinkedInAccounts)
+            params["owner"] = ("urn:li:organization:" + LinkedInOwner)
 
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
@@ -124,38 +124,38 @@ class LinkedInStream(RESTStream):
 
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
-            params["accounts"] = ("urn:li:sponsoredAccount:" + str(LinkedInAccounts))
+            params["accounts"] = ("urn:li:sponsoredAccount:" + LinkedInAccounts)
 
         # TODO: Add method to prevent encoding of params["campaigns"]
         #       and pass the URN as a list without encoding
         elif str(self.path) == "creatives":
-            params["campaigns"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
+            params["campaigns"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
             params["q"] = "criteria"
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = str(StartDateDay)
-            params["dateRange.start.month"] = str(StartDateMonth)
-            params["dateRange.start.year"] = str(StartDateYear)
-            params["dateRange.end.day"] = str(EndDateDay)
-            params["dateRange.end.month"] = str(EndDateMonth)
-            params["dateRange.end.year"] = str(EndDateYear)
-            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
+            params["dateRange.start.day"] = StartDateDay
+            params["dateRange.start.month"] = StartDateMonth
+            params["dateRange.start.year"] = StartDateYear
+            params["dateRange.end.day"] = EndDateDay
+            params["dateRange.end.month"] = EndDateMonth
+            params["dateRange.end.year"] = EndDateYear
+            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
 
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
             params["q"] = "analytics"
             params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = str(StartDateDay)
-            params["dateRange.start.month"] = str(StartDateMonth)
-            params["dateRange.start.year"] = str(StartDateYear)
-            params["dateRange.end.day"] = str(EndDateDay)
-            params["dateRange.end.month"] = str(EndDateMonth)
-            params["dateRange.end.year"] = str(EndDateYear)
-            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + str(LinkedInCampaign))
+            params["dateRange.start.day"] = StartDateDay
+            params["dateRange.start.month"] = StartDateMonth
+            params["dateRange.start.year"] = StartDateYear
+            params["dateRange.end.day"] = EndDateDay
+            params["dateRange.end.month"] = EndDateMonth
+            params["dateRange.end.year"] = EndDateYear
+            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
 
 
 
