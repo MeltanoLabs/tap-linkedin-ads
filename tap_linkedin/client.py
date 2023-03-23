@@ -114,8 +114,8 @@ class LinkedInStream(RESTStream):
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
-            params["account"] = ("urn:li:sponsoredAccount:" + LinkedInAccounts)
-            params["owner"] = ("urn:li:organization:" + LinkedInOwner)
+            params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+            params["owner"] = "urn:li:organization:" + LinkedInOwner
 
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
@@ -124,12 +124,12 @@ class LinkedInStream(RESTStream):
 
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
-            params["accounts"] = ("urn:li:sponsoredAccount:" + LinkedInAccounts)
+            params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
 
         # TODO: Add method to prevent encoding of params["campaigns"]
         #       and pass the URN as a list without encoding
         elif str(self.path) == "creatives":
-            params["campaigns"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
+            params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
             params["q"] = "criteria"
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
@@ -142,7 +142,7 @@ class LinkedInStream(RESTStream):
             params["dateRange.end.day"] = EndDateDay
             params["dateRange.end.month"] = EndDateMonth
             params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
 
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
@@ -155,7 +155,7 @@ class LinkedInStream(RESTStream):
             params["dateRange.end.day"] = EndDateDay
             params["dateRange.end.month"] = EndDateMonth
             params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = ("urn:li:sponsoredCampaign:" + LinkedInCampaign)
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
 
 
 
@@ -174,15 +174,4 @@ class LinkedInStream(RESTStream):
         # TODO: Parse response body and return a set of records.
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        """As needed, append or transform raw data to match expected structure.
 
-        Args:
-            row: An individual record from the stream.
-            context: The stream context.
-
-        Returns:
-            The updated record dictionary, or ``None`` to skip the record.
-        """
-        # TODO: Delete this method if not needed.
-        return row
