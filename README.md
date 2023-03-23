@@ -442,3 +442,26 @@ meltano elt edward-tap-linkedin-sdk target-jsonl
 
 See the [dev guide](https://sdk.meltano.com/en/latest/dev_guide.html) for more instructions on how to use the SDK to
 develop your own taps and targets.
+
+## Environmental Variables
+
+client.py uses several environmental variables for the Headers and Parameters for the LinkedIn streams. As such, the following environmental variables need to be set in .env:
+
+TAP_LINKEDIN_CLIENT_SECRET
+TAP_LINKEDIN_ACCESS_TOKEN
+TAP_LINKEDIN_REFRESH_TOKEN 
+TAP_LINKEDIN_ACCOUNTS
+TAP_LINKEDIN_CLIENT_ID
+TAP_LINKEDIN_USER_AGENT
+TAP_LINKEDIN_LINKEDIN_VERSION='202207'
+TAP_LINKEDIN_CONTENT_TYPE
+TAP_LINKEDIN_START_DATE={YYYY-MM-DD}
+TAP_LINKEDIN_OWNER={Owner ID}
+TAP_LINKEDIN_CAMPAIGN={Campaign ID}
+TAP_LINKEDIN_START_DATE_MONTH={M}
+TAP_LINKEDIN_START_DATE_DAY={D}
+TAP_LINKEDIN_START_DATE_YEAR={YYYY}
+TAP_LINKEDIN_END_DATE_MONTH={M}
+TAP_LINKEDIN_END_DATE_DAY={D}
+TAP_LINKEDIN_END_DATE_YEAR={YYYY}
+TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION = '1.0.0'
