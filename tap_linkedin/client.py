@@ -55,24 +55,24 @@ class LinkedInStream(RESTStream):
         
         return headers
 
-        def get_next_page_token(
-            self, response: requests.Response, previous_token: Optional[Any]
-        ) -> Optional[Any]:
-            """Return a token for identifying next page or None if no more pages."""
-            # If pagination is required, return a token which can be used to get the
-            #       next page. If this is the final page, return "None" to end the
-            #       pagination loop.
+    def get_next_page_token(
+        self, response: requests.Response, previous_token: Optional[Any]
+    ) -> Optional[Any]:
+        """Return a token for identifying next page or None if no more pages."""
+        # If pagination is required, return a token which can be used to get the
+        #       next page. If this is the final page, return "None" to end the
+        #       pagination loop.
 
-            resp_json = response.json()
-            if (previous_token == None):
-                previous_token = 1
+        resp_json = response.json()
+        if (previous_token == None):
+            previous_token = 1
 
-            if (resp_json.get("elements"))== []:
-                next_page_token = None
-            else:
-                next_page_token = previous_token + 1
+        if (resp_json.get("elements"))== []:
+            next_page_token = None
+        else:
+            next_page_token = previous_token + 1
 
-            return next_page_token
+        return next_page_token
 
     def get_url_params(
         self,
@@ -95,34 +95,35 @@ class LinkedInStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        
+
         path = str(self.path)
 
-        #params["start"] = "1"
-        #params["count"] = "10"
 
-
+        # TODO: Dynamically add the params
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
             params["account"] = "urn:li:sponsoredAccount:510799602"
             params["owner"] = "urn:li:organization:40706439"
 
+        # TODO: Dynamically add the params
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
             params["sort.field"] = "ID"
             params["sort.order"] = "ASCENDING"
 
+        # TODO: Dynamically add the params
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
             params["accounts"] = "urn:li:sponsoredAccount:510799602"
 
-
+        # TODO: Add method to prevent encoding of params["campaigns"]
+        #       and pass the URN as a list without encoding
         elif str(self.path) == "creatives":
             params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
             params["q"] = "criteria"
 
-
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign_history":
+        # TODO: Dynamically add the params
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
@@ -134,7 +135,9 @@ class LinkedInStream(RESTStream):
             params["dateRange.end.year"] = "2023"
             params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
 
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative_history":
+        # TODO: Dynamically add the date params
+
+        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
             params["q"] = "analytics"
             params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"
