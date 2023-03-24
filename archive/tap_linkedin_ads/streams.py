@@ -695,36 +695,6 @@ class AdAnalyticsByCampaign(LinkedInAds):
         "count": 10000
     }
 
-    def get_url_params(
-        self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params = super().get_url_params(context, next_page_token)
-
-        params["q"] = "analytics"
-        params["pivot"] = "CAMPAIGN"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = self.config["StartDateDay"]
-        params["dateRange.start.month"] = self.config["StartDateMonth"]
-        params["dateRange.start.year"] = self.config["StartDateYear"]
-        params["dateRange.end.day"] = self.config["EndDateDay"]
-        params["dateRange.end.month"] = self.config["EndDateMonth"]
-        params["dateRange.end.year"] = self.config["EndDateYear"]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["LinkedInCampaign"]
-
-        return params
-
-
 class AdAnalyticsByCreative(LinkedInAds):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
