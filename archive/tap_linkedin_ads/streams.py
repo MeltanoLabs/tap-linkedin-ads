@@ -674,7 +674,6 @@ class Creatives(LinkedInAds):
     headers = {'X-Restli-Protocol-Version': "2.0.0",
                "X-RestLi-Method": "FINDER"}
 
-
 class AdAnalyticsByCampaign(LinkedInAds):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
