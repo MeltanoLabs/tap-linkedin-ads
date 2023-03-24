@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
@@ -36,6 +38,13 @@ class TapLinkedIn(Tap):
             description="The earliest record date to sync",
         ),
         th.Property(
+            "end_date",
+            th.DateTimeType,
+            required=False,
+            default=datetime.datetime.utcnow(),
+            description="The latest record date to sync",
+        ),
+        th.Property(
             "client_secret",
             th.StringType,
             required=True,
@@ -48,15 +57,15 @@ class TapLinkedIn(Tap):
             description="API ID",
         ),
         th.Property(
-            "LinkedIn-Version",
+            "linkedin_version",
             th.StringType,
-            default="202207",
+            default="202207",  # TODO: remove test default
             description="LinkedIn API Version",
         ),
         th.Property(
             "accounts",
             th.StringType,
-            default="510799602",
+            default="510799602",  # TODO: remove test default
             description="LinkedIn Account ID",
         )
     ).to_dict()
