@@ -31,51 +31,51 @@ plugins:
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - accounts
+    - accounts
   - name: Linkedin-AdAccountsUsers
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - account_users
+    - account_user
   - name: Linkedin-Creatives
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '2.0.0'
+      x-restli-protocol-version: 2.0.0
     select:
-      - creatives
+    - creatives
   - name: Linkedin-Campaigns
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaigns
+    - campaign
   - name: Linkedin-CampaignGroups
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaign_groups
+    - campaign_groups
   - name: Linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_creative
+    - ad_analytics_by_creative
   - name: Linkedin-AdAnalyticsByCampaign
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_campaign
+    - ad_analytics_by_campaign
   - name: Linkedin-VideoAds
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - video_ads
+    - video_ads
   loaders:
   - name: target-jsonl
     variant: andyh1203
@@ -96,5 +96,8 @@ environments:
     plugins:
       loaders:
       - name: target-csv
+      - name: target-snowflake
+        config:
+          primary_key_required: false
 - name: staging
 - name: prod

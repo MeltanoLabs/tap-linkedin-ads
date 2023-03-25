@@ -179,7 +179,7 @@ class AdAnalyticsByCreative(LinkedInStream):
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
     name = "ad_analytics_by_creative"
-    replication_method = "INCREMENTAL"
+    #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
     account_filter = "accounts_param"
