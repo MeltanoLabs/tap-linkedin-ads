@@ -5,6 +5,7 @@ from __future__ import annotations
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
+# TODO: Import your custom stream types here:
 from tap_linkedin.streams import (LinkedInStream)
 import tap_linkedin.streams as streams
 
@@ -69,14 +70,14 @@ class TapLinkedIn(Tap):
         """
 
         return [
-            streams.Accounts(self),
-            streams.VideoAds(self),
-            streams.AccountUsers(self),
+            #streams.Accounts(self),
+            #streams.VideoAds(self),
+            #streams.AccountUsers(self),
             #streams.Creatives(self),
-            streams.Campaigns(self),
+            #streams.Campaigns(self),
             streams.CampaignGroups(self),
-            streams.AdAnalyticsByCreative(self),
-            streams.AdAnalyticsByCampaign(self)
+            #streams.AdAnalyticsByCreative(self),
+            #streams.AdAnalyticsByCampaign(self)
         ]
 
 

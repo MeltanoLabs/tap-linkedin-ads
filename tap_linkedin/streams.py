@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import singer_sdk
+
 from singer_sdk import typing as th  # JSON Schema typing helpers
+
+Property = th.Property
+
 
 from tap_linkedin.client import LinkedInStream
 
@@ -15,8 +20,7 @@ class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
-    # TODO : Adding Replication support
-    name = "accounts"
+    name = "account_history"
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
@@ -26,13 +30,15 @@ class Accounts(LinkedInStream):
     account_filter = "search_id_values_param"
     data_key = "elements"
     children = ["video_ads"]
+    params = {
+        "q": "search"
+    }
 
 class AdAnalyticsByCampaign(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    # TODO : Adding Replication support
-    name = "ad_analytics_by_campaign"
+    name = "ad_analytics_by_campaign_history"
     #replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
     replication_keys = ["end_at"]
@@ -42,6 +48,12 @@ class AdAnalyticsByCampaign(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
+    params = {
+        "q": "analytics",
+        "pivot": "CAMPAIGN",
+        "timeGranularity": "DAILY",
+        #"count": 10000
+    }
 
 class VideoAds(LinkedInStream):
     """
@@ -56,13 +68,15 @@ class VideoAds(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "accounts"
+    params = {
+        "q": "account"
+    }
 
 class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
-    # TODO : Adding Replication support
-    name = "account_users"
+    name = "account_user_history"
     #replication_keys = ["last_modified_time"]
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
@@ -70,27 +84,82 @@ class AccountUsers(LinkedInStream):
     schema_filepath = SCHEMAS_DIR / "account_users.json"
     path = "adAccountUsers"
     data_key = "elements"
+    params = {
+        "q": "accounts"
+    }
 
 class CampaignGroups(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
     """
-    # TODO : Adding Replication support
     name = "campaign_groups"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
-    schema_filepath = SCHEMAS_DIR / "campaign_groups.json"
+    #schema_filepath = SCHEMAS_DIR / "campaign_groups.json"
+
+    PropertiesList = th.PropertiesList
+    Property = th.Property
+    ObjectType = th.ObjectType
+    DateTimeType = th.DateTimeType
+    StringType = th.StringType
+    ArrayType = th.ArrayType
+    BooleanType = th.BooleanType
+    IntegerType = th.IntegerType
+
+    jsonschema = PropertiesList(
+        Property(
+            "runSchedule",
+            ObjectType(
+                Property("start", DateTimeType),
+                Property("end", DateTimeType)
+            )
+        ),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property("created", DateTimeType),
+                Property("last_modified", DateTimeType)
+            )
+        ),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
+        Property("name", StringType),
+        Property("servingStatuses", ArrayType(StringType)),
+        Property("backfilled", BooleanType),
+        Property("id", IntegerType),
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("status", StringType),
+
+        Property(
+            "total_budget",
+            ObjectType(
+                Property("currency_code", StringType),
+                Property("amount", StringType)
+            )
+        ),
+
+        Property("test", BooleanType),
+        Property("allowed_campaign_types", ArrayType(StringType))
+    ).to_dict()
+
+    schema = jsonschema
+
     account_filter = "search_account_values_param"
     path = "adCampaignGroups"
     data_key = "elements"
+    params = {
+        "q": "search",
+        "sort.field": "ID",
+        "sort.order": "ASCENDING"
+    }
 
 class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
-    # TODO : Adding Replication support
-    name = "campaigns"
+    name = "campaign_history"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
@@ -99,6 +168,11 @@ class Campaigns(LinkedInStream):
     schema_filepath = SCHEMAS_DIR / "campaigns.json"
     data_key = "elements"
     children = ["ad_analytics_by_campaign", "creatives", "ad_analytics_by_creative"]
+    params = {
+        "q": "search",
+        "sort.field": "ID",
+        "sort.order": "ASCENDING"
+    }
 
 class Creatives(LinkedInStream):
     """
@@ -113,6 +187,13 @@ class Creatives(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
+    # The value of the campaigns in the query params should be passed in the encoded format.
+    # Ref - https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#sample-request-3
+    params = {
+        "q": "criteria",
+        "campaigns": "List(urn%3Ali%3AsponsoredCampaign%3A{})",
+        "sortOrder": "ASCENDING"
+    }
 
 
 
@@ -120,9 +201,8 @@ class AdAnalyticsByCreative(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    # TODO : Adding Replication support
-    name = "ad_analytics_by_creative"
-    #replication_method = "INCREMENTAL"
+    name = "ad_analytics_by_creative_history"
+    replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
     account_filter = "accounts_param"
@@ -131,3 +211,9 @@ class AdAnalyticsByCreative(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
+    params = {
+        "q": "analytics",
+        "pivot": "CREATIVE",
+        "timeGranularity": "DAILY",
+        "count": 10000
+    }
