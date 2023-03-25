@@ -20,7 +20,7 @@ class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
-    name = "account_history"
+    name = "account"
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
@@ -30,15 +30,12 @@ class Accounts(LinkedInStream):
     account_filter = "search_id_values_param"
     data_key = "elements"
     children = ["video_ads"]
-    params = {
-        "q": "search"
-    }
 
 class AdAnalyticsByCampaign(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    name = "ad_analytics_by_campaign_history"
+    name = "ad_analytics_by_campaign"
     #replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
     replication_keys = ["end_at"]
@@ -48,12 +45,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
-    params = {
-        "q": "analytics",
-        "pivot": "CAMPAIGN",
-        "timeGranularity": "DAILY",
-        #"count": 10000
-    }
+
 
 class VideoAds(LinkedInStream):
     """
@@ -68,15 +60,13 @@ class VideoAds(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "accounts"
-    params = {
-        "q": "account"
-    }
+
 
 class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
-    name = "account_user_history"
+    name = "account_user"
     #replication_keys = ["last_modified_time"]
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
@@ -84,9 +74,7 @@ class AccountUsers(LinkedInStream):
     schema_filepath = SCHEMAS_DIR / "account_users.json"
     path = "adAccountUsers"
     data_key = "elements"
-    params = {
-        "q": "accounts"
-    }
+
 
 class CampaignGroups(LinkedInStream):
     """
@@ -159,7 +147,7 @@ class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
-    name = "campaign_history"
+    name = "campaign"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
@@ -168,11 +156,7 @@ class Campaigns(LinkedInStream):
     schema_filepath = SCHEMAS_DIR / "campaigns.json"
     data_key = "elements"
     children = ["ad_analytics_by_campaign", "creatives", "ad_analytics_by_creative"]
-    params = {
-        "q": "search",
-        "sort.field": "ID",
-        "sort.order": "ASCENDING"
-    }
+
 
 class Creatives(LinkedInStream):
     """
@@ -187,13 +171,6 @@ class Creatives(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
-    # The value of the campaigns in the query params should be passed in the encoded format.
-    # Ref - https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#sample-request-3
-    params = {
-        "q": "criteria",
-        "campaigns": "List(urn%3Ali%3AsponsoredCampaign%3A{})",
-        "sortOrder": "ASCENDING"
-    }
 
 
 
@@ -201,7 +178,7 @@ class AdAnalyticsByCreative(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
-    name = "ad_analytics_by_creative_history"
+    name = "ad_analytics_by_creative"
     replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
@@ -211,9 +188,3 @@ class AdAnalyticsByCreative(LinkedInStream):
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
-    params = {
-        "q": "analytics",
-        "pivot": "CREATIVE",
-        "timeGranularity": "DAILY",
-        "count": 10000
-    }
