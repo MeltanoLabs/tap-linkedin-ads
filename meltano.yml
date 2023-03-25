@@ -57,7 +57,7 @@ plugins:
     config:
       x-restli-protocol-version: '1.0.0'
     select:
-      - campaign_group
+      - campaign_groups
   - name: Linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
     config:
