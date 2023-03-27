@@ -28,54 +28,54 @@ plugins:
       linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
       x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
       content-type: TAP_LINKEDIN_CONTENT_TYPE
-  - name: Linkedin-Accounts
+  - name: linkedin-accounts
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - accounts
-  - name: Linkedin-AdAccountsUsers
+    - accounts
+  - name: linkedin-AdAccountsUsers
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - account_users
-  - name: Linkedin-Creatives
+    - account_users
+  - name: linkedin-creatives
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '2.0.0'
+      x-restli-protocol-version: 2.0.0
     select:
-      - creatives
-  - name: Linkedin-Campaigns
+    - creatives
+  - name: linkedin-campaigns
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaigns
-  - name: Linkedin-CampaignGroups
+    - campaigns
+  - name: linkedin-CampaignGroups
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaign_group
-  - name: Linkedin-AdAnalyticsByCreative
+    - campaign_group
+  - name: linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_creative
-  - name: Linkedin-AdAnalyticsByCampaign
+    - ad_analytics_by_creative
+  - name: linkedin-AdAnalyticsByCampaign
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_campaign
-  - name: Linkedin-VideoAds
+    - ad_analytics_by_campaign
+  - name: linkedin-VideoAds
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - video_ads
+    - video_ads
   loaders:
   - name: target-jsonl
     variant: andyh1203
@@ -90,6 +90,18 @@ plugins:
     pip_url: pipelinewise-target-snowflake
     config:
       batch_size: 5
+
+  transformers:
+  - name: dbt-snowflake
+    variant: dbt-labs
+    pip_url: dbt-core~=1.3.0 dbt-snowflake~=1.3.0
+    config:
+      account: EPA06486
+      user: RYAN_MIRANDA
+      role: RYAN_MIRANDA
+      warehouse: RYAN_MIRANDA
+      database: RYAN_MIRANDA_RAW
+      schema: PROD_MELTANO_LINKEDIN
 environments:
 - name: dev
   config:
