@@ -114,8 +114,8 @@ class LinkedInStream(RESTStream):
 
         if str(self.path) == "adDirectSponsoredContents":
             params["q"] = "account"
-            params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
-            params["owner"] = "urn:li:organization:" + LinkedInOwner
+            params["account"] = "urn:li:sponsoredAccount:" + self.config["LinkedInAccounts"]
+            params["owner"] = "urn:li:organization:" + self.config["LinkedInOwner"]
 
         elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
             params["q"] = "search"
@@ -124,7 +124,7 @@ class LinkedInStream(RESTStream):
 
         elif str(self.path) == "adAccountUsers":
             params["q"] = "accounts"
-            params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+            params["accounts"] = "urn:li:sponsoredAccount:" + self.config["LinkedInAccounts"]
 
         # TODO: Add method to prevent encoding of params["campaigns"]
         #       and pass the URN as a list without encoding
@@ -136,26 +136,26 @@ class LinkedInStream(RESTStream):
             params["q"] = "analytics"
             params["pivot"] = "CAMPAIGN"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = StartDateDay
-            params["dateRange.start.month"] = StartDateMonth
-            params["dateRange.start.year"] = StartDateYear
-            params["dateRange.end.day"] = EndDateDay
-            params["dateRange.end.month"] = EndDateMonth
-            params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+            params["dateRange.start.day"] = self.config["StartDateDay"]
+            params["dateRange.start.month"] = self.config["StartDateMonth"]
+            params["dateRange.start.year"] = self.config["StartDateYear"]
+            params["dateRange.end.day"] = self.config["EndDateDay"]
+            params["dateRange.end.month"] = self.config["EndDateMonth"]
+            params["dateRange.end.year"] = self.config["EndDateYear"]
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["LinkedInCampaign"]
 
 
         elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
             params["q"] = "analytics"
             params["pivot"] = "CREATIVE"
             params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = StartDateDay
-            params["dateRange.start.month"] = StartDateMonth
-            params["dateRange.start.year"] = StartDateYear
-            params["dateRange.end.day"] = EndDateDay
-            params["dateRange.end.month"] = EndDateMonth
-            params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+            params["dateRange.start.day"] = self.config["StartDateDay"]
+            params["dateRange.start.month"] = self.config["StartDateMonth"]
+            params["dateRange.start.year"] = self.config["StartDateYear"]
+            params["dateRange.end.day"] = self.config["EndDateDay"]
+            params["dateRange.end.month"] = self.config["EndDateMonth"]
+            params["dateRange.end.year"] = self.config["EndDateYear"]
+            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["LinkedInCampaign"]
 
 
 
