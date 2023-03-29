@@ -20,6 +20,20 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
+LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
+LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
+StartDateMonth = os.getenv("TAP_LINKEDIN_START_DATE_MONTH")
+StartDateDay = os.getenv("TAP_LINKEDIN_START_DATE_DAY")
+StartDateYear = os.getenv("TAP_LINKEDIN_START_DATE_YEAR")
+EndDateMonth = os.getenv("TAP_LINKEDIN_END_DATE_MONTH")
+EndDateDay = os.getenv("TAP_LINKEDIN_END_DATE_DAY")
+EndDateYear = os.getenv("TAP_LINKEDIN_END_DATE_YEAR")
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -123,6 +137,36 @@ class Accounts(LinkedInStream):
         )
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
 
 class AdAnalyticsByCampaign(LinkedInStream):
     """
@@ -302,6 +346,45 @@ class AdAnalyticsByCampaign(LinkedInStream):
     ).to_dict()
 
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = StartDateDay
+        params["dateRange.start.month"] = StartDateMonth
+        params["dateRange.start.year"] = StartDateYear
+        params["dateRange.end.day"] = EndDateDay
+        params["dateRange.end.month"] = EndDateMonth
+        params["dateRange.end.year"] = EndDateYear
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+
+
+        return params
+
+
 class VideoAds(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
@@ -347,6 +430,37 @@ class VideoAds(LinkedInStream):
         Property("type", StringType)
 
     ).to_dict()
+
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "account"
+        params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+        params["owner"] = "urn:li:organization:" + LinkedInOwner
+
+        return params
 
 
 class AccountUsers(LinkedInStream):
@@ -409,6 +523,35 @@ class AccountUsers(LinkedInStream):
         Property("user_person_id", StringType)
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "accounts"
+        params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+
+        return params
 
 
 class CampaignGroups(LinkedInStream):
@@ -488,6 +631,36 @@ class CampaignGroups(LinkedInStream):
         "sort.field": "ID",
         "sort.order": "ASCENDING"
     }
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
 
 class Campaigns(LinkedInStream):
     """
@@ -742,6 +915,36 @@ class Campaigns(LinkedInStream):
 
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
+
 
 class Creatives(LinkedInStream):
     """
@@ -794,6 +997,35 @@ class Creatives(LinkedInStream):
         )
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+        params["q"] = "criteria"
+
+        return params
 
 
 class AdAnalyticsByCreative(LinkedInStream):
@@ -973,3 +1205,44 @@ class AdAnalyticsByCreative(LinkedInStream):
         Property("viral_video_views", IntegerType)
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        path = str(self.path)
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = StartDateDay
+        params["dateRange.start.month"] = StartDateMonth
+        params["dateRange.start.year"] = StartDateYear
+        params["dateRange.end.day"] = EndDateDay
+        params["dateRange.end.month"] = EndDateMonth
+        params["dateRange.end.year"] = EndDateYear
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+
+
+
+
+
+
+        return params
