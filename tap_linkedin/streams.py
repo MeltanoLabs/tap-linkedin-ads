@@ -20,6 +20,30 @@ class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
+    columns = [
+        "CHANGE_AUDIT_STAMPS",
+        "CREATED_TIME",
+        "CURRENCY",
+        "ID",
+        "LAST_MODIFIED_TIME",
+        "NAME",
+        "NOTIFIED_ON_CAMPAIGN_OPTIMIZATION",
+        "NOTIFIED_ON_CREATIVE_APPROVAL",
+        "NOTIFIED_ON_CREATIVE_REJECTION",
+        "NOTIFIED_ON_END_OF_CAMPAIGN",
+        "NOTIFIED_ON_NEW_FEATURES_ENABLED",
+        "REFERENCE",
+        "REFERENCE_ORGANIZATION_ID",
+        "REFERENCE_PERSON_ID",
+        "SERVING_STATUSES",
+        "STATUS",
+        "TEST",
+        "TOTAL_BUDGET",
+        "TOTAL_BUDGET_ENDS_AT",
+        "TYPE",
+        "VERSION",
+    ]
+
     name = "account"
     path = "adAccounts"
     primary_keys = ["id"]
@@ -66,6 +90,18 @@ class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
+    columns = [
+        "ACCOUNT",
+        "ACCOUNT_ID",
+        "CAMPAIGN_CONTACT",
+        "CHANGE_AUDIT_STAMPS",
+        "CREATED_TIME",
+        "LAST_MODIFIED_TIME",
+        "ROLE",
+        "USER",
+        "USER_PERSON_ID",
+    ]
+
     name = "account_user"
     #replication_keys = ["last_modified_time"]
     #replication_method = "INCREMENTAL"
