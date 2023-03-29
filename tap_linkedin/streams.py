@@ -55,7 +55,6 @@ class Accounts(LinkedInStream):
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
-    #schema_filepath = SCHEMAS_DIR / "accounts.json"
     tap_stream_id = "accounts"
     #replication_method = "INCREMENTAL"
     account_filter = "search_id_values_param"
@@ -131,7 +130,6 @@ class AdAnalyticsByCampaign(LinkedInStream):
     """
     name = "ad_analytics_by_campaign"
     #replication_method = "INCREMENTAL"
-    #schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
     replication_keys = ["end_at"]
     key_properties = ["campaign_id", "start_at"]
     account_filter = "accounts_param"
@@ -313,7 +311,6 @@ class VideoAds(LinkedInStream):
     replication_keys = ["last_modified_time"]
     replication_method = "INCREMENTAL"
     key_properties = ["content_reference"]
-    #schema_filepath = SCHEMAS_DIR / "video_ads.json"
     foreign_key = "id"
     data_key = "elements"
     parent = "accounts"
@@ -373,7 +370,6 @@ class AccountUsers(LinkedInStream):
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
     account_filter = "accounts_param"
-    #schema_filepath = SCHEMAS_DIR / "account_users.json"
     path = "adAccountUsers"
     data_key = "elements"
 
@@ -423,7 +419,6 @@ class CampaignGroups(LinkedInStream):
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
-    #schema_filepath = SCHEMAS_DIR / "campaign_groups.json"
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -504,7 +499,6 @@ class Campaigns(LinkedInStream):
     key_properties = ["id"]
     account_filter = "search_account_values_param"
     path = "adCampaigns"
-    #schema_filepath = SCHEMAS_DIR / "campaigns.json"
     data_key = "elements"
     children = ["ad_analytics_by_campaign", "creatives", "ad_analytics_by_creative"]
 
@@ -758,7 +752,6 @@ class Creatives(LinkedInStream):
     replication_keys = ["last_modified_at"]
     key_properties = ["id"]
     path = "creatives"
-    #schema_filepath = SCHEMAS_DIR / "creatives.json"
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
@@ -812,7 +805,6 @@ class AdAnalyticsByCreative(LinkedInStream):
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
     account_filter = "accounts_param"
-    #schema_filepath = SCHEMAS_DIR / "ad_analytics_by_creative.json"
     path = "adAnalytics"
     foreign_key = "id"
     data_key = "elements"
