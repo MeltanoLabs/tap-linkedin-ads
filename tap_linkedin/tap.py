@@ -9,6 +9,7 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 from tap_linkedin.streams import (LinkedInStream)
 import tap_linkedin.streams as streams
 
+import datetime
 import os
 from dotenv import load_dotenv
 
@@ -42,6 +43,13 @@ class TapLinkedIn(Tap):
             th.DateTimeType,
             required=True,
             description="The earliest record date to sync",
+        ),
+        th.Property(
+            "end_date",
+            th.DateTimeType,
+            required=False,
+            default=str(datetime.datetime.utcnow()),
+            description="The latest record date to sync",
         ),
         th.Property(
             "client_secret",
