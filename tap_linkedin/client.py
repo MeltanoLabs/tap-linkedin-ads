@@ -96,9 +96,7 @@ class LinkedInStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
         path = str(self.path)
-
 
         return params
 

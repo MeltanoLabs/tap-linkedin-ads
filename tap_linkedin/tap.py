@@ -9,6 +9,13 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 from tap_linkedin.streams import (LinkedInStream)
 import tap_linkedin.streams as streams
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
+LinkedInVersion = os.getenv("TAP_LINKEDIN_LINKEDIN_VERSION")
+
 STREAM_TYPES = [LinkedInStream]
 
 class TapLinkedIn(Tap):
@@ -51,13 +58,13 @@ class TapLinkedIn(Tap):
         th.Property(
             "LinkedIn-Version",
             th.StringType,
-            default="202207",
+            default=LinkedInVersion,
             description="LinkedIn API Version",
         ),
         th.Property(
             "accounts",
             th.StringType,
-            default="510799602",
+            default=LinkedInAccounts,
             description="LinkedIn Account ID",
         )
     ).to_dict()
