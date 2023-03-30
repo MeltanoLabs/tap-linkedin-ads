@@ -20,6 +20,20 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
+LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
+LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
+StartDateMonth = os.getenv("TAP_LINKEDIN_START_DATE_MONTH")
+StartDateDay = os.getenv("TAP_LINKEDIN_START_DATE_DAY")
+StartDateYear = os.getenv("TAP_LINKEDIN_START_DATE_YEAR")
+EndDateMonth = os.getenv("TAP_LINKEDIN_END_DATE_MONTH")
+EndDateDay = os.getenv("TAP_LINKEDIN_END_DATE_DAY")
+EndDateYear = os.getenv("TAP_LINKEDIN_END_DATE_YEAR")
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -55,7 +69,6 @@ class Accounts(LinkedInStream):
     path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
-    #schema_filepath = SCHEMAS_DIR / "accounts.json"
     tap_stream_id = "accounts"
     #replication_method = "INCREMENTAL"
     account_filter = "search_id_values_param"
@@ -125,13 +138,42 @@ class Accounts(LinkedInStream):
 
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
+
 class AdAnalyticsByCampaign(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
     name = "ad_analytics_by_campaign"
     #replication_method = "INCREMENTAL"
-    #schema_filepath = SCHEMAS_DIR / "ad_analytics_by_campaign.json"
     replication_keys = ["end_at"]
     key_properties = ["campaign_id", "start_at"]
     account_filter = "accounts_param"
@@ -304,6 +346,45 @@ class AdAnalyticsByCampaign(LinkedInStream):
     ).to_dict()
 
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = StartDateDay
+        params["dateRange.start.month"] = StartDateMonth
+        params["dateRange.start.year"] = StartDateYear
+        params["dateRange.end.day"] = EndDateDay
+        params["dateRange.end.month"] = EndDateMonth
+        params["dateRange.end.year"] = EndDateYear
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+
+
+        return params
+
+
 class VideoAds(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
@@ -313,7 +394,6 @@ class VideoAds(LinkedInStream):
     replication_keys = ["last_modified_time"]
     replication_method = "INCREMENTAL"
     key_properties = ["content_reference"]
-    #schema_filepath = SCHEMAS_DIR / "video_ads.json"
     foreign_key = "id"
     data_key = "elements"
     parent = "accounts"
@@ -352,6 +432,37 @@ class VideoAds(LinkedInStream):
     ).to_dict()
 
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "account"
+        params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+        params["owner"] = "urn:li:organization:" + LinkedInOwner
+
+        return params
+
+
 class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
@@ -373,7 +484,6 @@ class AccountUsers(LinkedInStream):
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
     account_filter = "accounts_param"
-    #schema_filepath = SCHEMAS_DIR / "account_users.json"
     path = "adAccountUsers"
     data_key = "elements"
 
@@ -414,6 +524,35 @@ class AccountUsers(LinkedInStream):
 
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "accounts"
+        params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+
+        return params
+
 
 class CampaignGroups(LinkedInStream):
     """
@@ -423,7 +562,6 @@ class CampaignGroups(LinkedInStream):
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
-    #schema_filepath = SCHEMAS_DIR / "campaign_groups.json"
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -494,6 +632,36 @@ class CampaignGroups(LinkedInStream):
         "sort.order": "ASCENDING"
     }
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
+
 class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
@@ -504,7 +672,6 @@ class Campaigns(LinkedInStream):
     key_properties = ["id"]
     account_filter = "search_account_values_param"
     path = "adCampaigns"
-    #schema_filepath = SCHEMAS_DIR / "campaigns.json"
     data_key = "elements"
     children = ["ad_analytics_by_campaign", "creatives", "ad_analytics_by_creative"]
 
@@ -748,6 +915,36 @@ class Campaigns(LinkedInStream):
 
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["q"] = "search"
+        params["sort.field"] = "ID"
+        params["sort.order"] = "ASCENDING"
+
+        return params
+
 
 class Creatives(LinkedInStream):
     """
@@ -758,7 +955,6 @@ class Creatives(LinkedInStream):
     replication_keys = ["last_modified_at"]
     key_properties = ["id"]
     path = "creatives"
-    #schema_filepath = SCHEMAS_DIR / "creatives.json"
     foreign_key = "id"
     data_key = "elements"
     parent = "campaigns"
@@ -802,6 +998,35 @@ class Creatives(LinkedInStream):
 
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        path = str(self.path)
+
+        params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+        params["q"] = "criteria"
+
+        return params
+
 
 class AdAnalyticsByCreative(LinkedInStream):
     """
@@ -812,7 +1037,6 @@ class AdAnalyticsByCreative(LinkedInStream):
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
     account_filter = "accounts_param"
-    #schema_filepath = SCHEMAS_DIR / "ad_analytics_by_creative.json"
     path = "adAnalytics"
     foreign_key = "id"
     data_key = "elements"
@@ -981,3 +1205,44 @@ class AdAnalyticsByCreative(LinkedInStream):
         Property("viral_video_views", IntegerType)
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        path = str(self.path)
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = StartDateDay
+        params["dateRange.start.month"] = StartDateMonth
+        params["dateRange.start.year"] = StartDateYear
+        params["dateRange.end.day"] = EndDateDay
+        params["dateRange.end.month"] = EndDateMonth
+        params["dateRange.end.year"] = EndDateYear
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+
+
+
+
+
+
+        return params

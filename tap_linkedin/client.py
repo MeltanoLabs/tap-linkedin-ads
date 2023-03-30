@@ -9,19 +9,7 @@ import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-import os
-from dotenv import load_dotenv
 
-load_dotenv(".env")
-LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
-LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
-LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
-StartDateMonth = os.getenv("TAP_LINKEDIN_START_DATE_MONTH")
-StartDateDay = os.getenv("TAP_LINKEDIN_START_DATE_DAY")
-StartDateYear = os.getenv("TAP_LINKEDIN_START_DATE_YEAR")
-EndDateMonth = os.getenv("TAP_LINKEDIN_END_DATE_MONTH")
-EndDateDay = os.getenv("TAP_LINKEDIN_END_DATE_DAY")
-EndDateYear = os.getenv("TAP_LINKEDIN_END_DATE_YEAR")
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -108,56 +96,7 @@ class LinkedInStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
         path = str(self.path)
-
-
-        if str(self.path) == "adDirectSponsoredContents":
-            params["q"] = "account"
-            params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
-            params["owner"] = "urn:li:organization:" + LinkedInOwner
-
-        elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
-            params["q"] = "search"
-            params["sort.field"] = "ID"
-            params["sort.order"] = "ASCENDING"
-
-        elif str(self.path) == "adAccountUsers":
-            params["q"] = "accounts"
-            params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
-
-        # TODO: Add method to prevent encoding of params["campaigns"]
-        #       and pass the URN as a list without encoding
-        elif str(self.path) == "creatives":
-            params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
-            params["q"] = "criteria"
-
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
-            params["q"] = "analytics"
-            params["pivot"] = "CAMPAIGN"
-            params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = StartDateDay
-            params["dateRange.start.month"] = StartDateMonth
-            params["dateRange.start.year"] = StartDateYear
-            params["dateRange.end.day"] = EndDateDay
-            params["dateRange.end.month"] = EndDateMonth
-            params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
-
-
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
-            params["q"] = "analytics"
-            params["pivot"] = "CREATIVE"
-            params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = StartDateDay
-            params["dateRange.start.month"] = StartDateMonth
-            params["dateRange.start.year"] = StartDateYear
-            params["dateRange.end.day"] = EndDateDay
-            params["dateRange.end.month"] = EndDateMonth
-            params["dateRange.end.year"] = EndDateYear
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
-
-
 
         return params
 
