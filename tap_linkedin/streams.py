@@ -20,19 +20,15 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
-import os
+import os, pendulum
 from dotenv import load_dotenv
 
 load_dotenv(".env")
 LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
 LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
 LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
-StartDateMonth = os.getenv("TAP_LINKEDIN_START_DATE_MONTH")
-StartDateDay = os.getenv("TAP_LINKEDIN_START_DATE_DAY")
-StartDateYear = os.getenv("TAP_LINKEDIN_START_DATE_YEAR")
-EndDateMonth = os.getenv("TAP_LINKEDIN_END_DATE_MONTH")
-EndDateDay = os.getenv("TAP_LINKEDIN_END_DATE_DAY")
-EndDateYear = os.getenv("TAP_LINKEDIN_END_DATE_YEAR")
+start_date = pendulum.parse(os.getenv("TAP_LINKEDIN_START_DATE"))
+end_date = pendulum.parse(os.getenv("TAP_LINKEDIN_END_DATE"))
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -41,6 +37,19 @@ class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     columns = [
         "CHANGE_AUDIT_STAMPS",
         "CREATED_TIME",
@@ -172,6 +181,19 @@ class AdAnalyticsByCampaign(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "ad_analytics_by_campaign"
     #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
@@ -373,12 +395,12 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
         params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = StartDateDay
-        params["dateRange.start.month"] = StartDateMonth
-        params["dateRange.start.year"] = StartDateYear
-        params["dateRange.end.day"] = EndDateDay
-        params["dateRange.end.month"] = EndDateMonth
-        params["dateRange.end.year"] = EndDateYear
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
 
 
@@ -389,6 +411,19 @@ class VideoAds(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "video_ads"
     path = "adDirectSponsoredContents"
     replication_keys = ["last_modified_time"]
@@ -467,6 +502,19 @@ class AccountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     columns = [
         "ACCOUNT",
         "ACCOUNT_ID",
@@ -558,6 +606,19 @@ class CampaignGroups(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "campaign_groups"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
@@ -666,6 +727,19 @@ class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "campaign"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
@@ -950,6 +1024,19 @@ class Creatives(LinkedInStream):
     """
     https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "creatives"
     replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_at"]
@@ -1032,6 +1119,19 @@ class AdAnalyticsByCreative(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    primary_keys = primary keys for the table
+    replication_keys = datetime keys for replication
+    data_key = data element
+    account_filter = to filter response
+    """
+
     name = "ad_analytics_by_creative"
     #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
@@ -1232,17 +1332,12 @@ class AdAnalyticsByCreative(LinkedInStream):
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
         params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = StartDateDay
-        params["dateRange.start.month"] = StartDateMonth
-        params["dateRange.start.year"] = StartDateYear
-        params["dateRange.end.day"] = EndDateDay
-        params["dateRange.end.month"] = EndDateMonth
-        params["dateRange.end.year"] = EndDateYear
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
-
-
-
-
-
 
         return params
