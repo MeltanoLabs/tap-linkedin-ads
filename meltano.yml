@@ -12,22 +12,26 @@ plugins:
     - catalog
     - discover
     settings:
-    - name: username
+    - name: access_token
+      kind: password
     - name: password
       kind: password
     - name: start_date
       value: '2010-01-01T00:00:00Z'
+      kind: date_iso8601
+    - name: end_date
+      value: '2010-04-01T00:00:00Z'
+      kind: date_iso8601
     config:
-      start_date: TAP_LINKEDIN_START_DATE
-      client_secret: TAP_LINKEDIN_CLIENT_SECRET
-      access_token: TAP_LINKEDIN_ACCESS_TOKEN
-      refresh_token: TAP_LINKEDIN_REFRESH_TOKEN
-      accounts: TAP_LINKEDIN_ACCOUNTS
-      client_id: TAP_LINKEDIN_CLIENT_ID
-      user_agent: TAP_LINKEDIN_USER_AGENT
-      linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
-      x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
-      content-type: TAP_LINKEDIN_CONTENT_TYPE
+      client_secret: $TAP_LINKEDIN_CLIENT_SECRET
+      access_token: $TAP_LINKEDIN_ACCESS_TOKEN
+      refresh_token: $TAP_LINKEDIN_REFRESH_TOKEN
+      accounts: $TAP_LINKEDIN_ACCOUNTS
+      client_id: $TAP_LINKEDIN_CLIENT_ID
+      user_agent: $TAP_LINKEDIN_USER_AGENT
+      linkedin_version: '202207'
+      x-restli-protocol-version: '1.0.0'
+      content-type: 'text/plain'
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin
     config:
