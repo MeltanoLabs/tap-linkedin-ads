@@ -1106,7 +1106,7 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
+        # TODO remove unused 'path' variable
         path = str(self.path)
 
         params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
