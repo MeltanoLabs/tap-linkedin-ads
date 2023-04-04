@@ -22,13 +22,9 @@ from tap_linkedin.client import LinkedInStream
 
 import os, pendulum
 from dotenv import load_dotenv
+import json
 
 load_dotenv(".env")
-LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
-LinkedInOwner = os.getenv("TAP_LINKEDIN_OWNER")
-LinkedInCampaign = os.getenv("TAP_LINKEDIN_CAMPAIGN")
-start_date = pendulum.parse(os.getenv("TAP_LINKEDIN_START_DATE"))
-end_date = pendulum.parse(os.getenv("TAP_LINKEDIN_END_DATE"))
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -167,9 +163,6 @@ class Accounts(LinkedInStream):
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
-
-
-        path = str(self.path)
 
         params["q"] = "search"
         params["sort.field"] = "ID"
@@ -389,8 +382,9 @@ class AdAnalyticsByCampaign(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
-        path = str(self.path)
+        LinkedInCampaign = self.config.get("campaign")
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
 
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
@@ -488,8 +482,8 @@ class VideoAds(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
-        path = str(self.path)
+        LinkedInAccounts = self.config.get("account_id")
+        LinkedInOwner = self.config.get("owner")
 
         params["q"] = "account"
         params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
@@ -593,8 +587,7 @@ class AccountUsers(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
-        path = str(self.path)
+        LinkedInAccounts = self.config.get("account_id")
 
         params["q"] = "accounts"
         params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
@@ -713,9 +706,6 @@ class CampaignGroups(LinkedInStream):
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
-
-
-        path = str(self.path)
 
         params["q"] = "search"
         params["sort.field"] = "ID"
@@ -1010,9 +1000,6 @@ class Campaigns(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
-        path = str(self.path)
-
         params["q"] = "search"
         params["sort.field"] = "ID"
         params["sort.order"] = "ASCENDING"
@@ -1106,8 +1093,7 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        # TODO remove unused 'path' variable
-        path = str(self.path)
+        LinkedInCampaign = self.config.get("campaign")
 
         params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
         params["q"] = "criteria"
@@ -1327,7 +1313,9 @@ class AdAnalyticsByCreative(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        path = str(self.path)
+        LinkedInCampaign = self.config.get("campaign")
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
 
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
