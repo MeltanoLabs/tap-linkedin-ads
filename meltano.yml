@@ -13,6 +13,10 @@ plugins:
     - discover
     settings:
     - name: access_token
+      value: ${TAP_LINKEDIN_ACCESS_TOKEN}
+      kind: password
+    - name: refresh_token
+      value: ${TAP_LINKEDIN_REFRESH_TOKEN}
       kind: password
     - name: password
       kind: password
@@ -22,14 +26,18 @@ plugins:
     - name: end_date
       value: '2010-04-01T00:00:00Z'
       kind: date_iso8601
+    - name: client_secret
+      value: ${TAP_LINKEDIN_CLIENT_SECRET}
+      kind: password
+    - name: accounts
+      value: ${TAP_LINKEDIN_ACCOUNTS}
+    - name: client_id
+      value: ${TAP_LINKEDIN_CLIENT_ID}
+    - name: user_agent
+      value: ${TAP_LINKEDIN_USER_AGENT}
+    - name: linkedin_version
+      value: '202207'
     config:
-      client_secret: $TAP_LINKEDIN_CLIENT_SECRET
-      access_token: $TAP_LINKEDIN_ACCESS_TOKEN
-      refresh_token: $TAP_LINKEDIN_REFRESH_TOKEN
-      accounts: $TAP_LINKEDIN_ACCOUNTS
-      client_id: $TAP_LINKEDIN_CLIENT_ID
-      user_agent: $TAP_LINKEDIN_USER_AGENT
-      linkedin_version: '202207'
       x-restli-protocol-version: '1.0.0'
       content-type: 'text/plain'
   - name: Linkedin-Accounts
