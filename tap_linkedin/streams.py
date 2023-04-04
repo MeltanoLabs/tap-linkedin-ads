@@ -21,10 +21,7 @@ IntegerType = th.IntegerType
 from tap_linkedin.client import LinkedInStream
 
 import os, pendulum
-from dotenv import load_dotenv
 import json
-
-load_dotenv(".env")
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
