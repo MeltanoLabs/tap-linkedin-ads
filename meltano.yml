@@ -29,14 +29,14 @@ plugins:
     - name: client_secret
       value: ${TAP_LINKEDIN_CLIENT_SECRET}
       kind: password
-    - name: accounts
+    - name: account_id
       value: ${TAP_LINKEDIN_ACCOUNTS}
     - name: client_id
       value: ${TAP_LINKEDIN_CLIENT_ID}
     - name: user_agent
       value: ${TAP_LINKEDIN_USER_AGENT}
     - name: linkedin_version
-      value: '202207'
+      value: ${TAP_LINKEDIN_LINKEDIN_VERSION}
     - name: campaign
       value: ${TAP_LINKEDIN_CAMPAIGN}
     - name: owner
