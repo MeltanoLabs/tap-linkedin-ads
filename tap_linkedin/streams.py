@@ -20,8 +20,7 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
-import os, pendulum
-import json
+import pendulum, json
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -39,8 +38,6 @@ class Accounts(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     columns = [
@@ -73,9 +70,6 @@ class Accounts(LinkedInStream):
     replication_keys = ["last_modified_time"]
     tap_stream_id = "accounts"
     #replication_method = "INCREMENTAL"
-    account_filter = "search_id_values_param"
-    data_key = "elements"
-    children = ["video_ads"]
 
     schema = PropertiesList(
 
@@ -180,19 +174,13 @@ class AdAnalyticsByCampaign(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "ad_analytics_by_campaign"
     #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["campaign_id", "start_at"]
-    account_filter = "accounts_param"
     path = "adAnalytics"
-    foreign_key = "id"
-    data_key = "elements"
-    parent = "campaigns"
 
     schema = PropertiesList(
 
@@ -411,8 +399,6 @@ class VideoAds(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "video_ads"
@@ -420,9 +406,6 @@ class VideoAds(LinkedInStream):
     replication_keys = ["last_modified_time"]
     replication_method = "INCREMENTAL"
     key_properties = ["content_reference"]
-    foreign_key = "id"
-    data_key = "elements"
-    parent = "accounts"
 
     schema = PropertiesList(
 
@@ -502,8 +485,6 @@ class AccountUsers(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     columns = [
@@ -522,9 +503,7 @@ class AccountUsers(LinkedInStream):
     #replication_keys = ["last_modified_time"]
     #replication_method = "INCREMENTAL"
     key_properties = ["account_id", "user_person_id"]
-    account_filter = "accounts_param"
     path = "adAccountUsers"
-    data_key = "elements"
 
     schema = PropertiesList(
 
@@ -605,8 +584,6 @@ class CampaignGroups(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "campaign_groups"
@@ -674,14 +651,7 @@ class CampaignGroups(LinkedInStream):
 
     schema = jsonschema
 
-    account_filter = "search_account_values_param"
     path = "adCampaignGroups"
-    data_key = "elements"
-    params = {
-        "q": "search",
-        "sort.field": "ID",
-        "sort.order": "ASCENDING"
-    }
 
     def get_url_params(
         self,
@@ -723,18 +693,13 @@ class Campaigns(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "campaign"
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
-    account_filter = "search_account_values_param"
     path = "adCampaigns"
-    data_key = "elements"
-    children = ["ad_analytics_by_campaign", "creatives", "ad_analytics_by_creative"]
 
     schema = PropertiesList(
 
@@ -1017,8 +982,6 @@ class Creatives(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "creatives"
@@ -1026,9 +989,6 @@ class Creatives(LinkedInStream):
     replication_keys = ["last_modified_at"]
     key_properties = ["id"]
     path = "creatives"
-    foreign_key = "id"
-    data_key = "elements"
-    parent = "campaigns"
 
     schema = PropertiesList(
 
@@ -1111,19 +1071,13 @@ class AdAnalyticsByCreative(LinkedInStream):
     tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
-    data_key = data element
-    account_filter = to filter response
     """
 
     name = "ad_analytics_by_creative"
     #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
     key_properties = ["creative_id", "start_at"]
-    account_filter = "accounts_param"
     path = "adAnalytics"
-    foreign_key = "id"
-    data_key = "elements"
-    parent = "campaigns"
 
     schema = PropertiesList(
 
