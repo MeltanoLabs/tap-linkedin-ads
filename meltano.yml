@@ -20,12 +20,6 @@ plugins:
       kind: password
     - name: password
       kind: password
-    - name: start_date
-      value: '2010-01-01T00:00:00Z'
-      kind: date_iso8601
-    - name: end_date
-      value: '2010-04-01T00:00:00Z'
-      kind: date_iso8601
     - name: client_secret
       value: ${TAP_LINKEDIN_CLIENT_SECRET}
       kind: password
@@ -34,9 +28,9 @@ plugins:
     - name: client_id
       value: ${TAP_LINKEDIN_CLIENT_ID}
     - name: user_agent
-      value: ${TAP_LINKEDIN_USER_AGENT}
+      value: 'meltano'
     - name: linkedin_version
-      value: ${TAP_LINKEDIN_LINKEDIN_VERSION}
+      value: '202207'
     - name: campaign
       value: ${TAP_LINKEDIN_CAMPAIGN}
     - name: owner
@@ -44,6 +38,8 @@ plugins:
     config:
       x-restli-protocol-version: '1.0.0'
       content-type: 'text/plain'
+      start_date: '2022-01-01T00:00:00Z'
+      end_date: '2022-04-01T00:00:00Z'
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin
     config:
