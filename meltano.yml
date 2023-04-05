@@ -37,6 +37,10 @@ plugins:
       value: ${TAP_LINKEDIN_USER_AGENT}
     - name: linkedin_version
       value: '202207'
+    - name: campaign
+      value: ${TAP_LINKEDIN_CAMPAIGN}
+    - name: owner
+      value: ${TAP_LINKEDIN_OWNER}
     config:
       x-restli-protocol-version: '1.0.0'
       content-type: 'text/plain'
