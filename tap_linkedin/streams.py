@@ -20,7 +20,7 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
-import pendulum, json
+import pendulum
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -35,7 +35,6 @@ class Accounts(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -65,11 +64,10 @@ class Accounts(LinkedInStream):
     ]
 
     name = "account"
-    path = "adAccounts"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
-    tap_stream_id = "accounts"
     #replication_method = "INCREMENTAL"
+    path = "adAccounts"
 
     schema = PropertiesList(
 
@@ -171,7 +169,6 @@ class AdAnalyticsByCampaign(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -367,7 +364,6 @@ class AdAnalyticsByCampaign(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        LinkedInCampaign = self.config.get("campaign")
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
 
@@ -380,7 +376,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
 
         return params
@@ -396,16 +392,15 @@ class VideoAds(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
 
     name = "video_ads"
-    path = "adDirectSponsoredContents"
     replication_keys = ["last_modified_time"]
     replication_method = "INCREMENTAL"
     key_properties = ["content_reference"]
+    path = "adDirectSponsoredContents"
 
     schema = PropertiesList(
 
@@ -462,12 +457,9 @@ class VideoAds(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        LinkedInAccounts = self.config.get("account_id")
-        LinkedInOwner = self.config.get("owner")
-
         params["q"] = "account"
-        params["account"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
-        params["owner"] = "urn:li:organization:" + LinkedInOwner
+        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
+        params["owner"] = "urn:li:organization:" + self.config.get("owner")
 
         return params
 
@@ -482,7 +474,6 @@ class AccountUsers(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -563,10 +554,8 @@ class AccountUsers(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        LinkedInAccounts = self.config.get("account_id")
-
         params["q"] = "accounts"
-        params["accounts"] = "urn:li:sponsoredAccount:" + LinkedInAccounts
+        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
 
         return params
 
@@ -581,7 +570,6 @@ class CampaignGroups(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -590,6 +578,7 @@ class CampaignGroups(LinkedInStream):
     #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
     key_properties = ["id"]
+    path = "adCampaignGroups"
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -651,7 +640,6 @@ class CampaignGroups(LinkedInStream):
 
     schema = jsonschema
 
-    path = "adCampaignGroups"
 
     def get_url_params(
         self,
@@ -690,7 +678,6 @@ class Campaigns(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -979,7 +966,6 @@ class Creatives(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -1050,9 +1036,7 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        LinkedInCampaign = self.config.get("campaign")
-
-        params["campaigns"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+        params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
         params["q"] = "criteria"
 
         return params
@@ -1068,7 +1052,6 @@ class AdAnalyticsByCreative(LinkedInStream):
     name: stream name
     path: path which will be added to api url in client.py
     schema: instream schema
-    tap_stream_id = stream id
     primary_keys = primary keys for the table
     replication_keys = datetime keys for replication
     """
@@ -1264,7 +1247,6 @@ class AdAnalyticsByCreative(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        LinkedInCampaign = self.config.get("campaign")
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
 
@@ -1277,6 +1259,6 @@ class AdAnalyticsByCreative(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + LinkedInCampaign
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
         return params
