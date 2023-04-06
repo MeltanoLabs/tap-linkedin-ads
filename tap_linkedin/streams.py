@@ -66,7 +66,7 @@ class Accounts(LinkedInStream):
     name = "account"
     primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
-    #replication_method = "INCREMENTAL"
+    replication_method = "incremental"
     path = "adAccounts"
 
     schema = PropertiesList(
@@ -174,8 +174,8 @@ class AdAnalyticsByCampaign(LinkedInStream):
     """
 
     name = "ad_analytics_by_campaign"
-    #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
+    replication_method = "incremental"
     key_properties = ["campaign_id", "start_at"]
     path = "adAnalytics"
 
@@ -398,7 +398,7 @@ class VideoAds(LinkedInStream):
 
     name = "video_ads"
     replication_keys = ["last_modified_time"]
-    replication_method = "INCREMENTAL"
+    replication_method = "incremental"
     key_properties = ["content_reference"]
     path = "adDirectSponsoredContents"
 
@@ -491,8 +491,8 @@ class AccountUsers(LinkedInStream):
     ]
 
     name = "account_user"
-    #replication_keys = ["last_modified_time"]
-    #replication_method = "INCREMENTAL"
+    replication_keys = ["last_modified_time"]
+    replication_method = "incremental"
     key_properties = ["account_id", "user_person_id"]
     path = "adAccountUsers"
 
@@ -575,8 +575,8 @@ class CampaignGroups(LinkedInStream):
     """
 
     name = "campaign_groups"
-    #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
+    replication_method = "incremental"
     key_properties = ["id"]
     path = "adCampaignGroups"
 
@@ -683,8 +683,8 @@ class Campaigns(LinkedInStream):
     """
 
     name = "campaign"
-    #replication_method = "INCREMENTAL"
     replication_keys = ["last_modified_time"]
+    replication_method = "incremental"
     key_properties = ["id"]
     path = "adCampaigns"
 
@@ -971,8 +971,8 @@ class Creatives(LinkedInStream):
     """
 
     name = "creatives"
-    replication_method = "INCREMENTAL"
-    replication_keys = ["last_modified_at"]
+    replication_keys = ["last_modified_time"]
+    replication_method = "incremental"
     key_properties = ["id"]
     path = "creatives"
 
@@ -1057,8 +1057,8 @@ class AdAnalyticsByCreative(LinkedInStream):
     """
 
     name = "ad_analytics_by_creative"
-    #replication_method = "INCREMENTAL"
     replication_keys = ["end_at"]
+    replication_method = "incremental"
     key_properties = ["creative_id", "start_at"]
     path = "adAnalytics"
 

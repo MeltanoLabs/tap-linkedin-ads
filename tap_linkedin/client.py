@@ -10,6 +10,8 @@ from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 
+from datetime import datetime
+
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -66,9 +68,11 @@ class LinkedInStream(RESTStream):
 
         resp_json = response.json()
         if (previous_token == None):
-            previous_token = 1
+            previous_token = 0
 
-        if (resp_json.get("elements"))== []:
+        if len(resp_json.get("elements"))== 0:
+            next_page_token = None
+        elif len(resp_json.get("elements"))==previous_token:
             next_page_token = None
         else:
             next_page_token = previous_token + 1
@@ -108,7 +112,27 @@ class LinkedInStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        # TODO: Parse response body and return a set of records.
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+
+        resp_json = response.json()
+
+        if isinstance(resp_json, list):
+            results = resp_json
+        elif resp_json.get("elements") is not None:
+            results = resp_json["elements"]
+            try:
+                columns = results[0]
+                created_time = columns.get("changeAuditStamps").get("created").get("time")
+                last_modified_time = columns.get("changeAuditStamps").get("lastModified").get("time")
+                columns["created_time"] = datetime.fromtimestamp(int(created_time)/1000).isoformat()
+                columns["last_modified_time"] = datetime.fromtimestamp(int(last_modified_time)/1000).isoformat()
+                results = [columns]
+            except:
+                pass
+        else:
+            results = resp_json
+
+        yield from results
+
+
 
 
