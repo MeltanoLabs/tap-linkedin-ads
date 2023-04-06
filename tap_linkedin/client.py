@@ -112,7 +112,6 @@ class LinkedInStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        # TODO: Parse response body and return a set of records.
 
         resp_json = response.json()
 
