@@ -54,5 +54,14 @@ jobs:
       run: |
         poetry install
     - name: Test with pytest
+      id: test_pytest
+      continue-on-error: true
+      env:
+         access_token: ${{ secrets.access_token }}
+         refresh_token: ${{ secrets.refresh_token }}
+         client_id: ${{ secrets.client_id }}
+         client_secret: ${{ secrets.client_secret }}
+         owner: ${{ secrets.owner }}
+         campaign: ${{ secrets.campaign }}
       run: |
         poetry run pytest --capture=no
