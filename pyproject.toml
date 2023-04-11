@@ -13,12 +13,13 @@ license = "Apache 2.0"
 python = "<3.11,>=3.7.1"
 requests = "^2.25.1"
 singer-sdk = "^0.5.0"
+pendulum = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
 tox = "^3.24.4"
 flake8 = "^3.9.2"
-black = "^21.9b0"
+black = "^23.1.0"
 pydocstyle = "^6.1.1"
 mypy = "^0.910"
 types-requests = "^2.26.1"
@@ -35,4 +36,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # CLI declaration
-tap-linkedin = 'tap_linkedin.tap:Taplinkedin.cli'
+tap-linkedin = 'tap_linkedin.tap:TapLinkedIn.cli'

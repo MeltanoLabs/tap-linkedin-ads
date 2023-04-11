@@ -442,3 +442,45 @@ meltano elt edward-tap-linkedin-sdk target-jsonl
 
 See the [dev guide](https://sdk.meltano.com/en/latest/dev_guide.html) for more instructions on how to use the SDK to
 develop your own taps and targets.
+
+## Environmental Variables
+
+client.py uses several environmental variables for the Headers and Parameters for the LinkedIn streams. As such, the following environmental variables need to be set in .env:
+
+- [ ] `TAP_LINKEDIN_ACCOUNTS:` linkedin account id
+- [ ] `TAP_LINKEDIN_ACCESS_TOKEN:` linkedin access token
+- [ ] `TAP_LINKEDIN_REFRESH_TOKEN:` refresh token
+- [ ] `TAP_LINKEDIN_CLIENT_ID:` client id
+- [ ] `TAP_LINKEDIN_OWNER:` owner id
+- [ ] `TAP_LINKEDIN_CAMPAIGN:` campaign id
+- [ ] `TAP_LINKEDIN_CLIENT_SECRET:` client secret
+
+
+## Meltano Variables
+
+The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via `meltano config tap-linkedin set --interactive, or via the env var mappings shown above. The settings names are:
+- [ ] `account_id:` linkedin account id
+- [ ] `access_token:` linkedin access token
+- [ ] `refresh_token:` linkedin api refresh token
+- [ ] `client_id:` client id
+- [ ] `owner_id:` owner id
+- [ ] `campaign_id:` campaign id
+- [ ] `client_secret:` client secret
+- [ ] `user_agent:` user agent
+- [ ] `linkedin_version:` linkedin api version
+- [ ] `start_date:` start date
+- [ ] `end_date:` end_date
+
+
+## Replication keys
+
+These are the replication keys for linkedin streams:
+
+- [ ] `accounts:` last_modified_time
+- [ ] `account users:` last_modified_time
+- [ ] `video ads:` last_modified_time
+- [ ] `campaigns:` last_modified_time
+- [ ] `campaign groups:` last_modified_time
+- [ ] `ad analytics by campaigns:` end_at
+- [ ] `ad analytics by creatives:` end_at
+- [ ] `creative:` last_modified_time

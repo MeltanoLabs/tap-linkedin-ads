@@ -12,70 +12,81 @@ plugins:
     - catalog
     - discover
     settings:
-    - name: username
+    - name: access_token
+      value: ${TAP_LINKEDIN_ACCESS_TOKEN}
+      kind: password
+    - name: refresh_token
+      value: ${TAP_LINKEDIN_REFRESH_TOKEN}
+      kind: password
     - name: password
       kind: password
+    - name: client_secret
+      value: ${TAP_LINKEDIN_CLIENT_SECRET}
+      kind: password
+    - name: account_id
+      value: ${TAP_LINKEDIN_ACCOUNTS}
+    - name: client_id
+      value: ${TAP_LINKEDIN_CLIENT_ID}
+    - name: user_agent
+      value: 'meltano'
+    - name: linkedin_version
+      value: '202207'
+    - name: campaign
+      value: ${TAP_LINKEDIN_CAMPAIGN}
+    - name: owner
+      value: ${TAP_LINKEDIN_OWNER}
     - name: start_date
-      value: '2010-01-01T00:00:00Z'
-    config:
-      start_date: TAP_LINKEDIN_START_DATE
-      client_secret: TAP_LINKEDIN_CLIENT_SECRET
-      access_token: TAP_LINKEDIN_ACCESS_TOKEN
-      refresh_token: TAP_LINKEDIN_REFRESH_TOKEN
-      accounts: TAP_LINKEDIN_ACCOUNTS
-      client_id: TAP_LINKEDIN_CLIENT_ID
-      user_agent: TAP_LINKEDIN_USER_AGENT
-      linkedin_version: TAP_LINKEDIN_LINKEDIN_VERSION
-      x-restli-protocol-version: TAP_LINKEDIN_X_RESTLI_PROTOCOL_VERSION
-      content-type: TAP_LINKEDIN_CONTENT_TYPE
+      value: '2023-01-01T00:00:00Z'
+    - name: end_date
+      value: '2023-04-01T00:00:00Z'
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - accounts
+    - accounts
   - name: Linkedin-AdAccountsUsers
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - account_users
+    - account_user
   - name: Linkedin-Creatives
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '2.0.0'
+      x-restli-protocol-version: 2.0.0
     select:
-      - creatives
+    - creatives
   - name: Linkedin-Campaigns
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaigns
+    - campaign
   - name: Linkedin-CampaignGroups
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - campaign_group
+    - campaign_groups
   - name: Linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_creative
+    - ad_analytics_by_creative
   - name: Linkedin-AdAnalyticsByCampaign
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - ad_analytics_by_campaign
+    - ad_analytics_by_campaign
   - name: Linkedin-VideoAds
     inherit_from: tap-linkedin
     config:
-      x-restli-protocol-version: '1.0.0'
+      x-restli-protocol-version: 1.0.0
     select:
-      - video_ads
+    - video_ads
   loaders:
   - name: target-jsonl
     variant: andyh1203
@@ -96,5 +107,8 @@ environments:
     plugins:
       loaders:
       - name: target-csv
+      - name: target-snowflake
+        config:
+          primary_key_required: false
 - name: staging
 - name: prod

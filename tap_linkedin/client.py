@@ -10,6 +10,9 @@ from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 
+from datetime import datetime
+
+
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -65,9 +68,11 @@ class LinkedInStream(RESTStream):
 
         resp_json = response.json()
         if (previous_token == None):
-            previous_token = 1
+            previous_token = 0
 
-        if (resp_json.get("elements"))== []:
+        if len(resp_json.get("elements"))== 0:
+            next_page_token = None
+        elif len(resp_json.get("elements"))==previous_token:
             next_page_token = None
         else:
             next_page_token = previous_token + 1
@@ -95,62 +100,6 @@ class LinkedInStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-
-        path = str(self.path)
-
-
-        # TODO: Dynamically add the params
-        if str(self.path) == "adDirectSponsoredContents":
-            params["q"] = "account"
-            params["account"] = "urn:li:sponsoredAccount:510799602"
-            params["owner"] = "urn:li:organization:40706439"
-
-        # TODO: Dynamically add the params
-        elif str(self.path) == "adAccounts" or str(self.path) == "adCampaigns" or str(self.path) == "adCampaignGroups":
-            params["q"] = "search"
-            params["sort.field"] = "ID"
-            params["sort.order"] = "ASCENDING"
-
-        # TODO: Dynamically add the params
-        elif str(self.path) == "adAccountUsers":
-            params["q"] = "accounts"
-            params["accounts"] = "urn:li:sponsoredAccount:510799602"
-
-        # TODO: Add method to prevent encoding of params["campaigns"]
-        #       and pass the URN as a list without encoding
-        elif str(self.path) == "creatives":
-            params["campaigns"] = ["urn:li:sponsoredCampaign:211290954"]
-            params["q"] = "criteria"
-
-        # TODO: Dynamically add the params
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_campaign":
-            params["q"] = "analytics"
-            params["pivot"] = "CAMPAIGN"
-            params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = "24"
-            params["dateRange.start.month"] = "2"
-            params["dateRange.start.year"] = "2023"
-            params["dateRange.end.day"] = "10"
-            params["dateRange.end.month"] = "3"
-            params["dateRange.end.year"] = "2023"
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
-
-        # TODO: Dynamically add the date params
-
-        elif str(self.path) == "adAnalytics" and str(self.name) == "ad_analytics_by_creative":
-            params["q"] = "analytics"
-            params["pivot"] = "CREATIVE"
-            params["timeGranularity"] = "DAILY"
-            params["dateRange.start.day"] = "24"
-            params["dateRange.start.month"] = "2"
-            params["dateRange.start.year"] = "2023"
-            params["dateRange.end.day"] = "10"
-            params["dateRange.end.month"] = "3"
-            params["dateRange.end.year"] = "2023"
-            params["campaigns[0]"] = "urn:li:sponsoredCampaign:211290954"
-
-
-
         return params
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
@@ -163,18 +112,27 @@ class LinkedInStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        # TODO: Parse response body and return a set of records.
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        """As needed, append or transform raw data to match expected structure.
+        resp_json = response.json()
 
-        Args:
-            row: An individual record from the stream.
-            context: The stream context.
+        if isinstance(resp_json, list):
+            results = resp_json
+        elif resp_json.get("elements") is not None:
+            results = resp_json["elements"]
+            try:
+                columns = results[0]
+                created_time = columns.get("changeAuditStamps").get("created").get("time")
+                last_modified_time = columns.get("changeAuditStamps").get("lastModified").get("time")
+                columns["created_time"] = datetime.fromtimestamp(int(created_time)/1000).isoformat()
+                columns["last_modified_time"] = datetime.fromtimestamp(int(last_modified_time)/1000).isoformat()
+                results = [columns]
+            except:
+                pass
+        else:
+            results = resp_json
 
-        Returns:
-            The updated record dictionary, or ``None`` to skip the record.
-        """
-        # TODO: Delete this method if not needed.
-        return row
+        yield from results
+
+
+
+
