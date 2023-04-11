@@ -10,12 +10,6 @@ from tap_linkedin.streams import (LinkedInStream)
 import tap_linkedin.streams as streams
 
 import datetime
-import os
-from dotenv import load_dotenv
-
-load_dotenv(".env")
-LinkedInAccounts = os.getenv("TAP_LINKEDIN_ACCOUNTS")
-LinkedInVersion = os.getenv("TAP_LINKEDIN_LINKEDIN_VERSION")
 
 STREAM_TYPES = [LinkedInStream]
 
@@ -64,15 +58,14 @@ class TapLinkedIn(Tap):
             description="API ID",
         ),
         th.Property(
-            "LinkedIn-Version",
+            "api_version",
             th.StringType,
-            default=LinkedInVersion,
+            default="202207",
             description="LinkedIn API Version",
         ),
         th.Property(
             "accounts",
             th.StringType,
-            default=LinkedInAccounts,
             description="LinkedIn Account ID",
         )
     ).to_dict()

@@ -450,7 +450,7 @@ client.py uses several environmental variables for the Headers and Parameters fo
 - [ ] `TAP_LINKEDIN_ACCOUNTS:` linkedin account id
 - [ ] `TAP_LINKEDIN_ACCESS_TOKEN:` linkedin access token
 - [ ] `TAP_LINKEDIN_REFRESH_TOKEN:` refresh token
-- [ ] `TAP_LINKEDIN_CLIENT_ID:` clinet id
+- [ ] `TAP_LINKEDIN_CLIENT_ID:` client id
 - [ ] `TAP_LINKEDIN_OWNER:` owner id
 - [ ] `TAP_LINKEDIN_CAMPAIGN:` campaign id
 - [ ] `TAP_LINKEDIN_CLIENT_SECRET:` client secret
@@ -458,12 +458,11 @@ client.py uses several environmental variables for the Headers and Parameters fo
 
 ## Meltano Variables
 
-meltano.yml several environmental variables for the Headers and Parameters for the LinkedIn streams. As such, the following environmental variables need to be set in .env:
-
+The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via `meltano config tap-linkedin set --interactive, or via the env var mappings shown above. The settings names are:
 - [ ] `account_id:` linkedin account id
 - [ ] `access_token:` linkedin access token
 - [ ] `refresh_token:` linkedin api refresh token
-- [ ] `client_id:` clinet id
+- [ ] `client_id:` client id
 - [ ] `owner_id:` owner id
 - [ ] `campaign_id:` campaign id
 - [ ] `client_secret:` client secret
@@ -471,19 +470,17 @@ meltano.yml several environmental variables for the Headers and Parameters for t
 - [ ] `linkedin_version:` linkedin api version
 - [ ] `start_date:` start date
 - [ ] `end_date:` end_date
-- [ ] `content_type:` text/plain
-- [ ] `x-restli-protocol-version:` protocol version
 
 
 ## Replication keys
 
 These are the replication keys for linkedin streams:
 
-- [ ] `accounts:` last_mofified_time
-- [ ] `account users:` last_mofified_time
-- [ ] `video ads:` last_mofified_time
-- [ ] `campaigns:` last_mofified_time
-- [ ] `campaign groups:` last_mofified_time
+- [ ] `accounts:` last_modified_time
+- [ ] `account users:` last_modified_time
+- [ ] `video ads:` last_modified_time
+- [ ] `campaigns:` last_modified_time
+- [ ] `campaign groups:` last_modified_time
 - [ ] `ad analytics by campaigns:` end_at
 - [ ] `ad analytics by creatives:` end_at
-- [ ] `creative:` last_mofified_time
+- [ ] `creative:` last_modified_time
