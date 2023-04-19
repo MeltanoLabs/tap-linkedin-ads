@@ -64,7 +64,7 @@ class Accounts(LinkedInStream):
     ]
 
     name = "account"
-    primary_keys = ["id"]
+    key_properties = ["id"]
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     path = "adAccounts"
