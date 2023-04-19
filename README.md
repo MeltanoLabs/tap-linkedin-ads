@@ -15,16 +15,16 @@ Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Target
 
 ## Settings
 
-| Setting             | Required | Default | Description |
-|:--------------------|:--------:|:-------:|:------------|
-| access_token        | True     | None    | The token to authenticate against the API service |
-| start_date          | True     | None    | The earliest record date to sync |
-| user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | TODO        |
-| accounts            | False    | 510799602 | LinkedIn Account ID |
-| stream_maps         | False    | None    | Config object for stream maps capability. |
-| stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
-| flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
-| flattening_max_depth| False    | None    | The max depth to flatten schemas. |
+| Setting             | Required |                      Default                       | Description                                                                    |
+|:--------------------|:--------:|:--------------------------------------------------:|:-------------------------------------------------------------------------------|
+| access_token        |   True   |                        None                        | The token to authenticate against the API service.                             |
+| start_date          |   True   |                        None                        | The earliest record date to sync.                                              |
+| user_agent          |  False   | tap-linkedin-ads <api_user_email@your_company.com> | The user agent to send with requests.                                          |
+| accounts            |   True   |                        None                        | The LinkedIn Account ID.                                                       |
+| stream_maps         |  False   |                        None                        | Config object for stream maps capability.                                      |
+| stream_map_config   |  False   |                        None                        | User-defined config values to be used within map expressions.                  |
+| flattening_enabled  |  False   |                        None                        | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth|  False   |                        None                        | The max depth to flatten schemas.                                              |
 
 A full list of supported settings and capabilities is available by running: `tap-linkedin-sdk --about`
 
@@ -37,16 +37,8 @@ Developer TODO: Update the below as needed to correctly describe the install pro
 
 ## Installation
 
-Install from PyPi:
-
 ```bash
-pipx install edward-tap-linkedin-sdk
-```
-
-Install from GitHub:
-
-```bash
-pipx install git+https://github.com/ORG_NAME/edward-tap-linkedin-sdk.git@main
+pipx install git+https://github.com/ORG_NAME/tap-linkedin-sdk.git@main
 ```
 
 -->
@@ -364,12 +356,6 @@ This Singer tap will automatically import any environment variables within the w
 `.env` if the `--config=ENV` is provided, such that config values will be considered if a matching
 environment variable is set either in the terminal context or in the `.env` file.
 
-### Source Authentication and Authorization
-
-<!--
-Developer TODO: If your tap requires special access on the source system, or any special authentication requirements, provide those here.
--->
-
 ## Usage
 
 You can easily run `edward-tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
@@ -412,12 +398,6 @@ poetry run edward-tap-linkedin-sdk --help
 
 _**Note:** This tap will work in any Singer environment and does not require Meltano.
 Examples here are for convenience and to streamline end-to-end orchestration scenarios._
-
-<!--
-Developer TODO:
-Your project comes with a custom `meltano.yml` project file already created. Open the `meltano.yml` and follow any "TODO" items listed in
-the file.
--->
 
 Next, install Meltano (if you haven't already) and any needed plugins:
 
