@@ -5,6 +5,10 @@
 
 .meltano/
 
+.DS_Store
+.github/.DS_Store
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
