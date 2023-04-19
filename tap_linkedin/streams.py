@@ -925,6 +925,8 @@ class Campaigns(LinkedInStream):
         Property("status", StringType),
         Property("type", StringType),
         Property("storyDeliveryEnabled", BooleanType),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
 
     ).to_dict()
 
