@@ -125,7 +125,30 @@ class LinkedInStream(RESTStream):
                 last_modified_time = columns.get("changeAuditStamps").get("lastModified").get("time")
                 columns["created_time"] = datetime.fromtimestamp(int(created_time)/1000).isoformat()
                 columns["last_modified_time"] = datetime.fromtimestamp(int(last_modified_time)/1000).isoformat()
-                results = [columns]
+                try:
+                    account_column = columns.get("account")
+                    account_id = int(account_column.split(":")[3])
+                    columns["account_id"] = account_id
+                except:
+                    pass
+                try:
+                    campaign_column = columns.get("campaignGroup")
+                    campaign = int(campaign_column.split(":")[3])
+                    columns["campaign_group_id"] = campaign
+                except:
+                    pass
+                try:
+                    user_column = columns.get("user")
+                    user = user_column.split(":")[3]
+                    columns["user_person_id"] = user
+                except:
+                    pass
+                try:
+                    schedule_column = columns.get("runSchedule").get("start")
+                    columns["run_schedule_start"] = datetime.fromtimestamp(int(schedule_column)/1000).isoformat()
+                except:
+                    pass    
+                results = [columns]    
             except:
                 pass
         else:
