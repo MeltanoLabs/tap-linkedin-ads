@@ -179,6 +179,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     key_properties = ["campaign_id", "start_at"]
     path = "adAnalytics"
 
+    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
 
         Property(
@@ -1038,6 +1039,7 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
+        ## TODO: Resolve issue with parantheses in campaigns parameter being encoded by rest.py
         params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
         params["q"] = "criteria"
 
@@ -1064,6 +1066,7 @@ class AdAnalyticsByCreative(LinkedInStream):
     key_properties = ["creative_id", "start_at"]
     path = "adAnalytics"
 
+    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
 
         Property("landingPageClicks", IntegerType),
