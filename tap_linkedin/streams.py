@@ -254,8 +254,8 @@ class AdAnalyticsByCampaign(LinkedInStream):
         Property("campaign_id", IntegerType),
         Property("start_at", StringType),
         Property("end_at", StringType),
-        Property("action_clicks", IntegerType),
-        Property("ad_unit_clicks", IntegerType),
+        Property("actionClicks", IntegerType),
+        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
         Property("company_page_clicks", IntegerType),
         Property("conversion_value_in_local_currency", StringType),
@@ -323,7 +323,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
         Property("viral_external_website_post_click_conversions", IntegerType),
         Property("viral_external_website_post_view_conversions", IntegerType),
         Property("viral_follows", IntegerType),
-        Property("viral_full_screen_plays", IntegerType),
+        Property("viralFullScreenPlays", IntegerType),
         Property("viral_impressions", IntegerType),
         Property("viral_landing_page_clicks", IntegerType),
         Property("viral_likes", IntegerType),
@@ -376,6 +376,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
+        params["fields"] = "shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts,costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,dateRange"
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
 
@@ -1141,8 +1142,8 @@ class AdAnalyticsByCreative(LinkedInStream):
         Property("creative_id", IntegerType),
         Property("start_at", StringType),
         Property("end_at", StringType),
-        Property("action_clicks", IntegerType),
-        Property("ad_unit_clicks", IntegerType),
+        Property("actionClicks", IntegerType),
+        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
         Property("company_page_clicks", IntegerType),
         Property("conversion_value_in_local_currency", StringType),
