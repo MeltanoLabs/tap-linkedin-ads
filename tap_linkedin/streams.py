@@ -351,7 +351,9 @@ class AdAnalyticsByCampaign(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = "actionClicks, viralShares, pivotValue, videoCompletions, viralVideoStarts, comments, externalWebsitePostViewConversions, costInUsd, dateRange, landingPageClicks, oneClickLeadFormOpens, impressions, sends, shares, viralFullScreenPlays, videoMidpointCompletions, viralCardClicks, viralTotalEngagements, viralExternalWebsitePostViewConversions, viralCompanyPageClicks"
+
+        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
+        columns = "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts,costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes,viralOtherEngagements,viralVideoMidpointCompletions,externalWebsitePostClickConversions,adUnitClicks,companyPageClicks,videoFirstQuartileCompletions,viralOneClickLeads,textUrlClicks,viralCommentLikes,videoStarts,viralExternalWebsiteConversions,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"
 
         params: dict = {}
         if next_page_token:
@@ -1239,7 +1241,8 @@ class AdAnalyticsByCreative(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = "actionClicks, viralShares, pivotValue, videoCompletions, viralVideoStarts, comments, externalWebsitePostViewConversions, costInUsd, dateRange, landingPageClicks, oneClickLeadFormOpens, impressions, sends, shares, viralFullScreenPlays, videoMidpointCompletions, viralCardClicks, viralTotalEngagements, viralExternalWebsitePostViewConversions, viralCompanyPageClicks"
+        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
+        columns = "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts,costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes,viralOtherEngagements,viralVideoMidpointCompletions,externalWebsitePostClickConversions,adUnitClicks,companyPageClicks,videoFirstQuartileCompletions,viralOneClickLeads,textUrlClicks,viralCommentLikes,videoStarts,viralExternalWebsiteConversions,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"
 
         params: dict = {}
         if next_page_token:
@@ -1248,7 +1251,7 @@ class AdAnalyticsByCreative(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        params["fields"] = columns    
+        params["fields"] = columns
 
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
