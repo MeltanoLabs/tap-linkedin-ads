@@ -20,7 +20,7 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
-import pendulum
+import pendulum, requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -173,7 +173,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     replication_keys = datetime keys for replication
     """
 
-    name = "ad_analytics_by_campaign"
+    name = "adanalyticsbycampaign_second"
     replication_keys = ["end_at"]
     replication_method = "incremental"
     key_properties = ["campaign_id", "start_at"]
@@ -336,6 +336,13 @@ class AdAnalyticsByCampaign(LinkedInStream):
 
     ).to_dict()
 
+    @property
+    def adanalyticscolumns(self):
+        columns = ["viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts",
+                   "costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes",
+                   "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"]
+        
+        return columns
 
     def get_url_params(
         self,
@@ -353,8 +360,9 @@ class AdAnalyticsByCampaign(LinkedInStream):
         """
 
         ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
-        columns = "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts,costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes,viralOtherEngagements,viralVideoMidpointCompletions,externalWebsitePostClickConversions,adUnitClicks,companyPageClicks,videoFirstQuartileCompletions,viralOneClickLeads,textUrlClicks,viralCommentLikes,videoStarts,viralExternalWebsiteConversions,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"
 
+        columns = self.adanalyticscolumns
+       
         params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
@@ -374,11 +382,104 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns
+        params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
+        return params
+
+
+class adanalyticsbycampaign_second(AdAnalyticsByCampaign):
+    name = "AdAnalyticsByCampaign"
+    
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
+
+        columns = self.adanalyticscolumns
+       
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[1]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
         return params
+    
+
+class adanalyticsbycampaign_third(AdAnalyticsByCampaign):
+    name = "adanalyticsbycampaign_third"
+    
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
+
+        columns = self.adanalyticscolumns
+       
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[2]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
+
+        return params    
 
 
 class VideoAds(LinkedInStream):

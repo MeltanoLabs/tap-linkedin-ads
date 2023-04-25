@@ -12,6 +12,8 @@ from singer_sdk.streams import RESTStream
 
 from datetime import datetime
 
+#import json, pandas as pd
+
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -101,6 +103,8 @@ class LinkedInStream(RESTStream):
             params["order_by"] = self.replication_key
 
         return params
+    
+    adanalytics_columns = dict()
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
 
@@ -150,12 +154,17 @@ class LinkedInStream(RESTStream):
                     pass    
                 results = [columns]    
             except:
-                pass
+                #adanalytics = json.load(results)
+                #adanalytics_dataframe = pd.DataFrame.from_dict(adanalytics, orient='index')
+                #adanalytics_dataframe.reset_index(level=0, inplace=True)
+                try:
+                    columns = results[0]
+                    columns["viralShares"] = columns["viralShares"]
+                    self.adanalytics_columns.update(columns)
+                    results = [self.adanalytics_columns]
+                except:
+                    pass
         else:
-            results = resp_json
+            results = resp_json    
 
         yield from results
-
-
-
-
