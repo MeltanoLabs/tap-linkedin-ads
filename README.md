@@ -95,6 +95,17 @@ tap-linkedin-sdk --help
 tap-linkedin-sdk --config CONFIG --discover > ./catalog.json
 ```
 
+## Contributing
+
+This project uses parent-child streams. Learn more about them [here](https://gitlab.com/meltano/sdk/-/blob/main/docs/parent_streams.md).
+
+### Initialize your Development Environment
+
+```bash
+pipx install poetry
+poetry install
+``` 
+
 ### Create and Run Tests
 
 Create tests within the `lib_tap_linkedin_sdk/tests` subfolder and
