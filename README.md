@@ -43,7 +43,11 @@ The following config values need to be set in order to use with Meltano. These c
 - [ ] `start_date:` start date
 - [ ] `end_date:` end_date
 
-A full list of supported settings and capabilities is available by running: `tap-linkedin-sdk --about`
+A full list of supported settings and capabilities is available by running:
+
+```bash
+tap-linkedin --about
+```
 
 
 ## Usage
