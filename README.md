@@ -38,7 +38,7 @@ Developer TODO: Update the below as needed to correctly describe the install pro
 ## Installation
 
 ```bash
-pipx install git+https://github.com/ORG_NAME/tap-linkedin-sdk.git@main
+pipx install git+https://github.com/MeltanoLabs/tap-linkedin-sdk.git@main
 ```
 
 -->
@@ -79,14 +79,14 @@ environment variable is set either in the terminal context or in the `.env` file
 
 ## Usage
 
-You can easily run `edward-tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
+You can easily run `tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
 ### Executing the Tap Directly
 
 ```bash
-edward-tap-linkedin-sdk --version
-edward-tap-linkedin-sdk --help
-edward-tap-linkedin-sdk --config CONFIG --discover > ./catalog.json
+tap-linkedin-sdk --version
+tap-linkedin-sdk --help
+tap-linkedin-sdk --config CONFIG --discover > ./catalog.json
 ```
 
 ### Create and Run Tests
@@ -98,10 +98,10 @@ Create tests within the `lib_tap_linkedin_sdk/tests` subfolder and
 poetry run pytest
 ```
 
-You can also test the `edward-tap-linkedin-sdk` CLI interface directly using `poetry run`:
+You can also test the `tap-linkedin-sdk` CLI interface directly using `poetry run`:
 
 ```bash
-poetry run edward-tap-linkedin-sdk --help
+poetry run tap-linkedin --help
 ```
 
 ### Testing with [Meltano](https://www.meltano.com)
@@ -116,7 +116,7 @@ Next, install Meltano (if you haven't already) and any needed plugins:
 pipx install meltano
 # Initialize meltano within this directory
 cd tap-linkedin-sdk
-meltano install
+meltano install tap-linkedin
 ```
 
 Now you can test and orchestrate using Meltano:
