@@ -51,7 +51,7 @@ tap-linkedin --about
 
 ### Authentication
 
-The tap required a LinkedIn access token to make API requests
+The tap requires a LinkedIn access token to make API requests
 
 The access token requires the following permissions:
 
