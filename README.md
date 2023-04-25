@@ -79,6 +79,12 @@ environment variable is set either in the terminal context or in the `.env` file
 
 ## Usage
 
+### API Limitation - Pagination
+
+The AdAnalytics endpoint in the LinkedIn API does not support pagination, and the response size is
+limited to 15,000 elements. The only way to circumvent missing elements is to shorten the dateRange 
+in a single ELT.
+
 You can easily run `tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
 ### Executing the Tap Directly
