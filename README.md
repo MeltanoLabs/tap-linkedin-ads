@@ -49,6 +49,9 @@ A full list of supported settings and capabilities is available by running:
 tap-linkedin --about
 ```
 
+### Authentication
+
+We have BearerTokenAuthenticator in client.py for authentication
 
 ## Usage
 
