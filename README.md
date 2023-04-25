@@ -51,7 +51,15 @@ tap-linkedin --about
 
 ### Authentication
 
-We have BearerTokenAuthenticator in client.py for authentication
+The tap required a LinkedIn access token to make API requests
+
+The access token requires the following permissions:
+
+r_ads: read ads 
+rw_ads: read-write ads
+r_ads_reporting: read ads reporting
+
+Access tokens expire after 60 days and require a user to manually authenticate again
 
 ## Usage
 
