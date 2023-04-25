@@ -4,9 +4,6 @@ LinkedIn tap class.
 
 Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
 
-<!--
-
-Developer TODO: Update the below as needed to correctly describe the install procedure. For instance, if you do not have a PyPi repo, or if you want users to directly install from your git repo, you can modify this step as appropriate.
 
 ## Installation
 
@@ -14,7 +11,6 @@ Developer TODO: Update the below as needed to correctly describe the install pro
 pipx install git+https://github.com/MeltanoLabs/tap-linkedin-sdk.git@main
 ```
 
--->
 
 ## Configuration
 
