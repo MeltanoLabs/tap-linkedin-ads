@@ -45,9 +45,9 @@ pipx install git+https://github.com/MeltanoLabs/tap-linkedin-sdk.git@main
 
 ## Configuration
 
-### Configure using environment variables
+### Accepted Config Options
 
-client.py uses several environmental variables for the Headers and Parameters for the LinkedIn streams. As such, the following environmental variables need to be set in .env:
+This tap requires the following environmental variables to be set in ```.env```
 
 - [ ] `TAP_LINKEDIN_ACCOUNTS:` linkedin account id
 - [ ] `TAP_LINKEDIN_ACCESS_TOKEN:` linkedin access token
@@ -59,7 +59,8 @@ client.py uses several environmental variables for the Headers and Parameters fo
 
 ## Meltano Variables
 
-The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via `meltano config tap-linkedin set --interactive, or via the env var mappings shown above. The settings names are:
+The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via
+```meltano config tap-linkedin set --interactive```, or via the env var mappings shown above.
 
 - [ ] `account_id:` linkedin account id
 - [ ] `access_token:` linkedin access token
