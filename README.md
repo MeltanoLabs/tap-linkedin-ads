@@ -1,4 +1,4 @@
-# `tap-linkedin-sdk`
+# tap-linkedin-sdk
 
 LinkedIn tap class.
 
