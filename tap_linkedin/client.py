@@ -13,6 +13,7 @@ from singer_sdk.streams import RESTStream
 from datetime import datetime
 
 #import json, pandas as pd
+#from timeit import default_timer
 
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
@@ -26,6 +27,7 @@ class LinkedInStream(RESTStream):
 
     records_jsonpath = "$.elements[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
+    adanalytics_count = None
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -157,14 +159,25 @@ class LinkedInStream(RESTStream):
                 #adanalytics = json.load(results)
                 #adanalytics_dataframe = pd.DataFrame.from_dict(adanalytics, orient='index')
                 #adanalytics_dataframe.reset_index(level=0, inplace=True)
-                try:
-                    columns = results[0]
-                    columns["viralShares"] = columns["viralShares"]
-                    self.adanalytics_columns.update(columns)
-                    results = [self.adanalytics_columns]
-                except:
-                    pass
+                def request(session):
+                    with session.get(self.url_base) as response:
+                        linkedin_list = response.text
+                        if response.status_code != 200:
+                            print("URL::{0}".format(self.url_base))
+                    return linkedin_list
+                def start_sync_process(self, response: requests.Response):
+                    with requests.session() as session:
+                        print("{0:<30} {1:>20}".format("No", "Completed at"))
+                        start_time = default_timer()
+
+                        for i in range(15):
+                            request(session)
+                            elapsed_time = default_timer() - start_time
+                            completed_at = "{:5.2f}s".format(elapsed_time)
+                            print("{0:<30} {1:>20}".format(i, completed_at))
+                pass
         else:
             results = resp_json    
 
         yield from results
+

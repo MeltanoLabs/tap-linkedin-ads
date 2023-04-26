@@ -24,7 +24,6 @@ import pendulum, requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-
 class Accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
@@ -173,7 +172,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     replication_keys = datetime keys for replication
     """
 
-    name = "adanalyticsbycampaign_second"
+    name = "AdAnalyticsByCampaign"
     replication_keys = ["end_at"]
     replication_method = "incremental"
     key_properties = ["campaign_id", "start_at"]
@@ -343,6 +342,37 @@ class AdAnalyticsByCampaign(LinkedInStream):
                    "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"]
         
         return columns
+    
+    def get_next_page_token(
+        self, response: requests.Response, previous_token: Optional[Any]
+    ) -> Optional[Any]:
+        """Return a token for identifying next page or None if no more pages."""
+        # If pagination is required, return a token which can be used to get the
+        #       next page. If this is the final page, return "None" to end the
+        #       pagination loop.
+
+        resp_json = response.json()
+        if (previous_token == None):
+            previous_token = 0
+
+        if self.adanalytics_count is None:
+            self.adanalytics_count = 0    
+
+        if len(resp_json.get("elements"))== 0:
+            previous_token = 0
+            next_page_token = previous_token + 1
+            self.adanalytics_count = self.adanalytics_count + 1
+        elif len(resp_json.get("elements"))==previous_token:
+            previous_token = 0
+            next_page_token = previous_token + 1
+            self.adanalytics_count = self.adanalytics_count + 1
+            print(self.adanalytics_count)
+        elif self.adanalytics_count>=3:
+            next_page_token = None
+        else:
+            next_page_token = previous_token + 1
+
+        return next_page_token
 
     def get_url_params(
         self,
@@ -360,9 +390,12 @@ class AdAnalyticsByCampaign(LinkedInStream):
         """
 
         ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
-
-        columns = self.adanalyticscolumns
-       
+        
+        if (self.adanalytics_count == 0 or self.adanalytics_count is None):
+            columns = ["viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts"]
+        else:
+            columns = ["costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes"]
+            
         params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
