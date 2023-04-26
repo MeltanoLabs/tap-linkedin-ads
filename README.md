@@ -18,12 +18,12 @@ pipx install git+https://github.com/MeltanoLabs/tap-linkedin-sdk.git@main
 
 This tap requires the following environmental variables to be set in ```.env```
 
-- [ ] `TAP_LINKEDIN_ACCOUNTS:` linkedin account id
+- [ ] `TAP_LINKEDIN_ACCOUNTS:` linkedin account ID
 - [ ] `TAP_LINKEDIN_ACCESS_TOKEN:` linkedin access token
 - [ ] `TAP_LINKEDIN_REFRESH_TOKEN:` refresh token
-- [ ] `TAP_LINKEDIN_CLIENT_ID:` client id
-- [ ] `TAP_LINKEDIN_OWNER:` owner id
-- [ ] `TAP_LINKEDIN_CAMPAIGN:` campaign id
+- [ ] `TAP_LINKEDIN_CLIENT_ID:` client ID
+- [ ] `TAP_LINKEDIN_OWNER:` owner ID
+- [ ] `TAP_LINKEDIN_CAMPAIGN:` campaign ID
 - [ ] `TAP_LINKEDIN_CLIENT_SECRET:` client secret
 
 ## Meltano Variables
@@ -51,7 +51,7 @@ tap-linkedin --about
 
 ### Authentication
 
-The tap requires a LinkedIn access token to make API requests
+The tap requires a LinkedIn OAuth 2.0 access token to make API requests
 
 The access token requires the following permissions:
 
@@ -59,7 +59,8 @@ The access token requires the following permissions:
 ```rw_ads```: read-write ads  
 ```r_ads_reporting```: read ads reporting
 
-Access tokens expire after 60 days and require a user to manually authenticate again
+Access tokens expire after 60 days and require a user to manually authenticate
+again. See the [LinkedIn API docs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/postman-getting-started) for more info
 
 ## Usage
 
@@ -67,7 +68,8 @@ Access tokens expire after 60 days and require a user to manually authenticate a
 
 The AdAnalytics endpoint in the LinkedIn API does not support pagination, and the response size is
 limited to 15,000 elements. The only way to circumvent missing elements is to shorten the dateRange 
-in a single ELT.
+in a single ELT. Using a DateRange that returns a response larger than 15,000 elements will not pull
+all the data in that range.
 
 You can easily run `tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
