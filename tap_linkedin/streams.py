@@ -353,21 +353,11 @@ class AdAnalyticsByCampaign(LinkedInStream):
 
         resp_json = response.json()
         if (previous_token == None):
-            previous_token = 0
-
-        if self.adanalytics_count is None:
-            self.adanalytics_count = 0    
+            previous_token = 0  
 
         if len(resp_json.get("elements"))== 0:
-            previous_token = 0
-            next_page_token = previous_token + 1
-            self.adanalytics_count = self.adanalytics_count + 1
+            next_page_token = None
         elif len(resp_json.get("elements"))==previous_token:
-            previous_token = 0
-            next_page_token = previous_token + 1
-            self.adanalytics_count = self.adanalytics_count + 1
-            print(self.adanalytics_count)
-        elif self.adanalytics_count>=3:
             next_page_token = None
         else:
             next_page_token = previous_token + 1
@@ -391,10 +381,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
 
         ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
         
-        if (self.adanalytics_count == 0 or self.adanalytics_count is None):
-            columns = ["viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts"]
-        else:
-            columns = ["costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes"]
+        columns = self.adanalyticscolumns
             
         params: dict = {}
         if next_page_token:
@@ -418,11 +405,11 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
-        return params
+        return params          
 
 
 class adanalyticsbycampaign_second(AdAnalyticsByCampaign):
-    name = "AdAnalyticsByCampaign"
+    name = "adanalyticsbycampaign_second"
     
     def get_url_params(
         self,

@@ -27,7 +27,6 @@ class LinkedInStream(RESTStream):
 
     records_jsonpath = "$.elements[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
-    adanalytics_count = None
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -106,7 +105,8 @@ class LinkedInStream(RESTStream):
 
         return params
     
-    adanalytics_columns = dict()
+    adanalytics_columns_first = list()
+    adanalytics_columns_second = list()
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
 
@@ -159,25 +159,31 @@ class LinkedInStream(RESTStream):
                 #adanalytics = json.load(results)
                 #adanalytics_dataframe = pd.DataFrame.from_dict(adanalytics, orient='index')
                 #adanalytics_dataframe.reset_index(level=0, inplace=True)
-                def request(session):
-                    with session.get(self.url_base) as response:
-                        linkedin_list = response.text
-                        if response.status_code != 200:
-                            print("URL::{0}".format(self.url_base))
-                    return linkedin_list
-                def start_sync_process(self, response: requests.Response):
-                    with requests.session() as session:
-                        print("{0:<30} {1:>20}".format("No", "Completed at"))
-                        start_time = default_timer()
-
-                        for i in range(15):
-                            request(session)
-                            elapsed_time = default_timer() - start_time
-                            completed_at = "{:5.2f}s".format(elapsed_time)
-                            print("{0:<30} {1:>20}".format(i, completed_at))
+                columns = results[0]
+                try:
+                    adanalytics_stream = resp_json.get("paging").get("links")[0].get("href")
+                    if "viralFullScreenPlays" in columns:
+                        self.adanalytics_columns_first.append(columns)
+                        results = self.adanalytics_columns_first
+                    elif "costInUsd" in columns:
+                        self.adanalytics_columns_second.append(columns)
+                        results = self.adanalytics_columns_second    
+                    else:
+                        print("adanalytics: ", columns)
+                except:
+                    pass
                 pass
         else:
-            results = resp_json    
-
+            results = resp_json
+        
+        adanalytics_stream = {}
+        for i in resp_json.get("paging").get("links"):
+            adanalytics_stream.update(i)  
+        if "href" in adanalytics_stream:    
+            results = self.adanalytics_columns_first + self.adanalytics_columns_second
+        else:
+            print("adanalytics stream:", type(adanalytics_stream))            
+        
         yield from results
+   
 
