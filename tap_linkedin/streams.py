@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, Iterable
 
 import singer_sdk
 
@@ -158,7 +159,7 @@ class Accounts(LinkedInStream):
 
         return params
 
-class AdAnalyticsByCampaign(LinkedInStream):
+class AdAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -172,7 +173,7 @@ class AdAnalyticsByCampaign(LinkedInStream):
     replication_keys = datetime keys for replication
     """
 
-    name = "AdAnalyticsByCampaign"
+    name = "AdAnalyticsByCampaignInit"
     replication_keys = ["end_at"]
     replication_method = "incremental"
     key_properties = ["campaign_id", "start_at"]
@@ -338,8 +339,8 @@ class AdAnalyticsByCampaign(LinkedInStream):
     @property
     def adanalyticscolumns(self):
         columns = ["viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts",
-                   "costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes",
-                   "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows"]
+                   "costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+                   "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency"]
         
         return columns
     
@@ -405,12 +406,12 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
-        return params          
+        return params        
 
 
-class adanalyticsbycampaign_second(AdAnalyticsByCampaign):
-    name = "adanalyticsbycampaign_second"
-    
+class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
+    name = "ad_analytics_by_campaign"
+
     def get_url_params(
         self,
         context: dict | None,
@@ -454,9 +455,15 @@ class adanalyticsbycampaign_second(AdAnalyticsByCampaign):
 
         return params
     
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        adanalyticsinit_stream = AdAnalyticsByCampaignInit(self._tap, schema={"properties": {}})
+        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(self._tap, schema={"properties": {}})
+        adanalytics_records = [x|y|z for x,y,z in zip(list(adanalyticsinit_stream.get_records(context)), list(super().get_records(context)), list(adanalyticsecond_stream.get_records(context)))]
+        return adanalytics_records
+     
 
-class adanalyticsbycampaign_third(AdAnalyticsByCampaign):
-    name = "adanalyticsbycampaign_third"
+class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_second"
     
     def get_url_params(
         self,
@@ -499,7 +506,7 @@ class adanalyticsbycampaign_third(AdAnalyticsByCampaign):
         params["fields"] = columns[2]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
-        return params    
+        return params   
 
 
 class VideoAds(LinkedInStream):
