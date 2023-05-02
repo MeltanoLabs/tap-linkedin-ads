@@ -110,5 +110,6 @@ environments:
       - name: target-snowflake
         config:
           primary_key_required: false
+          add_metadata_columns: true
 - name: staging
 - name: prod
