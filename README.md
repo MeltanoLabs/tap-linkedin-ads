@@ -66,11 +66,11 @@ again. See the [LinkedIn API docs](https://learn.microsoft.com/en-us/linkedin/sh
 
 ### AdAnalytics API Column Limitation
 
-The AdAnalytics endpoint in the LinkedIn API can call upto 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
+The AdAnalytics endpoint in the LinkedIn API can call up to 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
 
 ### Metadata Columns
 
-- [ ] `add_metadata_columns:` We can add metadata columns to LinkedIn records, we have to update meltano.yml and set this variable to true for the loader.
+- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
 
 ### Elastic License 2.0
 
