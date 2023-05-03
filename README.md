@@ -72,6 +72,10 @@ The AdAnalytics endpoint in the LinkedIn API can call upto 20 columns at a time,
 
 - [ ] `add_metadata_columns:` We can add metadata columns to LinkedIn records, we have to update meltano.yml and set this variable to true for the loader.
 
+### Elastic License 2.0
+
+The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
+
 ### Executing the Tap Directly
 
 ```bash
