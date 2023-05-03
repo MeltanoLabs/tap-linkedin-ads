@@ -458,9 +458,19 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
         adanalyticsinit_stream = AdAnalyticsByCampaignInit(self._tap, schema={"properties": {}})
         adanalyticsecond_stream = AdAnalyticsByCampaignSecond(self._tap, schema={"properties": {}})
-        adanalytics_records = [x|y|z for x,y,z in zip(list(adanalyticsinit_stream.get_records(context)), list(super().get_records(context)), list(adanalyticsecond_stream.get_records(context)))]
+        adanalytics_records = [self.merge_dicts(x, y, z) for x, y, z in zip(list(adanalyticsinit_stream.get_records(context)), list(super().get_records(context)), list(adanalyticsecond_stream.get_records(context)))]
+
         return adanalytics_records
-     
+
+    def merge_dicts(self, *dict_args):
+        """
+        Given any number of dictionaries, shallow copy and merge into a new dict,
+        precedence goes to key-value pairs in latter dictionaries.
+        """
+        result = {}
+        for dictionary in dict_args:
+            result.update(dictionary)
+        return result
 
 class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
