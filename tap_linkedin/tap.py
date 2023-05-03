@@ -78,6 +78,7 @@ class TapLinkedIn(Tap):
             A list of discovered streams.
         """
 
+        #TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
             streams.Accounts(self),
             streams.VideoAds(self),
