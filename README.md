@@ -64,14 +64,13 @@ again. See the [LinkedIn API docs](https://learn.microsoft.com/en-us/linkedin/sh
 
 ## Usage
 
-### API Limitation - Pagination
+### AdAnalytics API Column Limitation
 
-The AdAnalytics endpoint in the LinkedIn API does not support pagination, and the response size is
-limited to 15,000 elements. The only way to circumvent missing elements is to shorten the dateRange 
-in a single ELT. Using a DateRange that returns a response larger than 15,000 elements will not pull
-all the data in that range.
+The AdAnalytics endpoint in the LinkedIn API can call upto 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
 
-You can easily run `tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
+### Metadata Columns
+
+- [ ] `add_metadata_columns:` We can add metadata columns to LinkedIn records, we have to update meltano.yml and set this variable to true for the loader.
 
 ### Executing the Tap Directly
 

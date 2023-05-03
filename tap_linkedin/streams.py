@@ -182,84 +182,10 @@ class AdAnalyticsByCampaign(LinkedInStream):
     ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
 
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property("document_completions", IntegerType),
-        Property("document_first_quartile_completions", IntegerType),
-        Property("clicks", IntegerType),
-        Property("document_midpoint_completions", IntegerType),
-        Property("document_third_quartile_completions", IntegerType),
-        Property("download_clicks", IntegerType),
-        Property("job_applications", StringType),
-        Property("job_apply_clicks", StringType),
-        Property("post_click_job_applications", StringType),
-        Property("post_click_job_apply_clicks", StringType),
-        Property("post_click_registrations", StringType),
-        Property("post_view_job_applications", StringType),
-        Property("post_view_job_apply_clicks", StringType),
         Property("costInUsd", StringType),
-        Property("post_view_registrations", StringType),
-        Property("registrations", StringType),
-        Property("talent_leads", IntegerType),
-        Property("viral_document_completions", IntegerType),
-        Property("viral_document_first_quartile_completions", IntegerType),
-        Property("viral_document_midpoint_completions", IntegerType),
-        Property("viral_document_third_quartile_completions", IntegerType),
-        Property("viral_download_clicks", IntegerType),
-        Property("viral_job_applications", StringType),
-        Property("viral_job_apply_clicks", StringType),
-        Property("cost_in_local_currency", StringType),
-        Property("viral_post_click_job_applications", StringType),
-        Property("viral_post_click_job_apply_clicks", StringType),
-        Property("viral_post_click_registrations", StringType),
-        Property("viral_post_view_job_applications", StringType),
-        Property("viral_post_view_job_apply_clicks", StringType),
-        Property("viral_post_view_registrations", StringType),
-        Property("viral_registrations", StringType),
-        Property("approximate_unique_impressions", IntegerType),
-        Property("card_clicks", IntegerType),
-        Property("card_impressions", IntegerType),
-        Property("comment_likes", IntegerType),
         Property("viralCardClicks", IntegerType),
-        Property("viral_card_impressions", IntegerType),
-        Property("viral_comment_likes", IntegerType),
-        Property("campaign", StringType),
-        Property("campaign_id", IntegerType),
-        Property("start_at", StringType),
-        Property("end_at", StringType),
         Property("actionClicks", IntegerType),
-        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
-        Property("company_page_clicks", IntegerType),
-        Property("conversion_value_in_local_currency", StringType),
 
         Property(
             "dateRange",
@@ -283,56 +209,21 @@ class AdAnalyticsByCampaign(LinkedInStream):
             )
         ),
 
-        Property("external_website_conversions", IntegerType),
-        Property("external_website_post_click_conversions", IntegerType),
         Property("externalWebsitePostViewConversions", IntegerType),
-        Property("follows", IntegerType),
-        Property("full_screen_plays", IntegerType),
         Property("impressions", IntegerType),
         Property("landingPageClicks", IntegerType),
-        Property("lead_generation_mail_contact_info_shares", IntegerType),
-        Property("lead_generation_mail_interested_clicks", IntegerType),
-        Property("likes", IntegerType),
         Property("oneClickLeadFormOpens", IntegerType),
-        Property("one_click_leads", IntegerType),
-        Property("opens", IntegerType),
-        Property("other_engagements", IntegerType),
-        Property("pivot", StringType),
         Property("pivotValue", StringType),
-        Property("reactions", IntegerType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
-        Property("text_url_clicks", IntegerType),
-        Property("total_engagements", IntegerType),
         Property("videoCompletions", IntegerType),
-        Property("video_first_quartile_completions", IntegerType),
         Property("videoMidpointCompletions", IntegerType),
-        Property("video_starts", IntegerType),
-        Property("video_third_quartile_completions", IntegerType),
-        Property("video_views", IntegerType),
-        Property("viral_clicks", IntegerType),
-        Property("viral_comments", IntegerType),
         Property("viralCompanyPageClicks", IntegerType),
-        Property("viral_external_website_conversions", IntegerType),
-        Property("viral_external_website_post_click_conversions", IntegerType),
         Property("viralExternalWebsitePostViewConversions", IntegerType),
-        Property("viral_follows", IntegerType),
         Property("viralFullScreenPlays", IntegerType),
-        Property("viral_impressions", IntegerType),
-        Property("viral_landing_page_clicks", IntegerType),
-        Property("viral_likes", IntegerType),
-        Property("viral_one_click_lead_form_opens", IntegerType),
-        Property("viral_one_click_leads", IntegerType),
-        Property("viral_other_engagements", IntegerType),
-        Property("viral_reactions", IntegerType),
         Property("viralShares", IntegerType),
         Property("viralTotalEngagements", IntegerType),
-        Property("viral_video_completions", IntegerType),
-        Property("viral_video_first_quartile_completions", IntegerType),
-        Property("viral_video_midpoint_completions", IntegerType),
-        Property("viralVideoStarts", IntegerType),
-        Property("viral_video_third_quartile_completions", IntegerType),
-        Property("viral_video_views", IntegerType)
+        Property("viralVideoStarts", IntegerType)
 
     ).to_dict()
 
@@ -1069,86 +960,10 @@ class AdAnalyticsByCreative(LinkedInStream):
     ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
 
-        Property("landingPageClicks", IntegerType),
-
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property("document_completions", IntegerType),
-        Property("document_first_quartile_completions", IntegerType),
-        Property("clicks", IntegerType),
-        Property("document_midpoint_completions", IntegerType),
-        Property("document_third_quartile_completions", IntegerType),
-        Property("download_clicks", IntegerType),
-        Property("job_applications", StringType),
-        Property("job_apply_clicks", StringType),
-        Property("post_click_job_applications", StringType),
-        Property("post_click_job_apply_clicks", StringType),
-        Property("post_click_registrations", StringType),
-        Property("post_view_job_applications", StringType),
-        Property("post_view_job_apply_clicks", StringType),
         Property("costInUsd", StringType),
-        Property("post_view_registrations", StringType),
-        Property("registrations", StringType),
-        Property("talent_leads", IntegerType),
-        Property("viral_document_completions", IntegerType),
-        Property("viral_document_first_quartile_completions", IntegerType),
-        Property("viral_document_midpoint_completions", IntegerType),
-        Property("viral_document_third_quartile_completions", IntegerType),
-        Property("viral_download_clicks", IntegerType),
-        Property("viral_job_applications", StringType),
-        Property("viral_job_apply_clicks", StringType),
-        Property("cost_in_local_currency", StringType),
-        Property("viral_post_click_job_applications", StringType),
-        Property("viral_post_click_job_apply_clicks", StringType),
-        Property("viral_post_click_registrations", StringType),
-        Property("viral_post_view_job_applications", StringType),
-        Property("viral_post_view_job_apply_clicks", StringType),
-        Property("viral_post_view_registrations", StringType),
-        Property("viral_registrations", IntegerType),
-        Property("approximate_unique_impressions", IntegerType),
-        Property("card_clicks", IntegerType),
-        Property("card_impressions", IntegerType),
-        Property("comment_likes", IntegerType),
-        Property("viral_card_clicks", IntegerType),
-        Property("viral_card_impressions", IntegerType),
-        Property("viral_comment_likes", IntegerType),
-        Property("creative", StringType),
-        Property("creative_id", IntegerType),
-        Property("start_at", StringType),
-        Property("end_at", StringType),
+        Property("viralCardClicks", IntegerType),
         Property("actionClicks", IntegerType),
-        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
-        Property("company_page_clicks", IntegerType),
-        Property("conversion_value_in_local_currency", StringType),
 
         Property(
             "dateRange",
@@ -1172,55 +987,21 @@ class AdAnalyticsByCreative(LinkedInStream):
             )
         ),
 
-        Property("external_website_conversions", IntegerType),
-        Property("external_website_post_click_conversions", IntegerType),
         Property("externalWebsitePostViewConversions", IntegerType),
-        Property("follows", IntegerType),
-        Property("full_screen_plays", IntegerType),
         Property("impressions", IntegerType),
-        Property("lead_generation_mail_contact_info_shares", IntegerType),
-        Property("lead_generation_mail_interested_clicks", IntegerType),
-        Property("likes", IntegerType),
+        Property("landingPageClicks", IntegerType),
         Property("oneClickLeadFormOpens", IntegerType),
-        Property("one_click_leads", IntegerType),
-        Property("opens", IntegerType),
-        Property("other_engagements", IntegerType),
-        Property("pivot", StringType),
         Property("pivotValue", StringType),
-        Property("reactions", IntegerType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
-        Property("text_url_clicks", IntegerType),
-        Property("total_engagements", IntegerType),
         Property("videoCompletions", IntegerType),
-        Property("video_first_quartile_completions", IntegerType),
-        Property("video_midpoint_completions", IntegerType),
-        Property("video_starts", IntegerType),
-        Property("video_third_quartile_completions", IntegerType),
-        Property("video_views", IntegerType),
-        Property("viral_clicks", IntegerType),
-        Property("viral_comments", IntegerType),
-        Property("viral_company_page_clicks", IntegerType),
-        Property("viral_external_website_conversions", IntegerType),
-        Property("viral_external_website_post_click_conversions", IntegerType),
-        Property("viral_external_website_post_view_conversions", IntegerType),
-        Property("viral_follows", IntegerType),
-        Property("viral_full_screen_plays", IntegerType),
-        Property("viral_impressions", IntegerType),
-        Property("viral_landing_page_clicks", IntegerType),
-        Property("viral_likes", IntegerType),
-        Property("viral_one_click_lead_form_opens", IntegerType),
-        Property("viral_one_click_leads", IntegerType),
-        Property("viral_other_engagements", IntegerType),
-        Property("viral_reactions", IntegerType),
+        Property("videoMidpointCompletions", IntegerType),
+        Property("viralCompanyPageClicks", IntegerType),
+        Property("viralExternalWebsitePostViewConversions", IntegerType),
+        Property("viralFullScreenPlays", IntegerType),
         Property("viralShares", IntegerType),
-        Property("viral_total_engagements", IntegerType),
-        Property("viral_video_completions", IntegerType),
-        Property("viral_video_first_quartile_completions", IntegerType),
-        Property("viral_video_midpoint_completions", IntegerType),
-        Property("viralVideoStarts", IntegerType),
-        Property("viral_video_third_quartile_completions", IntegerType),
-        Property("viral_video_views", IntegerType)
+        Property("viralTotalEngagements", IntegerType),
+        Property("viralVideoStarts", IntegerType)
 
     ).to_dict()
 
