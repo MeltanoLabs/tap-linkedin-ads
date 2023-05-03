@@ -71,7 +71,7 @@ The AdAnalytics endpoint in the LinkedIn API can call up to 20 columns at a time
 ### SDK X-Restli-Protocol Limitation
 
 The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin uses ‘()’, which are typically 
-encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. However, singer-idk does not have any handling for reduced encoding yet,
+encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. However, the SDK does not have any handling for reduced encoding yet,
 so a request to the creatives endpoint using the tap is currently not possible. When the SDK is updated to handle X-Restli-Protocol is 2.0.0, then
 requests to the creatives endpoint using tap-linkedin will be possible.
 
