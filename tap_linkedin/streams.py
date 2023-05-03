@@ -167,7 +167,6 @@ class AdAnalyticsByCampaign(LinkedInStream):
     key_properties = ["campaign_id", "start_at"]
     path = "adAnalytics"
 
-    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
         Property("costInUsd", StringType),
         Property("viralCardClicks", IntegerType),
@@ -905,7 +904,6 @@ class AdAnalyticsByCreative(LinkedInStream):
     key_properties = ["creative_id", "start_at"]
     path = "adAnalytics"
 
-    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
         Property("costInUsd", StringType),
         Property("viralCardClicks", IntegerType),
