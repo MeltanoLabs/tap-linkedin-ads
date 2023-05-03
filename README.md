@@ -68,6 +68,14 @@ again. See the [LinkedIn API docs](https://learn.microsoft.com/en-us/linkedin/sh
 
 The AdAnalytics endpoint in the LinkedIn API can call up to 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
 
+### SDK X-Restli-Protocol Limitation
+
+The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin uses ‘()’, which are typically 
+encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. However, singer-idk does not have any handling for reduced encoding yet,
+so a request to the creatives endpoint using the tap is currently not possible. When the SDK is updated to handle X-Restli-Protocol is 2.0.0, then
+requests to the creatives endpoint using tap-linkedin will be possible.
+
+
 ### Metadata Columns
 
 - [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
