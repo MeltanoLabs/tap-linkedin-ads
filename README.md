@@ -64,14 +64,23 @@ again. See the [LinkedIn API docs](https://learn.microsoft.com/en-us/linkedin/sh
 
 ## Usage
 
-### API Limitation - Pagination
+### AdAnalytics API Column Limitation
 
-The AdAnalytics endpoint in the LinkedIn API does not support pagination, and the response size is
-limited to 15,000 elements. The only way to circumvent missing elements is to shorten the dateRange 
-in a single ELT. Using a DateRange that returns a response larger than 15,000 elements will not pull
-all the data in that range.
+The AdAnalytics endpoint in the LinkedIn API can call up to 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
 
-You can easily run `tap-linkedin-sdk` by itself or in a pipeline using [Meltano](https://meltano.com/).
+### SDK X-Restli-Protocol Limitation
+
+The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin uses parentheses ‘()’. '(' and ')' are typically 
+encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. An SDK update for expanded escape characters is currently WIP [link github issue]
+
+
+### Metadata Columns
+
+- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
+
+### Elastic License 2.0
+
+The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
 
 ### Executing the Tap Directly
 
