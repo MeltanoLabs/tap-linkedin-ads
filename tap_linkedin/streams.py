@@ -168,7 +168,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
     key_properties = ["campaign_id", "start_at"]
     path = "adAnalytics"
 
-    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
         Property(
             "average_daily_reach_metrics",
@@ -245,8 +244,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-        Property("campaign", StringType),
-        Property("campaignId", IntegerType),
         Property("startAt", StringType),
         Property("endAt", StringType),
         Property("actionClicks", IntegerType),
@@ -354,7 +351,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             A dictionary of URL query parameters.
         """
 
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
 
         columns = self.adanalyticscolumns
 
@@ -403,7 +399,6 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
             A dictionary of URL query parameters.
         """
 
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
 
         columns = self.adanalyticscolumns
 
@@ -479,8 +474,6 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
 
         columns = self.adanalyticscolumns
 
@@ -1160,7 +1153,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
     key_properties = ["creative_id", "start_at"]
     path = "adAnalytics"
 
-    ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
         Property("landingPageClicks", IntegerType),
         Property(
@@ -1346,7 +1338,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -1395,7 +1386,6 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
             A dictionary of URL query parameters.
         """
 
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
 
         columns = self.adanalyticscolumns
 
@@ -1472,7 +1462,6 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
             A dictionary of URL query parameters.
         """
 
-        ## TODO: UPDATE ACCESS_TOKEN TO PULL ,approximateUniqueImpressions
 
         columns = self.adanalyticscolumns
 
