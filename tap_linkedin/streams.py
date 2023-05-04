@@ -274,6 +274,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
                 ),
             ),
         ),
+        Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
         Property("externalWebsitePostViewConversions", IntegerType),
@@ -1126,7 +1127,7 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        ## TODO: Resolve issue with parantheses in campaigns parameter being encoded by rest.py
+        ## TODO: Resolve issue with parentheses in campaigns parameter being encoded by rest.py
         params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
         params["q"] = "criteria"
 
@@ -1262,6 +1263,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
+        Property("day",StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
         Property("externalWebsitePostViewConversions", IntegerType),
