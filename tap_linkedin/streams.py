@@ -207,6 +207,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
                 additional_properties=False,
             ),
         ),
+        Property("campaign_id", IntegerType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
         Property("clicks", IntegerType),
@@ -393,6 +394,12 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             daterange_year = row.get("dateRange").get("start").get("year")
             daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        try:
+            campaign_column = row.get("pivotValue")
+            campaign_column = int(campaign_column.split(":")[3])
+            row["campaign_id"] = campaign_column
         except:
             pass
         
@@ -1260,6 +1267,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 additional_properties=False,
             ),
         ),
+        Property("creative_id", IntegerType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
         Property("clicks", IntegerType),
@@ -1447,6 +1455,12 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             daterange_year = row.get("dateRange").get("start").get("year")
             daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        try:
+            creative_column = row.get("pivotValue")
+            creative_column = int(creative_column.split(":")[3])
+            row["creative_id"] = creative_column
         except:
             pass
         
