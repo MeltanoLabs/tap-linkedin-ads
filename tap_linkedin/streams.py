@@ -23,6 +23,8 @@ from tap_linkedin.client import LinkedInStream
 
 import pendulum, requests
 
+from datetime import datetime
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -163,9 +165,9 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
     """
 
     name = "AdAnalyticsByCampaignInit"
-    replication_keys = ["end_at"]
+    replication_keys = ["dateRange"]
     replication_method = "incremental"
-    key_properties = ["campaign_id", "start_at"]
+    primary_keys = ["dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
@@ -330,9 +332,10 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
     @property
     def adanalyticscolumns(self):
         columns = [
-            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts",
-            "costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions"
         ]
 
         return columns
@@ -380,6 +383,18 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         )
 
         return params
+
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        try:
+            daterange_day = row.get("dateRange").get("start").get("day")
+            daterange_month = row.get("dateRange").get("start").get("month")
+            daterange_year = row.get("dateRange").get("start").get("year")
+            daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
+            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        
+        return super().post_process(row, context)    
 
 
 class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
@@ -436,12 +451,16 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
             self._tap, schema={"properties": {}}
         )
+        adanalyticsthird_stream = AdAnalyticsByCampaignThird(
+            self._tap, schema={"properties": {}}
+        )
         adanalytics_records = [
-            self.merge_dicts(x, y, z)
-            for x, y, z in zip(
+            self.merge_dicts(x, y, z, p)
+            for x, y, z, p in zip(
                 list(adanalyticsinit_stream.get_records(context)),
                 list(super().get_records(context)),
                 list(adanalyticsecond_stream.get_records(context)),
+                list(adanalyticsthird_stream.get_records(context)),
             )
         ]
 
@@ -456,7 +475,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-
+ 
 
 class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
@@ -498,6 +517,53 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+    
+
+class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_third"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
         )
@@ -1149,9 +1215,9 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
     """
 
     name = "AdAnalyticsByCreativeInit"
-    replication_keys = ["end_at"]
+    replication_keys = ["dateRange"]
     replication_method = "incremental"
-    key_properties = ["creative_id", "start_at"]
+    primary_keys = ["dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
@@ -1319,9 +1385,10 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
     @property
     def adanalyticscolumns(self):
         columns = [
-            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,viralVideoStarts",
-            "costInUsd,landingPageClicks,oneClickLeadFormOpens,impressions,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,costInLocalCurrency,viralLikes",
-            "viralOtherEngagements,viralVideoMidpointCompletions,externalWebsitePostClickConversions,adUnitClicks,companyPageClicks,videoFirstQuartileCompletions,viralOneClickLeads,textUrlClicks,viralCommentLikes,videoStarts,viralExternalWebsiteConversions,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows",
+            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions"
         ]
 
         return columns
@@ -1368,6 +1435,18 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         )
 
         return params
+
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        try:
+            daterange_day = row.get("dateRange").get("start").get("day")
+            daterange_month = row.get("dateRange").get("start").get("month")
+            daterange_year = row.get("dateRange").get("start").get("year")
+            daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
+            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        
+        return super().post_process(row, context)    
 
 
 class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
@@ -1418,18 +1497,22 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        adanalyticsinit_stream = AdAnalyticsByCampaignInit(
+        adanalyticsinit_stream = AdAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
         )
-        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
+        adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
+            self._tap, schema={"properties": {}}
+        )
+        adanalyticsthird_stream = AdAnalyticsByCreativeThird(
             self._tap, schema={"properties": {}}
         )
         adanalytics_records = [
-            self.merge_dicts(x, y, z)
-            for x, y, z in zip(
+            self.merge_dicts(x, y, z, p)
+            for x, y, z, p in zip(
                 list(adanalyticsinit_stream.get_records(context)),
                 list(super().get_records(context)),
                 list(adanalyticsecond_stream.get_records(context)),
+                list(adanalyticsthird_stream.get_records(context)),
             )
         ]
 
@@ -1487,6 +1570,54 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+    
+
+class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
+    name = "adanalyticsbycreative_third"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
         )
