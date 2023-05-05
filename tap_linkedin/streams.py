@@ -167,7 +167,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
     name = "AdAnalyticsByCampaignInit"
     replication_keys = ["dateRange"]
     replication_method = "incremental"
-    primary_keys = ["dateRange"]
+    primary_keys = ["campaign_id", "dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
@@ -1226,7 +1226,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
     name = "AdAnalyticsByCreativeInit"
     replication_keys = ["dateRange"]
     replication_method = "incremental"
-    primary_keys = ["dateRange"]
+    primary_keys = ["creative_id" , "dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
