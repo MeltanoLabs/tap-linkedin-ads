@@ -385,6 +385,8 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
         try:
             daterange_day = row.get("dateRange").get("start").get("day")
             daterange_month = row.get("dateRange").get("start").get("month")
@@ -1437,6 +1439,8 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
         try:
             daterange_day = row.get("dateRange").get("start").get("day")
             daterange_month = row.get("dateRange").get("start").get("month")
