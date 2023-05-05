@@ -171,42 +171,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
     path = "adAnalytics"
 
     schema = PropertiesList(
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
         Property("campaign_id", IntegerType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
@@ -216,11 +180,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("downloadClicks", IntegerType),
         Property("jobApplications", StringType),
         Property("jobApplyClicks", StringType),
-        Property("postClickJobApplications", StringType),
-        Property("postClickJobApplyClicks", StringType),
-        Property("postClickRegistrations", StringType),
         Property("postViewJobApplications", StringType),
-        Property("postViewJobApplyClicks", StringType),
         Property("costInUsd", StringType),
         Property("postViewRegistrations", StringType),
         Property("registrations", StringType),
@@ -233,12 +193,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralJobApplications", StringType),
         Property("viralJobApplyClicks", StringType),
         Property("costInLocalCurrency", StringType),
-        Property("viralPostClickJobApplications", StringType),
-        Property("viralPostClickJobApplyClicks", StringType),
-        Property("viralPostClickRegistrations", StringType),
-        Property("viralPostViewJobApplications", StringType),
-        Property("viralPostViewJobApplyClicks", StringType),
-        Property("viralPostViewRegistrations", StringType),
         Property("viralRegistrations", StringType),
         Property("approximateUniqueImpressions", IntegerType),
         Property("cardClicks", IntegerType),
@@ -247,8 +201,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-        Property("startAt", StringType),
-        Property("endAt", StringType),
         Property("actionClicks", IntegerType),
         Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
@@ -1231,42 +1183,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
 
     schema = PropertiesList(
         Property("landingPageClicks", IntegerType),
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property(
-                    "approximate_cost_in_currency_per_thousand_members_reached",
-                    StringType,
-                ),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False,
-            ),
-        ),
         Property("creative_id", IntegerType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
@@ -1276,11 +1192,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("downloadClicks", IntegerType),
         Property("jobApplications", StringType),
         Property("jobApplyClicks", StringType),
-        Property("postClickJobApplications", StringType),
-        Property("postClickJobApplyClicks", StringType),
-        Property("postClickRegistrations", StringType),
         Property("postViewJobApplications", StringType),
-        Property("postViewJobApplyClicks", StringType),
         Property("costInUsd", StringType),
         Property("postViewRegistrations", StringType),
         Property("registrations", StringType),
@@ -1293,12 +1205,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralJobApplications", StringType),
         Property("viralJobApplyClicks", StringType),
         Property("costInLocalCurrency", StringType),
-        Property("viralPostClickJobApplications", StringType),
-        Property("viralPostClickJobApplyClicks", StringType),
-        Property("viralPostClickRegistrations", StringType),
-        Property("viralPostViewJobApplications", StringType),
-        Property("viralPostViewJobApplyClicks", StringType),
-        Property("viralPostViewRegistrations", StringType),
         Property("viralRegistrations", IntegerType),
         Property("approximateUniqueImpressions", IntegerType),
         Property("cardClicks", IntegerType),
@@ -1307,10 +1213,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-        Property("creative", StringType),
-        Property("creativeId", IntegerType),
-        Property("startAt", StringType),
-        Property("endAt", StringType),
         Property("actionClicks", IntegerType),
         Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
