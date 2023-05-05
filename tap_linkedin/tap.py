@@ -86,8 +86,8 @@ class TapLinkedIn(Tap):
             # streams.Creatives(self),
             streams.Campaigns(self),
             streams.CampaignGroups(self),
-            streams.AdAnalyticsByCreative(self),
             streams.AdAnalyticsByCampaign(self),
+            streams.AdAnalyticsByCreative(self),
         ]
 
 

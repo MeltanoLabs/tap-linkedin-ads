@@ -102,6 +102,11 @@ class LinkedInStream(RESTStream):
 
         return params
 
+
+    adanalytics_columns_first = {}
+    adanalytics_columns_second = {}
+
+
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
