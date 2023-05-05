@@ -2,7 +2,7 @@
 name = "tap-linkedin"
 version = "0.0.1"
 description = "`tap-linkedin` is a Singer tap for linkedin, built with the Meltano SDK for Singer Taps."
-authors = ["monika rajput"]
+authors = ["Meltano"]
 keywords = [
     "ELT",
     "linkedin",

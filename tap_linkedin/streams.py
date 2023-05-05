@@ -150,6 +150,7 @@ class Accounts(LinkedInStream):
         return params
 
 
+
 class AdAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
@@ -202,7 +203,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
         Property("actionClicks", IntegerType),
-        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
@@ -229,6 +229,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
                 ),
             ),
         ),
+
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -246,7 +247,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("otherEngagements", IntegerType),
         Property("pivot", StringType),
         Property("pivotValue", StringType),
-        Property("reactions", IntegerType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -329,6 +329,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
+
         params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
@@ -1213,11 +1214,12 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
+
         Property("actionClicks", IntegerType),
-        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
+
         Property(
             "dateRange",
             ObjectType(
@@ -1241,6 +1243,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
+
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -1258,7 +1261,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("otherEngagements", IntegerType),
         Property("pivot", StringType),
         Property("pivotValue", StringType),
-        Property("reactions", IntegerType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -1292,6 +1294,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralVideoStarts", IntegerType),
         Property("viralVideoThirdQuartileCompletions", IntegerType),
         Property("viralVideoViews", IntegerType),
+
     ).to_dict()
 
     @property
@@ -1329,6 +1332,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["fields"] = columns[0]
+
 
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
@@ -1540,5 +1544,6 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
         )
+
 
         return params
