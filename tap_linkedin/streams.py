@@ -203,6 +203,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
         Property("actionClicks", IntegerType),
+        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
@@ -272,6 +273,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Property("viralOneclickLeads", IntegerType),
         Property("viralOtherEngagements", IntegerType),
         Property("viralReactions", IntegerType),
+        Property("reactions", IntegerType),
         Property("viralShares", IntegerType),
         Property("viralTotalEngagements", IntegerType),
         Property("viralVideoCompletions", IntegerType),
@@ -1184,6 +1186,8 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
 
     schema = PropertiesList(
         Property("landingPageClicks", IntegerType),
+        Property("reactions", IntegerType),
+        Property("adUnitClicks", IntegerType),
         Property("creative_id", IntegerType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
