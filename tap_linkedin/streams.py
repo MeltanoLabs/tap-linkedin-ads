@@ -288,7 +288,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
-            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions"
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
         ]
 
         return columns
@@ -307,7 +307,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
-
 
         columns = self.adanalyticscolumns
 
@@ -344,7 +343,9 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             daterange_day = row.get("dateRange").get("start").get("day")
             daterange_month = row.get("dateRange").get("start").get("month")
             daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
+            daterange_column = "{}-{}-{}".format(
+                daterange_year, daterange_month, daterange_day
+            )
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
         except:
             pass
@@ -354,8 +355,8 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             row["campaign_id"] = campaign_column
         except:
             pass
-        
-        return super().post_process(row, context)    
+
+        return super().post_process(row, context)
 
 
 class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
@@ -375,7 +376,6 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
 
         columns = self.adanalyticscolumns
 
@@ -436,7 +436,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
- 
+
 
 class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
@@ -483,7 +483,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         )
 
         return params
-    
+
 
 class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_third"
@@ -1178,7 +1178,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
     name = "AdAnalyticsByCreativeInit"
     replication_keys = ["dateRange"]
     replication_method = "incremental"
-    primary_keys = ["creative_id" , "dateRange"]
+    primary_keys = ["creative_id", "dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
@@ -1241,7 +1241,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
-        Property("day",StringType),
+        Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
         Property("externalWebsitePostViewConversions", IntegerType),
@@ -1300,7 +1300,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
-            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions"
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
         ]
 
         return columns
@@ -1355,7 +1355,9 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             daterange_day = row.get("dateRange").get("start").get("day")
             daterange_month = row.get("dateRange").get("start").get("month")
             daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(daterange_year, daterange_month, daterange_day)
+            daterange_column = "{}-{}-{}".format(
+                daterange_year, daterange_month, daterange_day
+            )
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
         except:
             pass
@@ -1365,8 +1367,8 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             row["creative_id"] = creative_column
         except:
             pass
-        
-        return super().post_process(row, context)    
+
+        return super().post_process(row, context)
 
 
 class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
@@ -1386,7 +1388,6 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
 
         columns = self.adanalyticscolumns
 
@@ -1467,7 +1468,6 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
             A dictionary of URL query parameters.
         """
 
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -1495,7 +1495,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         )
 
         return params
-    
+
 
 class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
@@ -1514,7 +1514,6 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
 
         columns = self.adanalyticscolumns
 
