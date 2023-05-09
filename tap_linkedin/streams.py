@@ -416,12 +416,20 @@ class adAnalyticsByCampaign(adAnalyticsByCampaignInit):
 
         Returns:
             A dictionary of records given from adanalytics streams
+            adAnalyticsByCampaignInit is the parent class with all properties
+            We can add this get_records() function in any child classes of adAnalyticsByCampaignInit, it is not specific to this class
+            This function gets the records of its parent class and child classes like itself and merges them
+            We want ad_analytics_by_campaign as the output table so we have added this function in this child class
             Adanalytics classes: adanalyticsinit_stream, adanalyticsecond_stream, adanalyticsthird_stream
             Adanalytics classes gives a dictionary of records with 20 columns
+            Adanalytics classes calls adanalyticscolumns() function to get the 20 columns
+            These 20 columns are added to fields parameter of these classes
+            This is why api calls for 20 columns, not all the columns in inline schema
             super() calls the records of adAnalyticsByCampaign class
             These classes are generator objects so they can't be merged unless we convert them into lists
             list() converts generator objects into lists
             merge_dicts() merges these classes
+            zip() iterates over the records of adanalytics classes and merges them with merge_dicts() function
         """
         adanalyticsinit_stream = adAnalyticsByCampaignInit(
             self._tap, schema={"properties": {}}
@@ -1447,12 +1455,20 @@ class adAnalyticsByCreative(adAnalyticsByCreativeInit):
 
         Returns:
             A dictionary of records given from adanalytics streams
+            adAnalyticsByCreativeInit is the parent class with all properties
+            We can add this get_records() function in any child classes of adAnalyticsByCreativeInit, it is not specific to this class
+            This function gets the records of its parent class and child classes like itself and merges them
+            We want ad_analytics_by_campaign as the output table so we have added this function in this child class
             Adanalytics classes: adanalyticsinit_stream, adanalyticsecond_stream, adanalyticsthird_stream
             Adanalytics classes gives a dictionary of records with 20 columns
-            super() calls the records of adAnalyticsByCampaign class
+            Adanalytics classes calls adanalyticscolumns() function to get the 20 columns
+            These 20 columns are added to fields parameter of these classes
+            This is why api calls for 20 columns, not all the columns in inline schema
+            super() calls the records of adAnalyticsByCreative class
             These classes are generator objects so they can't be merged unless we convert them into lists
             list() converts generator objects into lists
             merge_dicts() merges these classes
+            zip() iterates over the records of adanalytics classes and merges them with merge_dicts() function
         """
         adanalyticsinit_stream = adAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
