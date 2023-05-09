@@ -409,6 +409,20 @@ class adAnalyticsByCampaign(adAnalyticsByCampaignInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adanalytics classes
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adanalytics streams
+            Adanalytics classes: adanalyticsinit_stream, adanalyticsecond_stream, adanalyticsthird_stream
+            Adanalytics classes gives a dictionary of records with 20 columns
+            super() calls the records of adAnalyticsByCampaign class
+            These classes are generator objects so they can't be merged unless we convert them into lists
+            list() converts generator objects into lists
+            merge_dicts() merges these classes
+        """
         adanalyticsinit_stream = adAnalyticsByCampaignInit(
             self._tap, schema={"properties": {}}
         )
@@ -1426,6 +1440,20 @@ class adAnalyticsByCreative(adAnalyticsByCreativeInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adanalytics classes
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adanalytics streams
+            Adanalytics classes: adanalyticsinit_stream, adanalyticsecond_stream, adanalyticsthird_stream
+            Adanalytics classes gives a dictionary of records with 20 columns
+            super() calls the records of adAnalyticsByCampaign class
+            These classes are generator objects so they can't be merged unless we convert them into lists
+            list() converts generator objects into lists
+            merge_dicts() merges these classes
+        """
         adanalyticsinit_stream = adAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
         )
