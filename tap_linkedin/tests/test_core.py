@@ -12,25 +12,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SAMPLE_CONFIG = {
-    "client_secret":os.getenv("TAP_LINKEDIN_CLIENT_SECRET"),
-    "access_token":os.getenv("TAP_LINKEDIN_ACCESS_TOKEN"),
-    "refresh_token":os.getenv("TAP_LINKEDIN_REFRESH_TOKEN"),
-    "client_id":os.getenv("TAP_LINKEDIN_CLIENT_ID"),
-    "account_id":os.getenv("TAP_LINKEDIN_ACCOUNTS"),
-    "user_agent":os.getenv("TAP_LINKEDIN_USER_AGENT"),
-    "start_date":os.getenv("TAP_LINKEDIN_START_DATE"),
-    "linkedin_version":"202207",
-    "owner":os.getenv("TAP_LINKEDIN_OWNER"),
-    "campaign":os.getenv("TAP_LINKEDIN_CAMPAIGN")
+    "client_secret": os.getenv("TAP_LINKEDIN_CLIENT_SECRET"),
+    "access_token": os.getenv("TAP_LINKEDIN_ACCESS_TOKEN"),
+    "refresh_token": os.getenv("TAP_LINKEDIN_REFRESH_TOKEN"),
+    "client_id": os.getenv("TAP_LINKEDIN_CLIENT_ID"),
+    "account_id": os.getenv("TAP_LINKEDIN_ACCOUNTS"),
+    "user_agent": os.getenv("TAP_LINKEDIN_USER_AGENT"),
+    "start_date": os.getenv("TAP_LINKEDIN_START_DATE"),
+    "linkedin_version": "202207",
+    "owner": os.getenv("TAP_LINKEDIN_OWNER"),
+    "campaign": os.getenv("TAP_LINKEDIN_CAMPAIGN"),
 }
 
 
 # Run standard built-in tap tests from the SDK:
 def test_standard_tap_tests():
     """Run standard tap tests from the SDK."""
-    tests = get_standard_tap_tests(
-        TapLinkedIn,
-        config=SAMPLE_CONFIG
-    )
+    tests = get_standard_tap_tests(TapLinkedIn, config=SAMPLE_CONFIG)
     for test in tests:
         test()

@@ -150,7 +150,6 @@ class accounts(LinkedInStream):
         return params
 
 
-
 class adAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
@@ -230,7 +229,6 @@ class adAnalyticsByCampaignInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -1236,12 +1234,10 @@ class adAnalyticsByCreativeInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-
         Property("actionClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
-
         Property(
             "dateRange",
             ObjectType(
@@ -1265,7 +1261,6 @@ class adAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -1316,7 +1311,6 @@ class adAnalyticsByCreativeInit(LinkedInStream):
         Property("viralVideoStarts", IntegerType),
         Property("viralVideoThirdQuartileCompletions", IntegerType),
         Property("viralVideoViews", IntegerType),
-
     ).to_dict()
 
     @property
@@ -1354,7 +1348,6 @@ class adAnalyticsByCreativeInit(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["fields"] = columns[0]
-
 
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
@@ -1584,6 +1577,5 @@ class adAnalyticsByCreativeThird(adAnalyticsByCreativeInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
         )
-
 
         return params
