@@ -409,6 +409,20 @@ class adAnalyticsByCampaign(adAnalyticsByCampaignInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adanalytics classes
+
+        1.1 Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        1.2 Uses merge_dicts to combine responses from each class
+        2.1 super().get_records calls only the records from only the adAnalyticsByCampaign class
+        3.3 zip() iterates over the records of adanalytics classes and merges them with merge_dicts() function
+        3.2 list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adanalytics streams
+        """
         adanalyticsinit_stream = adAnalyticsByCampaignInit(
             self._tap, schema={"properties": {}}
         )
@@ -431,9 +445,13 @@ class adAnalyticsByCampaign(adAnalyticsByCampaignInit):
         return adanalytics_records
 
     def merge_dicts(self, *dict_args):
-        """
-        Given any number of dictionaries, shallow copy and merge into a new dict,
-        precedence goes to key-value pairs in latter dictionaries.
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
         """
         result = {}
         for dictionary in dict_args:
@@ -1426,6 +1444,20 @@ class adAnalyticsByCreative(adAnalyticsByCreativeInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adanalytics classes
+
+        1.1 Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        1.2 Uses merge_dicts to combine responses from each class
+        2.1 super().get_records calls only the records from only the adAnalyticsByCreative class
+        3.3 zip() iterates over the records of adanalytics classes and merges them with merge_dicts() function
+        3.2 list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adanalytics streams
+        """
         adanalyticsinit_stream = adAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
         )
@@ -1448,9 +1480,13 @@ class adAnalyticsByCreative(adAnalyticsByCreativeInit):
         return adanalytics_records
 
     def merge_dicts(self, *dict_args):
-        """
-        Given any number of dictionaries, shallow copy and merge into a new dict,
-        precedence goes to key-value pairs in latter dictionaries.
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
         """
         result = {}
         for dictionary in dict_args:
