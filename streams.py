@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
-import singer_sdk
-
+import pendulum
 from singer_sdk import typing as th  # JSON Schema typing helpers
+
+from tap_linkedin.client import LinkedInStream
+
+SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 PropertiesList = th.PropertiesList
 Property = th.Property
@@ -18,19 +22,11 @@ BooleanType = th.BooleanType
 IntegerType = th.IntegerType
 
 
-from tap_linkedin.client import LinkedInStream
-
-import pendulum
-
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-
-
 class Accounts(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
-    """
+    """Accounts stream.
 
-    """
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -70,25 +66,25 @@ class Accounts(LinkedInStream):
     path = "adAccounts"
 
     schema = PropertiesList(
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("currency", StringType),
@@ -102,34 +98,28 @@ class Accounts(LinkedInStream):
         Property("reference", StringType),
         Property("reference_organization_id", IntegerType),
         Property("reference_person_id", StringType),
-
-        Property("servingStatuses",
-                 th.ArrayType(
-                     Property("items", StringType)
-                 )
+        Property(
+            "servingStatuses",
+            th.ArrayType(
+                Property("items", StringType),
+            ),
         ),
-
         Property("status", StringType),
-
-        Property("total_budget",
-                 ObjectType(
-                     Property("amount", StringType),
-                     Property("currency_code", StringType),
-                     additional_properties=False
-                 ),
+        Property(
+            "total_budget",
+            ObjectType(
+                Property("amount", StringType),
+                Property("currency_code", StringType),
+                additional_properties=False,
+            ),
         ),
-
         Property("total_budget_ends_at", StringType),
         Property("type", StringType),
         Property("test", BooleanType),
-
-        Property("version",
-                 ObjectType(
-                     Property("versionTag", StringType),
-                     additional_properties=False
-                 ),
-        )
-
+        Property(
+            "version",
+            ObjectType(Property("versionTag", StringType), additional_properties=False),
+        ),
     ).to_dict()
 
     def get_url_params(
@@ -159,12 +149,12 @@ class Accounts(LinkedInStream):
 
         return params
 
-class AdAnalyticsByCampaign(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
-    """
 
-    """
+class AdAnalyticsByCampaign(LinkedInStream):
+    """Ad analytics by campaign stream.
+
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -181,34 +171,33 @@ class AdAnalyticsByCampaign(LinkedInStream):
 
     ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
-
         Property("costInUsd", StringType),
         Property("viralCardClicks", IntegerType),
         Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
-
         Property(
             "dateRange",
             ObjectType(
-                Property("end",
+                Property(
+                    "end",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-                Property("start",
+                Property(
+                    "start",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-            )
+            ),
         ),
-
         Property("externalWebsitePostViewConversions", IntegerType),
         Property("impressions", IntegerType),
         Property("landingPageClicks", IntegerType),
@@ -223,10 +212,8 @@ class AdAnalyticsByCampaign(LinkedInStream):
         Property("viralFullScreenPlays", IntegerType),
         Property("viralShares", IntegerType),
         Property("viralTotalEngagements", IntegerType),
-        Property("viralVideoStarts", IntegerType)
-
+        Property("viralVideoStarts", IntegerType),
     ).to_dict()
-
 
     def get_url_params(
         self,
@@ -264,18 +251,18 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
-
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign",
+        )
 
         return params
 
 
 class VideoAds(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
-    """
+    """Video ads stream.
 
-    """
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -291,38 +278,35 @@ class VideoAds(LinkedInStream):
     path = "adDirectSponsoredContents"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("account_id", IntegerType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("content_reference", StringType),
         Property("content_reference_ucg_post_id", IntegerType),
         Property("content_reference_share_id", IntegerType),
         Property("name", StringType),
-        Property("type", StringType)
-
+        Property("type", StringType),
     ).to_dict()
-
 
     def get_url_params(
         self,
@@ -353,11 +337,10 @@ class VideoAds(LinkedInStream):
 
 
 class AccountUsers(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
-    """
+    """Account users stream.
 
-    """
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -385,40 +368,33 @@ class AccountUsers(LinkedInStream):
     path = "adAccountUsers"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("campaign_contact", BooleanType),
         Property("account_id", IntegerType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
-                         ObjectType(
-                             Property("time", StringType),
-                             additional_properties=False
-
-                         ),
-
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", StringType),
+                        additional_properties=False,
+                    ),
                 ),
-
-                Property("lastModified",
-                         ObjectType(
-                             Property("time", StringType),
-                             additional_properties=False
-                         ),
-
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", StringType),
+                        additional_properties=False,
+                    ),
                 ),
-
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("role", StringType),
         Property("user", StringType),
-        Property("user_person_id", StringType)
-
+        Property("user_person_id", StringType),
     ).to_dict()
 
     def get_url_params(
@@ -480,30 +456,27 @@ class CampaignGroups(LinkedInStream):
     jsonschema = PropertiesList(
         Property(
             "runSchedule",
-            ObjectType(
-                Property("start", DateTimeType),
-                Property("end", DateTimeType)
-            )
+            ObjectType(Property("start", DateTimeType), Property("end", DateTimeType)),
         ),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", DateTimeType),
         Property("last_modified_time", DateTimeType),
         Property("name", StringType),
@@ -513,23 +486,20 @@ class CampaignGroups(LinkedInStream):
         Property("account", StringType),
         Property("account_id", IntegerType),
         Property("status", StringType),
-
         Property(
             "total_budget",
             ObjectType(
                 Property("currency_code", StringType),
-                Property("amount", StringType)
-            )
+                Property("amount", StringType),
+            ),
         ),
-
         Property("test", BooleanType),
         Property("allowed_campaign_types", ArrayType(StringType)),
         Property("run_schedule_start", DateTimeType),
-        Property("run_schedule_end", StringType)
+        Property("run_schedule_end", StringType),
     ).to_dict()
 
     schema = jsonschema
-
 
     def get_url_params(
         self,
@@ -558,12 +528,12 @@ class CampaignGroups(LinkedInStream):
 
         return params
 
-class Campaigns(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
-    """
 
-    """
+class Campaigns(LinkedInStream):
+    """Campaigns stream.
+
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -579,232 +549,229 @@ class Campaigns(LinkedInStream):
     path = "adCampaigns"
 
     schema = PropertiesList(
-
         Property(
             "targeting",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("included_targeting_facets",
+                        Property(
+                            "included_targeting_facets",
                             th.ArrayType(
-                                Property("items",
+                                Property(
+                                    "items",
                                     ObjectType(
                                         Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
                                         ),
-                                        additional_properties=False
-                                    )
+                                        additional_properties=False,
+                                    ),
                                 ),
-                            )
+                            ),
                         ),
-                        Property("excluded_targeting_facets",
+                        Property(
+                            "excluded_targeting_facets",
                             th.ArrayType(
-                                Property("items",
+                                Property(
+                                    "items",
                                     ObjectType(
                                         Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
                                         ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                    ),
-                ),
-            )
-        ),
-
-        Property(
-            "targetingCriteria",
-            ObjectType(
-                Property("include",
-                    ObjectType(
-                        Property("and",
-                            th.ArrayType(
-                                Property("items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
-                                        ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                        Property("or",
-                            th.ArrayType(
-                                Property("items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
-                                        ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                    ),
-                ),
-                Property("exclude",
-                    ObjectType(
-                        Property("or",
-                            ObjectType(
-                                Property("urn:li:ad_targeting_facet:titles",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:staff_count_ranges",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:followed_companies",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:seniorities",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
+                                        additional_properties=False,
+                                    ),
                                 ),
                             ),
                         ),
                     ),
                 ),
-            )
+            ),
         ),
-
-        Property("servingStatuses",
-            th.ArrayType(
-                Property("items", StringType)
-            )
+        Property(
+            "targetingCriteria",
+            ObjectType(
+                Property(
+                    "include",
+                    ObjectType(
+                        Property(
+                            "and",
+                            th.ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Property(
+                            "or",
+                            th.ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                Property(
+                    "exclude",
+                    ObjectType(
+                        Property(
+                            "or",
+                            ObjectType(
+                                Property(
+                                    "urn:li:ad_targeting_facet:titles",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:staff_count_ranges",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:followed_companies",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:seniorities",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
-
-        Property("totalBudget",
+        Property("servingStatuses", th.ArrayType(Property("items", StringType))),
+        Property(
+            "totalBudget",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("version_tag", StringType),
-
-        Property("locale",
+        Property(
+            "locale",
             ObjectType(
                 Property("country", StringType),
                 Property("language", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
-        Property("version",
-            ObjectType(
-                Property("versionTag", StringType),
-                additional_properties=False
-            ),
+        Property(
+            "version",
+            ObjectType(Property("versionTag", StringType), additional_properties=False),
         ),
-
         Property("associatedEntity", StringType),
         Property("associated_entity_organization_id", IntegerType),
         Property("associated_entity_person_id", IntegerType),
-
-        Property("runSchedule",
+        Property(
+            "runSchedule",
             ObjectType(
                 Property("start", StringType),
                 Property("end", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("optimizationTargetType", StringType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
                         Property("time", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-
-            )
+            ),
         ),
-
         Property("campaignGroup", StringType),
         Property("campaign_group_id", IntegerType),
-
-        Property("dailyBudget",
+        Property(
+            "dailyBudget",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
-        Property("unitCost",
+        Property(
+            "unitCost",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("creativeSelection", StringType),
         Property("costType", StringType),
         Property("name", StringType),
         Property("objectiveType", StringType),
         Property("offsiteDeliveryEnabled", BooleanType),
-
-        Property("offsitePreferences",
+        Property(
+            "offsitePreferences",
             ObjectType(
-                Property("iabCategories",
+                Property(
+                    "iabCategories",
                     ObjectType(
-                        Property("exclude",
+                        Property(
+                            "exclude",
                             th.ArrayType(
                                 Property("items", StringType),
-                            )
+                            ),
                         ),
-                        Property("include",
-                            th.ArrayType(
-                                Property("items", StringType)
-                            )
+                        Property(
+                            "include",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
-                Property("publisherRestrictionFiles",
+                Property(
+                    "publisherRestrictionFiles",
                     ObjectType(
-                        Property("exclude",
-                            th.ArrayType(
-                                Property("items", StringType)
-                            )
+                        Property(
+                            "exclude",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
             ),
         ),
-
         Property("id", IntegerType),
         Property("audienceExpansionEnabled", BooleanType),
         Property("test", BooleanType),
@@ -819,7 +786,6 @@ class Campaigns(LinkedInStream):
         Property("last_modified_time", DateTimeType),
         Property("run_schedule_start", DateTimeType),
         Property("run_schedule_end", StringType),
-
     ).to_dict()
 
     def get_url_params(
@@ -851,11 +817,10 @@ class Campaigns(LinkedInStream):
 
 
 class Creatives(LinkedInStream):
-    """
-    https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
-    """
+    """Creatives stream.
 
-    """
+    https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -871,27 +836,25 @@ class Creatives(LinkedInStream):
     path = "creatives"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("account_id", IntegerType),
         Property("campaign", StringType),
         Property("campaign_id", IntegerType),
-
         Property(
             "content",
             ObjectType(
                 Property("reference", StringType),
-                Property("text_ad",
+                Property(
+                    "text_ad",
                     ObjectType(
                         Property("headline", StringType),
                         Property("description", StringType),
                         Property("landing_page", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_at", StringType),
         Property("created_by", StringType),
         Property("last_modified_at", StringType),
@@ -900,14 +863,16 @@ class Creatives(LinkedInStream):
         Property("intended_status", StringType),
         Property("is_serving", BooleanType),
         Property("is_test", BooleanType),
-
-        Property("serving_hold_reasons",
-            th.ArrayType(
-                Property("items", StringType)
-            )
-        )
-
+        Property("serving_hold_reasons", th.ArrayType(Property("items", StringType))),
     ).to_dict()
+
+    def http_headers(self) -> dict:
+        """Return the HTTP headers needed for this endpoint."""
+        headers = super().http_headers()
+
+        # Override the protocol version to 2.0.0
+        headers["X-Restli-Protocol-Version"] = "2.0.0"
+        return headers
 
     def get_url_params(
         self,
@@ -938,11 +903,10 @@ class Creatives(LinkedInStream):
 
 
 class AdAnalyticsByCreative(LinkedInStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
-    """
+    """Ad Analytics by Creative stream.
 
-    """
+    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
+
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -959,34 +923,33 @@ class AdAnalyticsByCreative(LinkedInStream):
 
     ## TODO: CHANGE ALL COLUMN NAMES FROM SNAKE CASE INTO CAMEL CASE
     schema = PropertiesList(
-
         Property("costInUsd", StringType),
         Property("viralCardClicks", IntegerType),
         Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
-
         Property(
             "dateRange",
             ObjectType(
-                Property("end",
+                Property(
+                    "end",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-                Property("start",
+                Property(
+                    "start",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-            )
+            ),
         ),
-
         Property("externalWebsitePostViewConversions", IntegerType),
         Property("impressions", IntegerType),
         Property("landingPageClicks", IntegerType),
@@ -1001,8 +964,7 @@ class AdAnalyticsByCreative(LinkedInStream):
         Property("viralFullScreenPlays", IntegerType),
         Property("viralShares", IntegerType),
         Property("viralTotalEngagements", IntegerType),
-        Property("viralVideoStarts", IntegerType)
-
+        Property("viralVideoStarts", IntegerType),
     ).to_dict()
 
     def get_url_params(
@@ -1028,7 +990,7 @@ class AdAnalyticsByCreative(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        params["fields"] = columns    
+        params["fields"] = columns
 
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
@@ -1042,6 +1004,8 @@ class AdAnalyticsByCreative(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign",
+        )
 
         return params

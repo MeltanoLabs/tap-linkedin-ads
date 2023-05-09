@@ -79,13 +79,15 @@ class Accounts(LinkedInStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -148,7 +150,6 @@ class Accounts(LinkedInStream):
         params["sort.order"] = "ASCENDING"
 
         return params
-
 
 
 class AdAnalyticsByCampaignInit(LinkedInStream):
@@ -230,7 +231,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -334,7 +334,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
 
         params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -347,7 +347,9 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
             daterange_month = row.get("dateRange").get("start").get("month")
             daterange_year = row.get("dateRange").get("start").get("year")
             daterange_column = "{}-{}-{}".format(
-                daterange_year, daterange_month, daterange_day
+                daterange_year,
+                daterange_month,
+                daterange_day,
             )
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
         except:
@@ -403,20 +405,23 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
         adanalyticsinit_stream = AdAnalyticsByCampaignInit(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsthird_stream = AdAnalyticsByCampaignThird(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalytics_records = [
             self.merge_dicts(x, y, z, p)
@@ -482,7 +487,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -529,7 +534,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -564,13 +569,15 @@ class VideoAds(LinkedInStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -654,13 +661,15 @@ class AccountUsers(LinkedInStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -739,13 +748,15 @@ class CampaignGroups(LinkedInStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -762,7 +773,8 @@ class CampaignGroups(LinkedInStream):
         Property(
             "total_budget",
             ObjectType(
-                Property("currency_code", StringType), Property("amount", StringType)
+                Property("currency_code", StringType),
+                Property("amount", StringType),
             ),
         ),
         Property("test", BooleanType),
@@ -980,13 +992,15 @@ class Campaigns(LinkedInStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -1027,7 +1041,8 @@ class Campaigns(LinkedInStream):
                             ),
                         ),
                         Property(
-                            "include", th.ArrayType(Property("items", StringType))
+                            "include",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
@@ -1035,7 +1050,8 @@ class Campaigns(LinkedInStream):
                     "publisherRestrictionFiles",
                     ObjectType(
                         Property(
-                            "exclude", th.ArrayType(Property("items", StringType))
+                            "exclude",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
@@ -1218,12 +1234,10 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-
         Property("actionClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
-
         Property(
             "dateRange",
             ObjectType(
@@ -1247,7 +1261,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -1298,7 +1311,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralVideoStarts", IntegerType),
         Property("viralVideoThirdQuartileCompletions", IntegerType),
         Property("viralVideoViews", IntegerType),
-
     ).to_dict()
 
     @property
@@ -1337,7 +1349,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
 
         params["fields"] = columns[0]
 
-
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
 
@@ -1351,7 +1362,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -1364,7 +1375,9 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             daterange_month = row.get("dateRange").get("start").get("month")
             daterange_year = row.get("dateRange").get("start").get("year")
             daterange_column = "{}-{}-{}".format(
-                daterange_year, daterange_month, daterange_day
+                daterange_year,
+                daterange_month,
+                daterange_day,
             )
             row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
         except:
@@ -1420,20 +1433,23 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
         adanalyticsinit_stream = AdAnalyticsByCreativeInit(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsthird_stream = AdAnalyticsByCreativeThird(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalytics_records = [
             self.merge_dicts(x, y, z, p)
@@ -1499,7 +1515,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -1546,8 +1562,7 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
-
 
         return params

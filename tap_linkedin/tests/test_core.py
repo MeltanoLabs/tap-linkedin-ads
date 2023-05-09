@@ -7,7 +7,7 @@ from singer_sdk.testing import get_standard_tap_tests
 from tap_linkedin.tap import TapLinkedIn
 
 SAMPLE_CONFIG = {
-    "start_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    "start_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
     # TODO: Initialize minimal tap config
 }
 

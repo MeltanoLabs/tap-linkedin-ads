@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-
-from datetime import datetime
-
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -47,27 +44,24 @@ class LinkedInStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-            headers["LinkedIn-Version"] = self.config.get("linkedin_version")
-            headers["X-Restli-Protocol-Version"] = self.config.get(
-                "x-restli-protocol-version"
-            )
-            headers["Content-Type"] = self.config.get("application/json")
-
-        # If not using an authenticator, you may also provide inline auth headers:
-        # headers["Private-Token"] = self.config.get("refresh_token")
+            headers["LinkedIn-Version"] = self.config.get("api_version")
+            headers["Content-Type"] = "application/json"
+            headers["X-Restli-Protocol-Version"] = "1.0.0"
 
         return headers
 
     def get_next_page_token(
-        self, response: requests.Response, previous_token: Optional[Any]
-    ) -> Optional[Any]:
+        self,
+        response: requests.Response,
+        previous_token: Any | None,
+    ) -> Any | None:
         """Return a token for identifying next page or None if no more pages."""
         # If pagination is required, return a token which can be used to get the
         #       next page. If this is the final page, return "None" to end the
         #       pagination loop.
 
         resp_json = response.json()
-        if previous_token == None:
+        if previous_token is None:
             previous_token = 0
 
         if len(resp_json.get("elements")) == 0:
@@ -102,10 +96,8 @@ class LinkedInStream(RESTStream):
 
         return params
 
-
     adanalytics_columns_first = {}
     adanalytics_columns_second = {}
-
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
@@ -116,7 +108,6 @@ class LinkedInStream(RESTStream):
         Yields:
             Each record from the source.
         """
-
         resp_json = response.json()
 
         if isinstance(resp_json, list):
@@ -132,10 +123,10 @@ class LinkedInStream(RESTStream):
                     columns.get("changeAuditStamps").get("lastModified").get("time")
                 )
                 columns["created_time"] = datetime.fromtimestamp(
-                    int(created_time) / 1000
+                    int(created_time) / 1000,
                 ).isoformat()
                 columns["last_modified_time"] = datetime.fromtimestamp(
-                    int(last_modified_time) / 1000
+                    int(last_modified_time) / 1000,
                 ).isoformat()
                 try:
                     account_column = columns.get("account")
@@ -158,7 +149,7 @@ class LinkedInStream(RESTStream):
                 try:
                     schedule_column = columns.get("runSchedule").get("start")
                     columns["run_schedule_start"] = datetime.fromtimestamp(
-                        int(schedule_column) / 1000
+                        int(schedule_column) / 1000,
                     ).isoformat()
                 except:
                     pass
