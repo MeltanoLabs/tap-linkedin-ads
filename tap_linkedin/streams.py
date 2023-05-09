@@ -66,7 +66,7 @@ class Accounts(LinkedInStream):
 
     name = "account"
     replication_keys = ["last_modified_time"]
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     replication_method = "incremental"
     path = "adAccounts"
 
@@ -653,9 +653,9 @@ class AccountUsers(LinkedInStream):
     ]
 
     name = "account_user"
-    replication_keys = ["last_modified_time"]
+    replication_keys = ["user_person_id"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time"]
+    primary_keys = ["user_person_id", "last_modified_time"]
     path = "adAccountUsers"
 
     schema = PropertiesList(
@@ -730,7 +730,7 @@ class CampaignGroups(LinkedInStream):
     name = "campaign_groups"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaignGroups"
 
     PropertiesList = th.PropertiesList
@@ -832,7 +832,7 @@ class Campaigns(LinkedInStream):
     name = "campaign"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaigns"
 
     schema = PropertiesList(
