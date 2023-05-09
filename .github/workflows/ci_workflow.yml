@@ -55,7 +55,7 @@ jobs:
         poetry install
     - name: Test with pytest
       id: test_pytest
-      continue-on-error: true
+      continue-on-error: false
       env:
          TAP_LINKEDIN_ACCESS_TOKEN: ${{ secrets.access_token }}
          TAP_LINKEDIN_ACCOUNTS: ${{ secrets.accounts }}
