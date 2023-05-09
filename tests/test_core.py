@@ -1,15 +1,8 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
-import datetime
-
 from singer_sdk.testing import get_standard_tap_tests
 
 from tap_linkedin.tap import TapLinkedIn
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 SAMPLE_CONFIG = {
     "client_secret": "",
