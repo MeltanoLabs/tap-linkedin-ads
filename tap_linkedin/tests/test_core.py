@@ -12,16 +12,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SAMPLE_CONFIG = {
-    "client_secret": os.getenv("TAP_LINKEDIN_CLIENT_SECRET"),
-    "access_token": os.getenv("TAP_LINKEDIN_ACCESS_TOKEN"),
-    "refresh_token": os.getenv("TAP_LINKEDIN_REFRESH_TOKEN"),
-    "client_id": os.getenv("TAP_LINKEDIN_CLIENT_ID"),
-    "account_id": os.getenv("TAP_LINKEDIN_ACCOUNTS"),
-    "user_agent": os.getenv("TAP_LINKEDIN_USER_AGENT"),
-    "start_date": os.getenv("TAP_LINKEDIN_START_DATE"),
+    "client_secret": "",
+    "access_token": "",
+    "refresh_token": "",
+    "client_id": "",
+    "account_id": "",
+    "user_agent": "meltano",
+    "start_date": "2023-01-01T00:00:00Z",
     "linkedin_version": "202207",
-    "owner": os.getenv("TAP_LINKEDIN_OWNER"),
-    "campaign": os.getenv("TAP_LINKEDIN_CAMPAIGN"),
+    "owner": "",
+    "campaign": "",
 }
 
 
