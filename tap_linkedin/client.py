@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -9,9 +11,6 @@ import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-
-from datetime import datetime
-
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -47,14 +46,9 @@ class LinkedInStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-            headers["LinkedIn-Version"] = self.config.get("linkedin_version")
-            headers["X-Restli-Protocol-Version"] = self.config.get(
-                "x-restli-protocol-version"
-            )
-            headers["Content-Type"] = self.config.get("application/json")
-
-        # If not using an authenticator, you may also provide inline auth headers:
-        # headers["Private-Token"] = self.config.get("refresh_token")
+            headers["LinkedIn-Version"] = self.config.get("api_version")
+            headers["Content-Type"] = "application/json"
+            headers["X-Restli-Protocol-Version"] = "1.0.0"
 
         return headers
 

@@ -20,7 +20,6 @@ SAMPLE_CONFIG = {
     "user_agent":os.getenv("TAP_LINKEDIN_USER_AGENT"),
     "start_date":os.getenv("TAP_LINKEDIN_START_DATE"),
     "linkedin_version":"202207",
-    "x-restli-protocol-version":"1.0.0",
     "owner":os.getenv("TAP_LINKEDIN_OWNER"),
     "campaign":os.getenv("TAP_LINKEDIN_CAMPAIGN")
 }
