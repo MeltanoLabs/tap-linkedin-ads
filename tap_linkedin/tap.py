@@ -80,14 +80,14 @@ class TapLinkedIn(Tap):
 
         #TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
-            streams.Accounts(self),
-            streams.VideoAds(self),
-            streams.AccountUsers(self),
-            # streams.Creatives(self),
-            streams.Campaigns(self),
-            streams.CampaignGroups(self),
-            streams.AdAnalyticsByCampaign(self),
-            streams.AdAnalyticsByCreative(self),
+            streams.accounts(self),
+            streams.videoAds(self),
+            streams.accountUsers(self),
+            # streams.creatives(self),
+            streams.campaigns(self),
+            streams.campaignGroups(self),
+            streams.adAnalyticsByCampaign(self),
+            streams.adAnalyticsByCreative(self),
         ]
 
 

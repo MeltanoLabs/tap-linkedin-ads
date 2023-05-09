@@ -28,7 +28,7 @@ from datetime import datetime
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
-class Accounts(LinkedInStream):
+class accounts(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
@@ -151,7 +151,7 @@ class Accounts(LinkedInStream):
 
 
 
-class AdAnalyticsByCampaignInit(LinkedInStream):
+class adAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -362,7 +362,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
+class adAnalyticsByCampaign(adAnalyticsByCampaignInit):
     name = "ad_analytics_by_campaign"
 
     def get_url_params(
@@ -409,13 +409,13 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        adanalyticsinit_stream = AdAnalyticsByCampaignInit(
+        adanalyticsinit_stream = adAnalyticsByCampaignInit(
             self._tap, schema={"properties": {}}
         )
-        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
+        adanalyticsecond_stream = adAnalyticsByCampaignSecond(
             self._tap, schema={"properties": {}}
         )
-        adanalyticsthird_stream = AdAnalyticsByCampaignThird(
+        adanalyticsthird_stream = adAnalyticsByCampaignThird(
             self._tap, schema={"properties": {}}
         )
         adanalytics_records = [
@@ -441,7 +441,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         return result
 
 
-class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
+class adAnalyticsByCampaignSecond(adAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
 
     def get_url_params(
@@ -488,7 +488,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         return params
 
 
-class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
+class adAnalyticsByCampaignThird(adAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_third"
 
     def get_url_params(
@@ -535,7 +535,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         return params
 
 
-class VideoAds(LinkedInStream):
+class videoAds(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
     """
@@ -612,7 +612,7 @@ class VideoAds(LinkedInStream):
         return params
 
 
-class AccountUsers(LinkedInStream):
+class accountUsers(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
@@ -699,7 +699,7 @@ class AccountUsers(LinkedInStream):
         return params
 
 
-class CampaignGroups(LinkedInStream):
+class campaignGroups(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
     """
@@ -801,7 +801,7 @@ class CampaignGroups(LinkedInStream):
         return params
 
 
-class Campaigns(LinkedInStream):
+class campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
@@ -1085,7 +1085,7 @@ class Campaigns(LinkedInStream):
         return params
 
 
-class Creatives(LinkedInStream):
+class creatives(LinkedInStream):
     """
     https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
     """
@@ -1164,7 +1164,7 @@ class Creatives(LinkedInStream):
         return params
 
 
-class AdAnalyticsByCreativeInit(LinkedInStream):
+class adAnalyticsByCreativeInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -1379,7 +1379,7 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
+class adAnalyticsByCreative(adAnalyticsByCreativeInit):
     name = "ad_analytics_by_creative"
 
     def get_url_params(
@@ -1426,13 +1426,13 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        adanalyticsinit_stream = AdAnalyticsByCreativeInit(
+        adanalyticsinit_stream = adAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
         )
-        adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
+        adanalyticsecond_stream = adAnalyticsByCreativeSecond(
             self._tap, schema={"properties": {}}
         )
-        adanalyticsthird_stream = AdAnalyticsByCreativeThird(
+        adanalyticsthird_stream = adAnalyticsByCreativeThird(
             self._tap, schema={"properties": {}}
         )
         adanalytics_records = [
@@ -1458,7 +1458,7 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         return result
 
 
-class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
+class adAnalyticsByCreativeSecond(adAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
 
     def get_url_params(
@@ -1505,7 +1505,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         return params
 
 
-class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
+class adAnalyticsByCreativeThird(adAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
 
     def get_url_params(
