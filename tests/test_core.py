@@ -1,14 +1,20 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
-import datetime
-
 from singer_sdk.testing import get_standard_tap_tests
 
 from tap_linkedin.tap import TapLinkedIn
 
 SAMPLE_CONFIG = {
-    "start_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
-    # TODO: Initialize minimal tap config
+    "client_secret": "",
+    "access_token": "",
+    "refresh_token": "",
+    "client_id": "",
+    "account_id": "",
+    "user_agent": "meltano",
+    "start_date": "2023-01-01T00:00:00Z",
+    "linkedin_version": "202207",
+    "owner": "",
+    "campaign": "",
 }
 
 
@@ -18,6 +24,3 @@ def test_standard_tap_tests():
     tests = get_standard_tap_tests(TapLinkedIn, config=SAMPLE_CONFIG)
     for test in tests:
         test()
-
-
-# TODO: Create additional tests as appropriate for your tap.

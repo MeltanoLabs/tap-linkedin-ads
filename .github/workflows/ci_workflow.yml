@@ -23,7 +23,7 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.8
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
@@ -49,19 +49,20 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.11
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
     - name: Test with pytest
       id: test_pytest
-      continue-on-error: true
+      continue-on-error: false
       env:
-         access_token: ${{ secrets.access_token }}
-         refresh_token: ${{ secrets.refresh_token }}
-         client_id: ${{ secrets.client_id }}
-         client_secret: ${{ secrets.client_secret }}
-         owner: ${{ secrets.owner }}
-         campaign: ${{ secrets.campaign }}
+         TAP_LINKEDIN_ACCESS_TOKEN: ${{ secrets.access_token }}
+         TAP_LINKEDIN_ACCOUNTS: ${{ secrets.accounts }}
+         TAP_LINKEDIN_REFRESH_TOKEN: ${{ secrets.refresh_token }}
+         TAP_LINKEDIN_CLIENT_ID: ${{ secrets.client_id }}
+         TAP_LINKEDIN_CLIENT_SECRET: ${{ secrets.client_secret }}
+         TAP_LINKEDIN_OWNER: ${{ secrets.owner }}
+         TAP_LINKEDIN_CAMPAIGN: ${{ secrets.campaign }}
       run: |
         poetry run pytest --capture=no

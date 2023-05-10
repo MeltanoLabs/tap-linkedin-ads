@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Iterable
 
-import singer_sdk
-
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 PropertiesList = th.PropertiesList
@@ -68,7 +66,7 @@ class Accounts(LinkedInStream):
 
     name = "account"
     replication_keys = ["last_modified_time"]
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     replication_method = "incremental"
     path = "adAccounts"
 
@@ -150,7 +148,6 @@ class Accounts(LinkedInStream):
         return params
 
 
-
 class AdAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
@@ -230,7 +227,6 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -409,6 +405,20 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adAanalytics classes
+
+        Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        Uses merge_dicts to combine responses from each class
+        super().get_records calls only the records from the adAnalyticsByCampaign class
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
+        list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adAnalytics streams
+        """
         adanalyticsinit_stream = AdAnalyticsByCampaignInit(
             self._tap, schema={"properties": {}}
         )
@@ -431,9 +441,13 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         return adanalytics_records
 
     def merge_dicts(self, *dict_args):
-        """
-        Given any number of dictionaries, shallow copy and merge into a new dict,
-        precedence goes to key-value pairs in latter dictionaries.
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
         """
         result = {}
         for dictionary in dict_args:
@@ -639,9 +653,9 @@ class AccountUsers(LinkedInStream):
     ]
 
     name = "account_user"
-    replication_keys = ["last_modified_time"]
+    replication_keys = ["user_person_id"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time"]
+    primary_keys = ["user_person_id", "last_modified_time"]
     path = "adAccountUsers"
 
     schema = PropertiesList(
@@ -716,7 +730,7 @@ class CampaignGroups(LinkedInStream):
     name = "campaign_groups"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaignGroups"
 
     PropertiesList = th.PropertiesList
@@ -818,7 +832,7 @@ class Campaigns(LinkedInStream):
     name = "campaign"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaigns"
 
     schema = PropertiesList(
@@ -1218,12 +1232,10 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralCardClicks", IntegerType),
         Property("viralCardImpressions", IntegerType),
         Property("viralCommentLikes", IntegerType),
-
         Property("actionClicks", IntegerType),
         Property("comments", IntegerType),
         Property("companyPageClicks", IntegerType),
         Property("conversionValueInLocalCurrency", StringType),
-
         Property(
             "dateRange",
             ObjectType(
@@ -1247,7 +1259,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
                 ),
             ),
         ),
-
         Property("day", StringType),
         Property("externalWebsiteConversions", IntegerType),
         Property("externalWebsitePostClickConversions", IntegerType),
@@ -1298,7 +1309,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
         Property("viralVideoStarts", IntegerType),
         Property("viralVideoThirdQuartileCompletions", IntegerType),
         Property("viralVideoViews", IntegerType),
-
     ).to_dict()
 
     @property
@@ -1336,7 +1346,6 @@ class AdAnalyticsByCreativeInit(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["fields"] = columns[0]
-
 
         start_date = pendulum.parse(self.config.get("start_date"))
         end_date = pendulum.parse(self.config.get("end_date"))
@@ -1426,6 +1435,20 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         return params
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adAnalytics classes
+
+        Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        Uses merge_dicts to combine responses from each class
+        super().get_records calls only the records from adAnalyticsByCreative class
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
+        list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adAnalytics streams
+        """
         adanalyticsinit_stream = AdAnalyticsByCreativeInit(
             self._tap, schema={"properties": {}}
         )
@@ -1448,9 +1471,13 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         return adanalytics_records
 
     def merge_dicts(self, *dict_args):
-        """
-        Given any number of dictionaries, shallow copy and merge into a new dict,
-        precedence goes to key-value pairs in latter dictionaries.
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
         """
         result = {}
         for dictionary in dict_args:
@@ -1548,6 +1575,5 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
             "campaign"
         )
-
 
         return params

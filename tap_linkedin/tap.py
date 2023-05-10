@@ -24,19 +24,17 @@ class TapLinkedIn(Tap):
         th.Property(
             "access_token",
             th.StringType,
-            required=True,
             description="The token to authenticate against the API service",
         ),
         th.Property(
             "refresh_token",
             th.StringType,
-            required=True,
             description="Generated token, bearer auth",
         ),
         th.Property(
             "start_date",
             th.DateTimeType,
-            required=True,
+            required=False,
             description="The earliest record date to sync",
         ),
         th.Property(
@@ -49,7 +47,6 @@ class TapLinkedIn(Tap):
         th.Property(
             "client_secret",
             th.StringType,
-            required=True,
             description="client secret key",
         ),
         th.Property(
@@ -78,7 +75,7 @@ class TapLinkedIn(Tap):
             A list of discovered streams.
         """
 
-        #TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
+        # TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
             streams.Accounts(self),
             streams.VideoAds(self),
