@@ -13,20 +13,13 @@ plugins:
     - discover
     settings:
     - name: access_token
-      value: ${TAP_LINKEDIN_ACCESS_TOKEN}
       kind: password
     - name: refresh_token
-      value: ${TAP_LINKEDIN_REFRESH_TOKEN}
-      kind: password
-    - name: password
       kind: password
     - name: client_secret
-      value: ${TAP_LINKEDIN_CLIENT_SECRET}
       kind: password
-    - name: account_id
-      value: ${TAP_LINKEDIN_ACCOUNTS}
+    - name: accounts
     - name: client_id
-      value: ${TAP_LINKEDIN_CLIENT_ID}
     - name: user_agent
       value: 'meltano'
     - name: linkedin_version
@@ -41,74 +34,35 @@ plugins:
       value: '2023-04-01T00:00:00Z'
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - accounts
   - name: Linkedin-AdAccountsUsers
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - account_user
   - name: Linkedin-Creatives
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 2.0.0
     select:
     - creatives
   - name: Linkedin-Campaigns
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - campaign
   - name: Linkedin-CampaignGroups
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - campaign_groups
   - name: Linkedin-AdAnalyticsByCreative
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - ad_analytics_by_creative
   - name: Linkedin-AdAnalyticsByCampaign
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - ad_analytics_by_campaign
   - name: Linkedin-VideoAds
     inherit_from: tap-linkedin
-    config:
-      x-restli-protocol-version: 1.0.0
     select:
     - video_ads
-  loaders:
-  - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
-  - name: target-csv
-    variant: hotgluexyz
-    pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
-    config:
-      destination_path: /Users/neilgorman/Documents/GitHub/tap-linkedin-sdk/output
-  - name: target-snowflake
-    variant: transferwise
-    pip_url: pipelinewise-target-snowflake
-    config:
-      batch_size: 5
 environments:
 - name: dev
-  config:
-    plugins:
-      loaders:
-      - name: target-csv
-      - name: target-snowflake
-        config:
-          primary_key_required: false
-- name: staging
-- name: prod

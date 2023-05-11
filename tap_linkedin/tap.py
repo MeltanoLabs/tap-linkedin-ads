@@ -6,12 +6,13 @@ from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 # TODO: Import your custom stream types here:
-from tap_linkedin.streams import (LinkedInStream)
+from tap_linkedin.streams import LinkedInStream
 import tap_linkedin.streams as streams
 
 import datetime
 
 STREAM_TYPES = [LinkedInStream]
+
 
 class TapLinkedIn(Tap):
     """LinkedIn tap class."""
@@ -29,13 +30,12 @@ class TapLinkedIn(Tap):
         th.Property(
             "refresh_token",
             th.StringType,
-            required=True,
             description="Generated token, bearer auth",
         ),
         th.Property(
             "start_date",
             th.DateTimeType,
-            required=True,
+            required=False,
             description="The earliest record date to sync",
         ),
         th.Property(
@@ -48,7 +48,6 @@ class TapLinkedIn(Tap):
         th.Property(
             "client_secret",
             th.StringType,
-            required=True,
             description="client secret key",
         ),
         th.Property(
@@ -67,7 +66,18 @@ class TapLinkedIn(Tap):
             "accounts",
             th.StringType,
             description="LinkedIn Account ID",
-        )
+        ),
+        th.Property(
+            "campaign",
+            th.StringType,
+            description="LinkedIn Campaign ID",
+        ),
+        th.Property(
+            "owner",
+            th.StringType,
+            description="LinkedIn Owner ID",
+        ),
+
     ).to_dict()
 
     def discover_streams(self) -> list[streams.LinkedInStream]:
@@ -77,15 +87,16 @@ class TapLinkedIn(Tap):
             A list of discovered streams.
         """
 
+        # TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
             streams.Accounts(self),
             streams.VideoAds(self),
             streams.AccountUsers(self),
-            #streams.Creatives(self),
+            # streams.Creatives(self),
             streams.Campaigns(self),
             streams.CampaignGroups(self),
+            streams.AdAnalyticsByCampaign(self),
             streams.AdAnalyticsByCreative(self),
-            streams.AdAnalyticsByCampaign(self)
         ]
 
 

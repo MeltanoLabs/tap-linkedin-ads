@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-
-import singer_sdk
+from typing import Any, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -20,7 +19,9 @@ IntegerType = th.IntegerType
 
 from tap_linkedin.client import LinkedInStream
 
-import pendulum
+import pendulum, requests
+
+from datetime import datetime
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -64,31 +65,29 @@ class Accounts(LinkedInStream):
     ]
 
     name = "account"
-    primary_keys = ["id"]
     replication_keys = ["last_modified_time"]
+    primary_keys = ["last_modified_time", "id", "status"]
     replication_method = "incremental"
     path = "adAccounts"
 
     schema = PropertiesList(
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("currency", StringType),
@@ -102,34 +101,23 @@ class Accounts(LinkedInStream):
         Property("reference", StringType),
         Property("reference_organization_id", IntegerType),
         Property("reference_person_id", StringType),
-
-        Property("servingStatuses",
-                 th.ArrayType(
-                     Property("items", StringType)
-                 )
-        ),
-
+        Property("servingStatuses", th.ArrayType(Property("items", StringType))),
         Property("status", StringType),
-
-        Property("total_budget",
-                 ObjectType(
-                     Property("amount", StringType),
-                     Property("currency_code", StringType),
-                     additional_properties=False
-                 ),
+        Property(
+            "total_budget",
+            ObjectType(
+                Property("amount", StringType),
+                Property("currency_code", StringType),
+                additional_properties=False,
+            ),
         ),
-
         Property("total_budget_ends_at", StringType),
         Property("type", StringType),
         Property("test", BooleanType),
-
-        Property("version",
-                 ObjectType(
-                     Property("versionTag", StringType),
-                     additional_properties=False
-                 ),
-        )
-
+        Property(
+            "version",
+            ObjectType(Property("versionTag", StringType), additional_properties=False),
+        ),
     ).to_dict()
 
     def get_url_params(
@@ -159,7 +147,8 @@ class Accounts(LinkedInStream):
 
         return params
 
-class AdAnalyticsByCampaign(LinkedInStream):
+
+class AdAnalyticsByCampaignInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -173,175 +162,134 @@ class AdAnalyticsByCampaign(LinkedInStream):
     replication_keys = datetime keys for replication
     """
 
-    name = "ad_analytics_by_campaign"
-    replication_keys = ["end_at"]
+    name = "AdAnalyticsByCampaignInit"
+    replication_keys = ["dateRange"]
     replication_method = "incremental"
-    key_properties = ["campaign_id", "start_at"]
+    primary_keys = ["campaign_id", "dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
-
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property("document_completions", IntegerType),
-        Property("document_first_quartile_completions", IntegerType),
-        Property("clicks", IntegerType),
-        Property("document_midpoint_completions", IntegerType),
-        Property("document_third_quartile_completions", IntegerType),
-        Property("download_clicks", IntegerType),
-        Property("job_applications", StringType),
-        Property("job_apply_clicks", StringType),
-        Property("post_click_job_applications", StringType),
-        Property("post_click_job_apply_clicks", StringType),
-        Property("post_click_registrations", StringType),
-        Property("post_view_job_applications", StringType),
-        Property("post_view_job_apply_clicks", StringType),
-        Property("cost_in_usd", StringType),
-        Property("post_view_registrations", StringType),
-        Property("registrations", StringType),
-        Property("talent_leads", IntegerType),
-        Property("viral_document_completions", IntegerType),
-        Property("viral_document_first_quartile_completions", IntegerType),
-        Property("viral_document_midpoint_completions", IntegerType),
-        Property("viral_document_third_quartile_completions", IntegerType),
-        Property("viral_download_clicks", IntegerType),
-        Property("viral_job_applications", StringType),
-        Property("viral_job_apply_clicks", StringType),
-        Property("cost_in_local_currency", StringType),
-        Property("viral_post_click_job_applications", StringType),
-        Property("viral_post_click_job_apply_clicks", StringType),
-        Property("viral_post_click_registrations", StringType),
-        Property("viral_post_view_job_applications", StringType),
-        Property("viral_post_view_job_apply_clicks", StringType),
-        Property("viral_post_view_registrations", StringType),
-        Property("viral_registrations", StringType),
-        Property("approximate_unique_impressions", IntegerType),
-        Property("card_clicks", IntegerType),
-        Property("card_impressions", IntegerType),
-        Property("comment_likes", IntegerType),
-        Property("viral_card_clicks", IntegerType),
-        Property("viral_card_impressions", IntegerType),
-        Property("viral_comment_likes", IntegerType),
-        Property("campaign", StringType),
         Property("campaign_id", IntegerType),
-        Property("start_at", StringType),
-        Property("end_at", StringType),
-        Property("action_clicks", IntegerType),
-        Property("ad_unit_clicks", IntegerType),
+        Property("documentCompletions", IntegerType),
+        Property("documentFirstQuartileCompletions", IntegerType),
+        Property("clicks", IntegerType),
+        Property("documentMidpointCompletions", IntegerType),
+        Property("documentThirdQuartileCompletions", IntegerType),
+        Property("downloadClicks", IntegerType),
+        Property("jobApplications", StringType),
+        Property("jobApplyClicks", StringType),
+        Property("postViewJobApplications", StringType),
+        Property("costInUsd", StringType),
+        Property("postViewRegistrations", StringType),
+        Property("registrations", StringType),
+        Property("talentLeads", IntegerType),
+        Property("viralDocumentCompletions", IntegerType),
+        Property("viralDocumentFirstQuartileCompletions", IntegerType),
+        Property("viralDocumentMidpointCompletions", IntegerType),
+        Property("viralDocumentThirdQuartileCompletions", IntegerType),
+        Property("viralDownloadClicks", IntegerType),
+        Property("viralJobApplications", StringType),
+        Property("viralJobApplyClicks", StringType),
+        Property("costInLocalCurrency", StringType),
+        Property("viralRegistrations", StringType),
+        Property("approximateUniqueImpressions", IntegerType),
+        Property("cardClicks", IntegerType),
+        Property("cardImpressions", IntegerType),
+        Property("commentLikes", IntegerType),
+        Property("viralCardClicks", IntegerType),
+        Property("viralCardImpressions", IntegerType),
+        Property("viralCommentLikes", IntegerType),
+        Property("actionClicks", IntegerType),
+        Property("adUnitClicks", IntegerType),
         Property("comments", IntegerType),
-        Property("company_page_clicks", IntegerType),
-        Property("conversion_value_in_local_currency", StringType),
-
+        Property("companyPageClicks", IntegerType),
+        Property("conversionValueInLocalCurrency", StringType),
         Property(
-            "date_range",
+            "dateRange",
             ObjectType(
-                Property("end",
+                Property(
+                    "end",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-                Property("start",
+                Property(
+                    "start",
                     ObjectType(
                         Property("day", IntegerType),
                         Property("month", IntegerType),
                         Property("year", IntegerType),
-                        additional_properties=False
-                    )
+                        additional_properties=False,
+                    ),
                 ),
-            )
+            ),
         ),
-
-        Property("external_website_conversions", IntegerType),
-        Property("external_website_post_click_conversions", IntegerType),
-        Property("external_website_post_view_conversions", IntegerType),
+        Property("day", StringType),
+        Property("externalWebsiteConversions", IntegerType),
+        Property("externalWebsitePostClickConversions", IntegerType),
+        Property("externalWebsitePostViewConversions", IntegerType),
         Property("follows", IntegerType),
-        Property("full_screen_plays", IntegerType),
+        Property("fullScreenPlays", IntegerType),
         Property("impressions", IntegerType),
-        Property("landing_page_clicks", IntegerType),
-        Property("lead_generation_mail_contact_info_shares", IntegerType),
-        Property("lead_generation_mail_interested_clicks", IntegerType),
+        Property("landingPageClicks", IntegerType),
+        Property("leadGenerationMailContactInfoShares", IntegerType),
+        Property("leadGenerationMailInterestedClicks", IntegerType),
         Property("likes", IntegerType),
-        Property("one_click_lead_form_opens", IntegerType),
-        Property("one_click_leads", IntegerType),
+        Property("oneClickLeadFormOpens", IntegerType),
+        Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
-        Property("other_engagements", IntegerType),
+        Property("otherEngagements", IntegerType),
         Property("pivot", StringType),
-        Property("pivot_value", StringType),
-
-        Property("pivot_values",
-            th.ArrayType(
-                Property("items", StringType)
-            )
-        ),
-
-        Property("reactions", IntegerType),
+        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
-        Property("text_url_clicks", IntegerType),
-        Property("total_engagements", IntegerType),
-        Property("video_completions", IntegerType),
-        Property("video_first_quartile_completions", IntegerType),
-        Property("video_midpoint_completions", IntegerType),
-        Property("video_starts", IntegerType),
-        Property("video_third_quartile_completions", IntegerType),
-        Property("video_views", IntegerType),
-        Property("viral_clicks", IntegerType),
-        Property("viral_comments", IntegerType),
-        Property("viral_company_page_clicks", IntegerType),
-        Property("viral_external_website_conversions", IntegerType),
-        Property("viral_external_website_post_click_conversions", IntegerType),
-        Property("viral_external_website_post_view_conversions", IntegerType),
-        Property("viral_follows", IntegerType),
-        Property("viral_full_screen_plays", IntegerType),
-        Property("viral_impressions", IntegerType),
-        Property("viral_landing_page_clicks", IntegerType),
-        Property("viral_likes", IntegerType),
-        Property("viral_one_click_lead_form_opens", IntegerType),
-        Property("viral_one_click_leads", IntegerType),
-        Property("viral_other_engagements", IntegerType),
-        Property("viral_reactions", IntegerType),
-        Property("viral_shares", IntegerType),
-        Property("viral_total_engagements", IntegerType),
-        Property("viral_video_completions", IntegerType),
-        Property("viral_video_first_quartile_completions", IntegerType),
-        Property("viral_video_midpoint_completions", IntegerType),
-        Property("viral_video_starts", IntegerType),
-        Property("viral_video_third_quartile_completions", IntegerType),
-        Property("viral_video_views", IntegerType)
-
+        Property("textUrlClicks", IntegerType),
+        Property("totalEngagements", IntegerType),
+        Property("videoCompletions", IntegerType),
+        Property("videoFirstQuartileCompletions", IntegerType),
+        Property("videoMidpointCompletions", IntegerType),
+        Property("videoStarts", IntegerType),
+        Property("videoThirdQuartileCompletions", IntegerType),
+        Property("videoViews", IntegerType),
+        Property("viralClicks", IntegerType),
+        Property("viralComments", IntegerType),
+        Property("viralCompanyPageClicks", IntegerType),
+        Property("viralExternalWebsiteConversions", IntegerType),
+        Property("viralExternalWebsitePostClickConversions", IntegerType),
+        Property("viralExternalWebsitePostViewConversions", IntegerType),
+        Property("viralFollows", IntegerType),
+        Property("viralFullScreenPlays", IntegerType),
+        Property("viralImpressions", IntegerType),
+        Property("viralLandingPageClicks", IntegerType),
+        Property("viralLikes", IntegerType),
+        Property("viralOneClickLeadFormOpens", IntegerType),
+        Property("viralOneclickLeads", IntegerType),
+        Property("viralOtherEngagements", IntegerType),
+        Property("viralReactions", IntegerType),
+        Property("reactions", IntegerType),
+        Property("viralShares", IntegerType),
+        Property("viralTotalEngagements", IntegerType),
+        Property("viralVideoCompletions", IntegerType),
+        Property("viralVideoFirstQuartileCompletions", IntegerType),
+        Property("viralVideoMidpointCompletions", IntegerType),
+        Property("viralVideoStarts", IntegerType),
+        Property("viralVideoThirdQuartileCompletions", IntegerType),
+        Property("viralVideoViews", IntegerType),
     ).to_dict()
 
+    @property
+    def adanalyticscolumns(self):
+        columns = [
+            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
+        ]
+
+        return columns
 
     def get_url_params(
         self,
@@ -357,6 +305,9 @@ class AdAnalyticsByCampaign(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
+
+        columns = self.adanalyticscolumns
+
         params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
@@ -376,8 +327,222 @@ class AdAnalyticsByCampaign(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
+
+        params["fields"] = columns[0]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
+        return params
+
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
+        try:
+            daterange_day = row.get("dateRange").get("start").get("day")
+            daterange_month = row.get("dateRange").get("start").get("month")
+            daterange_year = row.get("dateRange").get("start").get("year")
+            daterange_column = "{}-{}-{}".format(
+                daterange_year, daterange_month, daterange_day
+            )
+            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        try:
+            campaign_column = row.get("pivotValue")
+            campaign_column = int(campaign_column.split(":")[3])
+            row["campaign_id"] = campaign_column
+        except:
+            pass
+
+        return super().post_process(row, context)
+
+
+class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
+    name = "ad_analytics_by_campaign"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[1]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adAanalytics classes
+
+        Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        Uses merge_dicts to combine responses from each class
+        super().get_records calls only the records from the adAnalyticsByCampaign class
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
+        list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adAnalytics streams
+        """
+        adanalyticsinit_stream = AdAnalyticsByCampaignInit(
+            self._tap, schema={"properties": {}}
+        )
+        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
+            self._tap, schema={"properties": {}}
+        )
+        adanalyticsthird_stream = AdAnalyticsByCampaignThird(
+            self._tap, schema={"properties": {}}
+        )
+        adanalytics_records = [
+            self.merge_dicts(x, y, z, p)
+            for x, y, z, p in zip(
+                list(adanalyticsinit_stream.get_records(context)),
+                list(super().get_records(context)),
+                list(adanalyticsecond_stream.get_records(context)),
+                list(adanalyticsthird_stream.get_records(context)),
+            )
+        ]
+
+        return adanalytics_records
+
+    def merge_dicts(self, *dict_args):
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
+        """
+        result = {}
+        for dictionary in dict_args:
+            result.update(dictionary)
+        return result
+
+
+class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_second"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[2]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+
+
+class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_third"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CAMPAIGN"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[3]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
 
         return params
 
@@ -399,42 +564,37 @@ class VideoAds(LinkedInStream):
     name = "video_ads"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    key_properties = ["content_reference"]
+    primary_keys = ["last_modified_time"]
     path = "adDirectSponsoredContents"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("account_id", IntegerType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("content_reference", StringType),
         Property("content_reference_ucg_post_id", IntegerType),
         Property("content_reference_share_id", IntegerType),
         Property("name", StringType),
-        Property("type", StringType)
-
+        Property("type", StringType),
     ).to_dict()
-
 
     def get_url_params(
         self,
@@ -458,7 +618,7 @@ class VideoAds(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "account"
-        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
+        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
         params["owner"] = "urn:li:organization:" + self.config.get("owner")
 
         return params
@@ -491,46 +651,37 @@ class AccountUsers(LinkedInStream):
     ]
 
     name = "account_user"
-    replication_keys = ["last_modified_time"]
+    replication_keys = ["user_person_id"]
     replication_method = "incremental"
-    key_properties = ["account_id", "user_person_id"]
+    primary_keys = ["user_person_id", "last_modified_time"]
     path = "adAccountUsers"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("campaign_contact", BooleanType),
         Property("account_id", IntegerType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
-                         ObjectType(
-                             Property("time", StringType),
-                             additional_properties=False
-
-                         ),
-
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", StringType), additional_properties=False
+                    ),
                 ),
-
-                Property("lastModified",
-                         ObjectType(
-                             Property("time", StringType),
-                             additional_properties=False
-                         ),
-
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", StringType), additional_properties=False
+                    ),
                 ),
-
-            )
+            ),
         ),
-
         Property("created_time", StringType),
         Property("last_modified_time", StringType),
         Property("role", StringType),
         Property("user", StringType),
-        Property("user_person_id", StringType)
-
+        Property("user_person_id", StringType),
     ).to_dict()
 
     def get_url_params(
@@ -555,7 +706,7 @@ class AccountUsers(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "accounts"
-        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
+        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
 
         return params
 
@@ -577,7 +728,7 @@ class CampaignGroups(LinkedInStream):
     name = "campaign_groups"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    key_properties = ["id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaignGroups"
 
     PropertiesList = th.PropertiesList
@@ -592,30 +743,25 @@ class CampaignGroups(LinkedInStream):
     jsonschema = PropertiesList(
         Property(
             "runSchedule",
-            ObjectType(
-                Property("start", DateTimeType),
-                Property("end", DateTimeType)
-            )
+            ObjectType(Property("start", DateTimeType), Property("end", DateTimeType)),
         ),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_time", DateTimeType),
         Property("last_modified_time", DateTimeType),
         Property("name", StringType),
@@ -625,21 +771,19 @@ class CampaignGroups(LinkedInStream):
         Property("account", StringType),
         Property("account_id", IntegerType),
         Property("status", StringType),
-
         Property(
             "total_budget",
             ObjectType(
-                Property("currency_code", StringType),
-                Property("amount", StringType)
-            )
+                Property("currency_code", StringType), Property("amount", StringType)
+            ),
         ),
-
         Property("test", BooleanType),
-        Property("allowed_campaign_types", ArrayType(StringType))
+        Property("allowed_campaign_types", ArrayType(StringType)),
+        Property("run_schedule_start", DateTimeType),
+        Property("run_schedule_end", StringType),
     ).to_dict()
 
     schema = jsonschema
-
 
     def get_url_params(
         self,
@@ -668,6 +812,7 @@ class CampaignGroups(LinkedInStream):
 
         return params
 
+
 class Campaigns(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
@@ -685,236 +830,229 @@ class Campaigns(LinkedInStream):
     name = "campaign"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    key_properties = ["id"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adCampaigns"
 
     schema = PropertiesList(
-
         Property(
             "targeting",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("included_targeting_facets",
+                        Property(
+                            "included_targeting_facets",
                             th.ArrayType(
-                                Property("items",
+                                Property(
+                                    "items",
                                     ObjectType(
                                         Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
                                         ),
-                                        additional_properties=False
-                                    )
+                                        additional_properties=False,
+                                    ),
                                 ),
-                            )
+                            ),
                         ),
-                        Property("excluded_targeting_facets",
+                        Property(
+                            "excluded_targeting_facets",
                             th.ArrayType(
-                                Property("items",
+                                Property(
+                                    "items",
                                     ObjectType(
                                         Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
                                         ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                    ),
-                ),
-            )
-        ),
-
-        Property(
-            "targetingCriteria",
-            ObjectType(
-                Property("include",
-                    ObjectType(
-                        Property("and",
-                            th.ArrayType(
-                                Property("items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
-                                        ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                        Property("or",
-                            th.ArrayType(
-                                Property("items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property("values",
-                                            th.ArrayType(
-                                                Property("items", StringType)
-                                            )
-                                        ),
-                                        additional_properties=False
-                                    )
-                                ),
-                            )
-                        ),
-                    ),
-                ),
-                Property("exclude",
-                    ObjectType(
-                        Property("or",
-                            ObjectType(
-                                Property("urn:li:ad_targeting_facet:titles",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:staff_count_ranges",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:followed_companies",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
-                                ),
-                                Property("urn:li:ad_targeting_facet:seniorities",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    )
+                                        additional_properties=False,
+                                    ),
                                 ),
                             ),
                         ),
                     ),
                 ),
-            )
+            ),
         ),
-
-        Property("servingStatuses",
-            th.ArrayType(
-                Property("items", StringType)
-            )
+        Property(
+            "targetingCriteria",
+            ObjectType(
+                Property(
+                    "include",
+                    ObjectType(
+                        Property(
+                            "and",
+                            th.ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Property(
+                            "or",
+                            th.ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            th.ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                Property(
+                    "exclude",
+                    ObjectType(
+                        Property(
+                            "or",
+                            ObjectType(
+                                Property(
+                                    "urn:li:ad_targeting_facet:titles",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:staff_count_ranges",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:followed_companies",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:seniorities",
+                                    th.ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
-
-        Property("totalBudget",
+        Property("servingStatuses", th.ArrayType(Property("items", StringType))),
+        Property(
+            "totalBudget",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("version_tag", StringType),
-
-        Property("locale",
+        Property(
+            "locale",
             ObjectType(
                 Property("country", StringType),
                 Property("language", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
-        Property("version",
-            ObjectType(
-                Property("versionTag", StringType),
-                additional_properties=False
-            ),
+        Property(
+            "version",
+            ObjectType(Property("versionTag", StringType), additional_properties=False),
         ),
-
         Property("associatedEntity", StringType),
         Property("associated_entity_organization_id", IntegerType),
         Property("associated_entity_person_id", IntegerType),
-
-        Property("runSchedule",
+        Property(
+            "runSchedule",
             ObjectType(
                 Property("start", StringType),
                 Property("end", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("optimizationTargetType", StringType),
-
         Property(
             "changeAuditStamps",
             ObjectType(
-                Property("created",
+                Property(
+                    "created",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-                Property("lastModified",
+                Property(
+                    "lastModified",
                     ObjectType(
-                        Property("time", StringType),
-                        additional_properties=False
+                        Property("time", StringType), additional_properties=False
                     ),
                 ),
-
-            )
+            ),
         ),
-
         Property("campaignGroup", StringType),
-        Property("campaign_group_id", StringType),
-
-        Property("dailyBudget",
+        Property("campaign_group_id", IntegerType),
+        Property(
+            "dailyBudget",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
-        Property("unitCost",
+        Property(
+            "unitCost",
             ObjectType(
                 Property("amount", StringType),
                 Property("currencyCode", StringType),
-                additional_properties=False
+                additional_properties=False,
             ),
         ),
-
         Property("creativeSelection", StringType),
         Property("costType", StringType),
         Property("name", StringType),
         Property("objectiveType", StringType),
         Property("offsiteDeliveryEnabled", BooleanType),
-
-        Property("offsitePreferences",
+        Property(
+            "offsitePreferences",
             ObjectType(
-                Property("iabCategories",
+                Property(
+                    "iabCategories",
                     ObjectType(
-                        Property("exclude",
+                        Property(
+                            "exclude",
                             th.ArrayType(
                                 Property("items", StringType),
-                            )
+                            ),
                         ),
-                        Property("include",
-                            th.ArrayType(
-                                Property("items", StringType)
-                            )
+                        Property(
+                            "include", th.ArrayType(Property("items", StringType))
                         ),
                     ),
                 ),
-                Property("publisherRestrictionFiles",
+                Property(
+                    "publisherRestrictionFiles",
                     ObjectType(
-                        Property("exclude",
-                            th.ArrayType(
-                                Property("items", StringType)
-                            )
+                        Property(
+                            "exclude", th.ArrayType(Property("items", StringType))
                         ),
                     ),
                 ),
             ),
         ),
-
         Property("id", IntegerType),
         Property("audienceExpansionEnabled", BooleanType),
         Property("test", BooleanType),
@@ -925,7 +1063,10 @@ class Campaigns(LinkedInStream):
         Property("status", StringType),
         Property("type", StringType),
         Property("storyDeliveryEnabled", BooleanType),
-
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
+        Property("run_schedule_start", DateTimeType),
+        Property("run_schedule_end", StringType),
     ).to_dict()
 
     def get_url_params(
@@ -973,31 +1114,29 @@ class Creatives(LinkedInStream):
     name = "creatives"
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    key_properties = ["id"]
+    primary_keys = ["last_modified_time", "id"]
     path = "creatives"
 
     schema = PropertiesList(
-
         Property("account", StringType),
         Property("account_id", IntegerType),
         Property("campaign", StringType),
         Property("campaign_id", IntegerType),
-
         Property(
             "content",
             ObjectType(
                 Property("reference", StringType),
-                Property("text_ad",
+                Property(
+                    "text_ad",
                     ObjectType(
                         Property("headline", StringType),
                         Property("description", StringType),
                         Property("landing_page", StringType),
-                        additional_properties=False
+                        additional_properties=False,
                     ),
                 ),
-            )
+            ),
         ),
-
         Property("created_at", StringType),
         Property("created_by", StringType),
         Property("last_modified_at", StringType),
@@ -1006,13 +1145,7 @@ class Creatives(LinkedInStream):
         Property("intended_status", StringType),
         Property("is_serving", BooleanType),
         Property("is_test", BooleanType),
-
-        Property("serving_hold_reasons",
-            th.ArrayType(
-                Property("items", StringType)
-            )
-        )
-
+        Property("serving_hold_reasons", th.ArrayType(Property("items", StringType))),
     ).to_dict()
 
     def get_url_params(
@@ -1036,13 +1169,14 @@ class Creatives(LinkedInStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
+        ## TODO: Resolve issue with parentheses in campaigns parameter being encoded by rest.py
         params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
         params["q"] = "criteria"
 
         return params
 
 
-class AdAnalyticsByCreative(LinkedInStream):
+class AdAnalyticsByCreativeInit(LinkedInStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -1056,175 +1190,135 @@ class AdAnalyticsByCreative(LinkedInStream):
     replication_keys = datetime keys for replication
     """
 
-    name = "ad_analytics_by_creative"
-    replication_keys = ["end_at"]
+    name = "AdAnalyticsByCreativeInit"
+    replication_keys = ["dateRange"]
     replication_method = "incremental"
-    key_properties = ["creative_id", "start_at"]
+    primary_keys = ["creative_id", "dateRange"]
     path = "adAnalytics"
 
     schema = PropertiesList(
-
-        Property("landing_page_clicks", IntegerType),
-
-        Property(
-            "average_daily_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_seven_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property(
-            "average_previous_thirty_day_reach_metrics",
-            ObjectType(
-                Property("approximate_cost_in_currency_per_thousand_members_reached", StringType),
-                Property("approximate_reach", StringType),
-                Property("approximate_frequency", StringType),
-                additional_properties=False
-            )
-        ),
-
-        Property("document_completions", IntegerType),
-        Property("document_first_quartile_completions", IntegerType),
-        Property("clicks", IntegerType),
-        Property("document_midpoint_completions", IntegerType),
-        Property("document_third_quartile_completions", IntegerType),
-        Property("download_clicks", IntegerType),
-        Property("job_applications", StringType),
-        Property("job_apply_clicks", StringType),
-        Property("post_click_job_applications", StringType),
-        Property("post_click_job_apply_clicks", StringType),
-        Property("post_click_registrations", StringType),
-        Property("post_view_job_applications", StringType),
-        Property("post_view_job_apply_clicks", StringType),
-        Property("cost_in_usd", StringType),
-        Property("post_view_registrations", StringType),
-        Property("registrations", StringType),
-        Property("talent_leads", IntegerType),
-        Property("viral_document_completions", IntegerType),
-        Property("viral_document_first_quartile_completions", IntegerType),
-        Property("viral_document_midpoint_completions", IntegerType),
-        Property("viral_document_third_quartile_completions", IntegerType),
-        Property("viral_download_clicks", IntegerType),
-        Property("viral_job_applications", StringType),
-        Property("viral_job_apply_clicks", StringType),
-        Property("cost_in_local_currency", StringType),
-        Property("viral_post_click_job_applications", StringType),
-        Property("viral_post_click_job_apply_clicks", StringType),
-        Property("viral_post_click_registrations", StringType),
-        Property("viral_post_view_job_applications", StringType),
-        Property("viral_post_view_job_apply_clicks", StringType),
-        Property("viral_post_view_registrations", StringType),
-        Property("viral_registrations", IntegerType),
-        Property("approximate_unique_impressions", IntegerType),
-        Property("card_clicks", IntegerType),
-        Property("card_impressions", IntegerType),
-        Property("comment_likes", IntegerType),
-        Property("viral_card_clicks", IntegerType),
-        Property("viral_card_impressions", IntegerType),
-        Property("viral_comment_likes", IntegerType),
-        Property("creative", StringType),
-        Property("creative_id", IntegerType),
-        Property("start_at", StringType),
-        Property("end_at", StringType),
-        Property("action_clicks", IntegerType),
-        Property("ad_unit_clicks", IntegerType),
-        Property("comments", IntegerType),
-        Property("company_page_clicks", IntegerType),
-        Property("conversion_value_in_local_currency", StringType),
-
-        Property(
-            "date_range",
-            ObjectType(
-                Property("end",
-                    ObjectType(
-                        Property("day", IntegerType),
-                        Property("month", IntegerType),
-                        Property("year", IntegerType),
-                        additional_properties=False
-                    )
-                ),
-                Property("start",
-                    ObjectType(
-                        Property("day", IntegerType),
-                        Property("month", IntegerType),
-                        Property("year", IntegerType),
-                        additional_properties=False
-                    )
-                ),
-            )
-        ),
-
-        Property("external_website_conversions", IntegerType),
-        Property("external_website_post_click_conversions", IntegerType),
-        Property("external_website_post_view_conversions", IntegerType),
-        Property("follows", IntegerType),
-        Property("full_screen_plays", IntegerType),
-        Property("impressions", IntegerType),
-        Property("lead_generation_mail_contact_info_shares", IntegerType),
-        Property("lead_generation_mail_interested_clicks", IntegerType),
-        Property("likes", IntegerType),
-        Property("one_click_lead_form_opens", IntegerType),
-        Property("one_click_leads", IntegerType),
-        Property("opens", IntegerType),
-        Property("other_engagements", IntegerType),
-        Property("pivot", StringType),
-        Property("pivot_value", StringType),
-
-        Property("pivot_values",
-            th.ArrayType(
-                Property("items", StringType)
-            )
-        ),
-
+        Property("landingPageClicks", IntegerType),
         Property("reactions", IntegerType),
+        Property("adUnitClicks", IntegerType),
+        Property("creative_id", IntegerType),
+        Property("documentCompletions", IntegerType),
+        Property("documentFirstQuartileCompletions", IntegerType),
+        Property("clicks", IntegerType),
+        Property("documentMidpointCompletions", IntegerType),
+        Property("documentThirdQuartileCompletions", IntegerType),
+        Property("downloadClicks", IntegerType),
+        Property("jobApplications", StringType),
+        Property("jobApplyClicks", StringType),
+        Property("postViewJobApplications", StringType),
+        Property("costInUsd", StringType),
+        Property("postViewRegistrations", StringType),
+        Property("registrations", StringType),
+        Property("talentLeads", IntegerType),
+        Property("viralDocumentCompletions", IntegerType),
+        Property("viralDocumentFirstQuartileCompletions", IntegerType),
+        Property("viralDocumentMidpointCompletions", IntegerType),
+        Property("viralDocumentThirdQuartileCompletions", IntegerType),
+        Property("viralDownloadClicks", IntegerType),
+        Property("viralJobApplications", StringType),
+        Property("viralJobApplyClicks", StringType),
+        Property("costInLocalCurrency", StringType),
+        Property("viralRegistrations", IntegerType),
+        Property("approximateUniqueImpressions", IntegerType),
+        Property("cardClicks", IntegerType),
+        Property("cardImpressions", IntegerType),
+        Property("commentLikes", IntegerType),
+        Property("viralCardClicks", IntegerType),
+        Property("viralCardImpressions", IntegerType),
+        Property("viralCommentLikes", IntegerType),
+        Property("actionClicks", IntegerType),
+        Property("comments", IntegerType),
+        Property("companyPageClicks", IntegerType),
+        Property("conversionValueInLocalCurrency", StringType),
+        Property(
+            "dateRange",
+            ObjectType(
+                Property(
+                    "end",
+                    ObjectType(
+                        Property("day", IntegerType),
+                        Property("month", IntegerType),
+                        Property("year", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "start",
+                    ObjectType(
+                        Property("day", IntegerType),
+                        Property("month", IntegerType),
+                        Property("year", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("day", StringType),
+        Property("externalWebsiteConversions", IntegerType),
+        Property("externalWebsitePostClickConversions", IntegerType),
+        Property("externalWebsitePostViewConversions", IntegerType),
+        Property("follows", IntegerType),
+        Property("fullScreenPlays", IntegerType),
+        Property("impressions", IntegerType),
+        Property("landingPageClicks", IntegerType),
+        Property("leadGenerationMailContactInfoShares", IntegerType),
+        Property("leadGenerationMailInterestedClicks", IntegerType),
+        Property("likes", IntegerType),
+        Property("oneClickLeadFormOpens", IntegerType),
+        Property("oneClickLeads", IntegerType),
+        Property("opens", IntegerType),
+        Property("otherEngagements", IntegerType),
+        Property("pivot", StringType),
+        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
-        Property("text_url_clicks", IntegerType),
-        Property("total_engagements", IntegerType),
-        Property("video_completions", IntegerType),
-        Property("video_first_quartile_completions", IntegerType),
-        Property("video_midpoint_completions", IntegerType),
-        Property("video_starts", IntegerType),
-        Property("video_third_quartile_completions", IntegerType),
-        Property("video_views", IntegerType),
-        Property("viral_clicks", IntegerType),
-        Property("viral_comments", IntegerType),
-        Property("viral_company_page_clicks", IntegerType),
-        Property("viral_external_website_conversions", IntegerType),
-        Property("viral_external_website_post_click_conversions", IntegerType),
-        Property("viral_external_website_post_view_conversions", IntegerType),
-        Property("viral_follows", IntegerType),
-        Property("viral_full_screen_plays", IntegerType),
-        Property("viral_impressions", IntegerType),
-        Property("viral_landing_page_clicks", IntegerType),
-        Property("viral_likes", IntegerType),
-        Property("viral_one_click_lead_form_opens", IntegerType),
-        Property("viral_one_click_leads", IntegerType),
-        Property("viral_other_engagements", IntegerType),
-        Property("viral_reactions", IntegerType),
-        Property("viral_shares", IntegerType),
-        Property("viral_total_engagements", IntegerType),
-        Property("viral_video_completions", IntegerType),
-        Property("viral_video_first_quartile_completions", IntegerType),
-        Property("viral_video_midpoint_completions", IntegerType),
-        Property("viral_video_starts", IntegerType),
-        Property("viral_video_third_quartile_completions", IntegerType),
-        Property("viral_video_views", IntegerType)
-
+        Property("textUrlClicks", IntegerType),
+        Property("totalEngagements", IntegerType),
+        Property("videoCompletions", IntegerType),
+        Property("videoFirstQuartileCompletions", IntegerType),
+        Property("videoMidpointCompletions", IntegerType),
+        Property("videoStarts", IntegerType),
+        Property("videoThirdQuartileCompletions", IntegerType),
+        Property("videoViews", IntegerType),
+        Property("viralClicks", IntegerType),
+        Property("viralComments", IntegerType),
+        Property("viralCompanyPageClicks", IntegerType),
+        Property("viralExternalWebsiteConversions", IntegerType),
+        Property("viralExternalWebsitePostClickConversions", IntegerType),
+        Property("viralExternalWebsitePostViewConversions", IntegerType),
+        Property("viralFollows", IntegerType),
+        Property("viralFullScreenPlays", IntegerType),
+        Property("viralImpressions", IntegerType),
+        Property("viralLandingPageClicks", IntegerType),
+        Property("viralLikes", IntegerType),
+        Property("viralOneClickLeadFormOpens", IntegerType),
+        Property("viralOneclickLeads", IntegerType),
+        Property("viralOtherEngagements", IntegerType),
+        Property("viralReactions", IntegerType),
+        Property("viralShares", IntegerType),
+        Property("viralTotalEngagements", IntegerType),
+        Property("viralVideoCompletions", IntegerType),
+        Property("viralVideoFirstQuartileCompletions", IntegerType),
+        Property("viralVideoMidpointCompletions", IntegerType),
+        Property("viralVideoStarts", IntegerType),
+        Property("viralVideoThirdQuartileCompletions", IntegerType),
+        Property("viralVideoViews", IntegerType),
     ).to_dict()
+
+    @property
+    def adanalyticscolumns(self):
+        columns = [
+            "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
+        ]
+
+        return columns
 
     def get_url_params(
         self,
@@ -1240,6 +1334,78 @@ class AdAnalyticsByCreative(LinkedInStream):
         Returns:
             A dictionary of URL query parameters.
         """
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        params["fields"] = columns[0]
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
+        try:
+            daterange_day = row.get("dateRange").get("start").get("day")
+            daterange_month = row.get("dateRange").get("start").get("month")
+            daterange_year = row.get("dateRange").get("start").get("year")
+            daterange_column = "{}-{}-{}".format(
+                daterange_year, daterange_month, daterange_day
+            )
+            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
+        except:
+            pass
+        try:
+            creative_column = row.get("pivotValue")
+            creative_column = int(creative_column.split(":")[3])
+            row["creative_id"] = creative_column
+        except:
+            pass
+
+        return super().post_process(row, context)
+
+
+class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
+    name = "ad_analytics_by_creative"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
         params: dict = {}
         if next_page_token:
             params["start"] = next_page_token
@@ -1259,6 +1425,153 @@ class AdAnalyticsByCreative(LinkedInStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
+        params["fields"] = columns[1]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a dictionary of records from adAnalytics classes
+
+        Combines request columns from multiple calls to the api, which are limited to 20 columns each
+        Uses merge_dicts to combine responses from each class
+        super().get_records calls only the records from adAnalyticsByCreative class
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
+        list() converts each stream context into lists
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of records given from adAnalytics streams
+        """
+        adanalyticsinit_stream = AdAnalyticsByCreativeInit(
+            self._tap, schema={"properties": {}}
+        )
+        adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
+            self._tap, schema={"properties": {}}
+        )
+        adanalyticsthird_stream = AdAnalyticsByCreativeThird(
+            self._tap, schema={"properties": {}}
+        )
+        adanalytics_records = [
+            self.merge_dicts(x, y, z, p)
+            for x, y, z, p in zip(
+                list(adanalyticsinit_stream.get_records(context)),
+                list(super().get_records(context)),
+                list(adanalyticsecond_stream.get_records(context)),
+                list(adanalyticsthird_stream.get_records(context)),
+            )
+        ]
+
+        return adanalytics_records
+
+    def merge_dicts(self, *dict_args):
+        """Return a merged dictionary of adAnalytics responses
+
+        Args:
+            *dict_args: dictionaries with adAnalytics response data.
+
+        Returns:
+            A merged dictionary of adAnalytics responses
+        """
+        result = {}
+        for dictionary in dict_args:
+            result.update(dictionary)
+        return result
+
+
+class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
+    name = "adanalyticsbycreative_second"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[2]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
+
+        return params
+
+
+class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
+    name = "adanalyticsbycreative_third"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+
+        columns = self.adanalyticscolumns
+
+        params: dict = {}
+        if next_page_token:
+            params["start"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        start_date = pendulum.parse(self.config.get("start_date"))
+        end_date = pendulum.parse(self.config.get("end_date"))
+
+        params["q"] = "analytics"
+        params["pivot"] = "CREATIVE"
+        params["timeGranularity"] = "DAILY"
+        params["dateRange.start.day"] = start_date.day
+        params["dateRange.start.month"] = start_date.month
+        params["dateRange.start.year"] = start_date.year
+        params["dateRange.end.day"] = end_date.day
+        params["dateRange.end.month"] = end_date.month
+        params["dateRange.end.year"] = end_date.year
+        params["fields"] = columns[3]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign"
+        )
 
         return params
