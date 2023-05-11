@@ -13,20 +13,13 @@ plugins:
     - discover
     settings:
     - name: access_token
-      value: ${TAP_LINKEDIN_ACCESS_TOKEN}
       kind: password
     - name: refresh_token
-      value: ${TAP_LINKEDIN_REFRESH_TOKEN}
-      kind: password
-    - name: password
       kind: password
     - name: client_secret
-      value: ${TAP_LINKEDIN_CLIENT_SECRET}
       kind: password
-    - name: account_id
-      value: ${TAP_LINKEDIN_ACCOUNTS}
+    - name: accounts
     - name: client_id
-      value: ${TAP_LINKEDIN_CLIENT_ID}
     - name: user_agent
       value: 'meltano'
     - name: linkedin_version

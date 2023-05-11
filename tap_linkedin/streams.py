@@ -329,9 +329,7 @@ class AdAnalyticsByCampaignInit(LinkedInStream):
         params["dateRange.end.year"] = end_date.year
 
         params["fields"] = columns[0]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
 
         return params
 
@@ -620,7 +618,7 @@ class VideoAds(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "account"
-        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
+        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
         params["owner"] = "urn:li:organization:" + self.config.get("owner")
 
         return params
@@ -708,7 +706,7 @@ class AccountUsers(LinkedInStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "accounts"
-        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("account_id")
+        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
 
         return params
 

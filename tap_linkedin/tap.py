@@ -17,13 +17,14 @@ STREAM_TYPES = [LinkedInStream]
 class TapLinkedIn(Tap):
     """LinkedIn tap class."""
 
-    name = "tap-linkedin-sdk"
+    name = "tap-linkedin"
 
     # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
         th.Property(
             "access_token",
             th.StringType,
+            required=True,
             description="The token to authenticate against the API service",
         ),
         th.Property(
@@ -66,6 +67,17 @@ class TapLinkedIn(Tap):
             th.StringType,
             description="LinkedIn Account ID",
         ),
+        th.Property(
+            "campaign",
+            th.StringType,
+            description="LinkedIn Campaign ID",
+        ),
+        th.Property(
+            "owner",
+            th.StringType,
+            description="LinkedIn Owner ID",
+        ),
+
     ).to_dict()
 
     def discover_streams(self) -> list[streams.LinkedInStream]:

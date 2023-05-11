@@ -33,7 +33,7 @@ class LinkedInStream(RESTStream):
         """
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("access_token", ""),
+            token=self.config["access_token"],
         )
 
     @property
@@ -46,9 +46,9 @@ class LinkedInStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-            headers["LinkedIn-Version"] = self.config.get("api_version")
-            headers["Content-Type"] = "application/json"
-            headers["X-Restli-Protocol-Version"] = "1.0.0"
+        headers["LinkedIn-Version"] = self.config.get("api_version")
+        headers["Content-Type"] = "application/json"
+        headers["X-Restli-Protocol-Version"] = "1.0.0"
 
         return headers
 
