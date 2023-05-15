@@ -1,1 +1,1 @@
-"""Test suite for tap-linkedin."""
+"""Test suite for tap-linkedin-ads."""

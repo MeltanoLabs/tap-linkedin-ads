@@ -1,4 +1,4 @@
-"""LinkedIn tap class."""
+"""LinkedInAds tap class."""
 
 from __future__ import annotations
 
@@ -6,18 +6,18 @@ from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 # TODO: Import your custom stream types here:
-from tap_linkedin.streams import LinkedInStream
-import tap_linkedin.streams as streams
+from tap_linkedin_ads.streams import LinkedInAdsStream
+import tap_linkedin_ads.streams as streams
 
 import datetime
 
-STREAM_TYPES = [LinkedInStream]
+STREAM_TYPES = [LinkedInAdsStream]
 
 
-class TapLinkedIn(Tap):
-    """LinkedIn tap class."""
+class TapLinkedInAds(Tap):
+    """LinkedInAds tap class."""
 
-    name = "tap-linkedin"
+    name = "tap-linkedin-ads"
 
     # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
@@ -53,34 +53,34 @@ class TapLinkedIn(Tap):
         th.Property(
             "user_agent",
             th.StringType,
-            default="tap-linkedin-ads <api_user_email@your_company.com>",
+            default="tap-linkedin-ads-ads <api_user_email@your_company.com>",
             description="API ID",
         ),
         th.Property(
             "api_version",
             th.StringType,
             default="202207",
-            description="LinkedIn API Version",
+            description="LinkedInAds API Version",
         ),
         th.Property(
             "accounts",
             th.StringType,
-            description="LinkedIn Account ID",
+            description="LinkedInAds Account ID",
         ),
         th.Property(
             "campaign",
             th.StringType,
-            description="LinkedIn Campaign ID",
+            description="LinkedInAds Campaign ID",
         ),
         th.Property(
             "owner",
             th.StringType,
-            description="LinkedIn Owner ID",
+            description="LinkedInAds Owner ID",
         ),
 
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.LinkedInStream]:
+    def discover_streams(self) -> list[streams.LinkedInAdsStream]:
         """Return a list of discovered streams.
 
         Returns:
@@ -101,4 +101,4 @@ class TapLinkedIn(Tap):
 
 
 if __name__ == "__main__":
-    TapLinkedIn.cli()
+    TapLinkedInAds.cli()
