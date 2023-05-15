@@ -8,7 +8,6 @@ from typing import Any, Callable, Iterable, Optional
 
 import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]

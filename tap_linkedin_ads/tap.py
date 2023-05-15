@@ -79,7 +79,7 @@ class TapLinkedInAds(Tap):
 
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.LinkedInAdsStream]:
+    def discover_streams(self) -> list[LinkedInAdsStream]:
         """Return a list of discovered streams.
 
         Returns:

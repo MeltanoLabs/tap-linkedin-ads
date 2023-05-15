@@ -19,7 +19,7 @@ IntegerType = th.IntegerType
 
 from tap_linkedin_ads.client import LinkedInAdsStream
 
-import pendulum, requests
+import pendulum
 
 from datetime import datetime
 
