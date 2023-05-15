@@ -44,7 +44,7 @@ class LinkedInAdsStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-        headers["LinkedInAds-Version"] = self.config.get("api_version")
+        headers["LinkedIn-Version"] = self.config.get("api_version")
         headers["Content-Type"] = "application/json"
         headers["X-Restli-Protocol-Version"] = "1.0.0"
 
