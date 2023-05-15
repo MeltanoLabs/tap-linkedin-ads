@@ -6,7 +6,7 @@ from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 # TODO: Import your custom stream types here:
-from tap_linkedin_ads.streams import LinkedInAdsStream
+from tap_linkedin_ads.client import LinkedInAdsStream
 import tap_linkedin_ads.streams as streams
 
 import datetime
