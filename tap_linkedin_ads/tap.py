@@ -11,7 +11,6 @@ import tap_linkedin_ads.streams as streams
 
 import datetime
 
-STREAM_TYPES = [LinkedInAdsStream]
 
 
 class TapLinkedInAds(Tap):
