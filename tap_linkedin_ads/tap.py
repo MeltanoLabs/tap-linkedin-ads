@@ -53,7 +53,7 @@ class TapLinkedInAds(Tap):
         th.Property(
             "user_agent",
             th.StringType,
-            default="tap-linkedin-ads-ads <api_user_email@your_company.com>",
+            default="tap-linkedin-ads <api_user_email@your_company.com>",
             description="API ID",
         ),
         th.Property(
