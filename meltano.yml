@@ -21,17 +21,11 @@ plugins:
     - name: accounts
     - name: client_id
     - name: user_agent
-      value: 'meltano'
     - name: linkedin_version
-      value: '202207'
     - name: campaign
-      value: ${TAP_LINKEDIN_ADS_CAMPAIGN}
     - name: owner
-      value: ${TAP_LINKEDIN_ADS_OWNER}
     - name: start_date
-      value: '2023-01-01T00:00:00Z'
     - name: end_date
-      value: '2023-04-01T00:00:00Z'
   - name: Linkedin-Accounts
     inherit_from: tap-linkedin-ads
     select:
