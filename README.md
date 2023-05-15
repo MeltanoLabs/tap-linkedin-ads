@@ -1,8 +1,8 @@
-# tap-linkedin-ads
+# `tap-linkedin-ads`
 
 LinkedInAds tap class.
 
-Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
+Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
 ## Capabilities
 
@@ -18,17 +18,21 @@ Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Target
 | Setting             | Required | Default | Description |
 |:--------------------|:--------:|:-------:|:------------|
 | access_token        | True     | None    | The token to authenticate against the API service |
-| refresh_token       | True     | None    | Generated token, bearer auth |
-| start_date          | True     | None    | The earliest record date to sync |
+| refresh_token       | False    | None    | Generated token, bearer auth |
+| start_date          | False    | None    | The earliest record date to sync |
 | end_date            | False    | 2023-05-09 02:04:18.151589 | The latest record date to sync |
-| client_secret       | True     | None    | client secret key |
-| user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID      |
+| client_secret       | False    | None    | client secret key |
+| user_agent          | False    | tap-linkedin-ads-ads <api_user_email@your_company.com> | API ID      |
 | api_version         | False    | 202207  | LinkedInAds API Version |
 | accounts            | False    | None    | LinkedInAds Account ID |
+| campaign            | False    | None    | LinkedInAds Campaign ID |
+| owner               | False    | None    | LinkedInAds Owner ID |
 | stream_maps         | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
 | stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
 | flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
 | flattening_max_depth| False    | None    | The max depth to flatten schemas. |
+
+A full list of supported settings and capabilities is available by running: `tap-linkedin-ads --about`
 
 
 ## Installation
