@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import datetime
+import typing as t
+
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-# TODO: Import your custom stream types here:
-from tap_linkedin_ads.client import LinkedInAdsStream
-import tap_linkedin_ads.streams as streams
+from tap_linkedin_ads import streams
 
-import datetime
+if t.TYPE_CHECKING:
+    from tap_linkedin_ads.streams import LinkedInAdsStream
 
+NOW = datetime.datetime.now(tz=datetime.timezone.utc)
 
 
 class TapLinkedInAds(Tap):
@@ -41,7 +44,7 @@ class TapLinkedInAds(Tap):
             "end_date",
             th.DateTimeType,
             required=False,
-            default=str(datetime.datetime.utcnow()),
+            default=NOW.isoformat(),
             description="The latest record date to sync",
         ),
         th.Property(
@@ -76,7 +79,6 @@ class TapLinkedInAds(Tap):
             th.StringType,
             description="LinkedInAds Owner ID",
         ),
-
     ).to_dict()
 
     def discover_streams(self) -> list[LinkedInAdsStream]:
@@ -85,13 +87,12 @@ class TapLinkedInAds(Tap):
         Returns:
             A list of discovered streams.
         """
-
         # TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
             streams.Accounts(self),
             streams.VideoAds(self),
             streams.AccountUsers(self),
-            # streams.Creatives(self),
+            # streams.Creatives(self),  # noqa: ERA001
             streams.Campaigns(self),
             streams.CampaignGroups(self),
             streams.AdAnalyticsByCampaign(self),

@@ -85,8 +85,8 @@ The tap requires a LinkedInAds OAuth 2.0 access token to make API requests
 
 The access token requires the following permissions:
 
-```r_ads```: read ads  
-```rw_ads```: read-write ads  
+```r_ads```: read ads
+```rw_ads```: read-write ads
 ```r_ads_reporting```: read ads reporting
 
 Access tokens expire after 60 days and require a user to manually authenticate
@@ -100,7 +100,7 @@ The AdAnalytics endpoint in the LinkedInAds API can call up to 20 columns at a t
 
 ### SDK X-Restli-Protocol Limitation
 
-The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin-ads uses parentheses ‘()’. '(' and ')' are typically 
+The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin-ads uses parentheses ‘()’. '(' and ')' are typically
 encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. An SDK update for expanded escape characters is currently WIP [link github issue]
 
 
@@ -129,7 +129,7 @@ This project uses parent-child streams. Learn more about them [here](https://git
 ```bash
 pipx install poetry
 poetry install
-``` 
+```
 
 ### Create and Run Tests
 
