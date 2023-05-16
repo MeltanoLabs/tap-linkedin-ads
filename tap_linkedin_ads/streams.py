@@ -1,4 +1,4 @@
-"""Stream type classes for tap-linkedin-sdk."""
+"""Stream type classes for tap-linkedin-ads-sdk."""
 
 from __future__ import annotations
 
@@ -17,16 +17,16 @@ BooleanType = th.BooleanType
 IntegerType = th.IntegerType
 
 
-from tap_linkedin.client import LinkedInStream
+from tap_linkedin_ads.client import LinkedInAdsStream
 
-import pendulum, requests
+import pendulum
 
 from datetime import datetime
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
-class Accounts(LinkedInStream):
+class Accounts(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
     """
@@ -148,7 +148,7 @@ class Accounts(LinkedInStream):
         return params
 
 
-class AdAnalyticsByCampaignInit(LinkedInStream):
+class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """
@@ -547,7 +547,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         return params
 
 
-class VideoAds(LinkedInStream):
+class VideoAds(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
     """
@@ -624,7 +624,7 @@ class VideoAds(LinkedInStream):
         return params
 
 
-class AccountUsers(LinkedInStream):
+class AccountUsers(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
     """
@@ -711,7 +711,7 @@ class AccountUsers(LinkedInStream):
         return params
 
 
-class CampaignGroups(LinkedInStream):
+class CampaignGroups(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
     """
@@ -813,7 +813,7 @@ class CampaignGroups(LinkedInStream):
         return params
 
 
-class Campaigns(LinkedInStream):
+class Campaigns(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
     """
@@ -1097,7 +1097,7 @@ class Campaigns(LinkedInStream):
         return params
 
 
-class Creatives(LinkedInStream):
+class Creatives(LinkedInAdsStream):
     """
     https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
     """
@@ -1176,7 +1176,7 @@ class Creatives(LinkedInStream):
         return params
 
 
-class AdAnalyticsByCreativeInit(LinkedInStream):
+class AdAnalyticsByCreativeInit(LinkedInAdsStream):
     """
     https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
     """

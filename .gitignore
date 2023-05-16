@@ -144,4 +144,3 @@ dmypy.json
 .idea/tap-linkedin-sdk.iml
 .idea/workspace.xml
 .idea/vcs.xml
-poetry.lock

@@ -4,8 +4,8 @@ send_anonymous_usage_stats: true
 project_id: linkedin_sdk
 plugins:
   extractors:
-  - name: tap-linkedin
-    namespace: tap_linkedin
+  - name: tap-linkedin-ads
+    namespace: tap_linkedin_ads
     pip_url: -e .
     capabilities:
     - state
@@ -25,43 +25,41 @@ plugins:
     - name: linkedin_version
       value: '202207'
     - name: campaign
-      value: ${TAP_LINKEDIN_CAMPAIGN}
     - name: owner
-      value: ${TAP_LINKEDIN_OWNER}
     - name: start_date
       value: '2023-01-01T00:00:00Z'
     - name: end_date
       value: '2023-04-01T00:00:00Z'
   - name: Linkedin-Accounts
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - accounts
   - name: Linkedin-AdAccountsUsers
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - account_user
   - name: Linkedin-Creatives
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - creatives
   - name: Linkedin-Campaigns
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - campaign
   - name: Linkedin-CampaignGroups
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - campaign_groups
   - name: Linkedin-AdAnalyticsByCreative
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - ad_analytics_by_creative
   - name: Linkedin-AdAnalyticsByCampaign
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - ad_analytics_by_campaign
   - name: Linkedin-VideoAds
-    inherit_from: tap-linkedin
+    inherit_from: tap-linkedin-ads
     select:
     - video_ads
 environments:

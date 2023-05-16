@@ -1,7 +1,7 @@
 ### A CI workflow template that runs linting and python testing
 ### TODO: Modify as needed or as desired.
 
-name: Test tap-linkedin
+name: Test tap-linkedin-ads
 
 on: [push]
 
@@ -57,12 +57,12 @@ jobs:
       id: test_pytest
       continue-on-error: false
       env:
-         TAP_LINKEDIN_ACCESS_TOKEN: ${{ secrets.access_token }}
-         TAP_LINKEDIN_ACCOUNTS: ${{ secrets.accounts }}
-         TAP_LINKEDIN_REFRESH_TOKEN: ${{ secrets.refresh_token }}
-         TAP_LINKEDIN_CLIENT_ID: ${{ secrets.client_id }}
-         TAP_LINKEDIN_CLIENT_SECRET: ${{ secrets.client_secret }}
-         TAP_LINKEDIN_OWNER: ${{ secrets.owner }}
-         TAP_LINKEDIN_CAMPAIGN: ${{ secrets.campaign }}
+         TAP_LINKEDIN_ADS_ACCESS_TOKEN: ${{ secrets.access_token }}
+         TAP_LINKEDIN_ADS_ACCOUNTS: ${{ secrets.accounts }}
+         TAP_LINKEDIN_ADS_REFRESH_TOKEN: ${{ secrets.refresh_token }}
+         TAP_LINKEDIN_ADS_CLIENT_ID: ${{ secrets.client_id }}
+         TAP_LINKEDIN_ADS_CLIENT_SECRET: ${{ secrets.client_secret }}
+         TAP_LINKEDIN_ADS_OWNER: ${{ secrets.owner }}
+         TAP_LINKEDIN_ADS_CAMPAIGN: ${{ secrets.campaign }}
       run: |
         poetry run pytest --capture=no

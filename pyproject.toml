@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "tap-linkedin"
+name = "tap-linkedin-ads"
 version = "0.0.1"
-description = "`tap-linkedin` is a Singer tap for linkedin, built with the Meltano SDK for Singer Taps."
+description = "`tap-linkedin-ads` is a Singer tap for linkedin, built with the Meltano SDK for Singer Taps."
 authors = ["Meltano"]
 keywords = [
     "ELT",
@@ -28,7 +28,7 @@ isort = "^5.10.1"
 [tool.isort]
 profile = "black"
 multi_line_output = 3 # Vertical Hanging Indent
-src_paths = "tap_linkedin"
+src_paths = "tap_linkedin_ads"
 
 [build-system]
 requires = ["poetry-core>=1.0.8"]
@@ -36,4 +36,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # CLI declaration
-tap-linkedin = 'tap_linkedin.tap:TapLinkedIn.cli'
+tap-linkedin-ads = 'tap_linkedin_ads.tap:TapLinkedInAds.cli'

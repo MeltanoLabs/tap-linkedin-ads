@@ -1,23 +1,21 @@
-"""REST client handling, including LinkedInStream base class."""
+"""REST client handling, including LinkedInAdsStream base class."""
 
 from __future__ import annotations
 
 from datetime import datetime
-
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Optional
 
 import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
-class LinkedInStream(RESTStream):
-    """LinkedIn stream class."""
+class LinkedInAdsStream(RESTStream):
+    """LinkedInAds stream class."""
 
     url_base = "https://api.linkedin.com/rest/"
 
