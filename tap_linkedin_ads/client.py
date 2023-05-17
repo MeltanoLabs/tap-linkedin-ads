@@ -98,7 +98,10 @@ class LinkedInAdsStream(RESTStream):
 
         return params
 
-    def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
+    def parse_response(  # noqa: PLR0912
+        self,
+        response: requests.Response,
+    ) -> t.Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
         Args:
@@ -133,29 +136,31 @@ class LinkedInAdsStream(RESTStream):
                     account_column = columns.get("account")
                     account_id = int(account_column.split(":")[3])
                     columns["account_id"] = account_id
-                except:
+                except:  # noqa: E722, S110
                     pass
                 try:
                     campaign_column = columns.get("campaignGroup")
                     campaign = int(campaign_column.split(":")[3])
                     columns["campaign_group_id"] = campaign
-                except:
+                except:  # noqa: E722, S110
                     pass
                 try:
                     user_column = columns.get("user")
                     user = user_column.split(":")[3]
                     columns["user_person_id"] = user
-                except:
+                except:  # noqa: E722, S110
                     pass
                 try:
                     schedule_column = columns.get("runSchedule").get("start")
-                    columns["run_schedule_start"] = datetime.fromtimestamp(
+                    columns[
+                        "run_schedule_start"
+                    ] = datetime.fromtimestamp(  # noqa: DTZ006
                         int(schedule_column) / 1000,
                     ).isoformat()
-                except:
+                except:  # noqa: E722, S110
                     pass
                 results = [columns]
-            except:
+            except:  # noqa: E722, S110
                 pass
         else:
             results = resp_json

@@ -331,23 +331,25 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
         # These values are aprsed with datetime function and the date is added to the day column
+        date_range = row.get("dateRange", {})
+        start_date = date_range.get("start", {})
+
+        if start_date:
+            row["day"] = datetime.strptime(
+                "{}-{}-{}".format(
+                    start_date.get("year"),
+                    start_date.get("month"),
+                    start_date.get("day"),
+                ),
+                "%Y-%m-%d",
+            ).astimezone(UTC)
+
+        pivot_value = row.get("pivotValue", "")
+
         try:
-            daterange_day = row.get("dateRange").get("start").get("day")
-            daterange_month = row.get("dateRange").get("start").get("month")
-            daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(
-                daterange_year,
-                daterange_month,
-                daterange_day,
-            )
-            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d").astimezone(UTC)
-        except:
-            pass
-        try:
-            campaign_column = row.get("pivotValue")
-            campaign_column = int(campaign_column.split(":")[3])
+            campaign_column = int(pivot_value.split(":")[3])
             row["campaign_id"] = campaign_column
-        except:
+        except IndexError:
             pass
 
         return super().post_process(row, context)
@@ -1361,23 +1363,25 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
         # These values are aprsed with datetime function and the date is added to the day column
+        date_range = row.get("dateRange", {})
+        start_date = date_range.get("start", {})
+
+        if start_date:
+            row["day"] = datetime.strptime(
+                "{}-{}-{}".format(
+                    start_date.get("year"),
+                    start_date.get("month"),
+                    start_date.get("day"),
+                ),
+                "%Y-%m-%d",
+            ).astimezone(UTC)
+
+        pivot_value = row.get("pivotValue", "")
+
         try:
-            daterange_day = row.get("dateRange").get("start").get("day")
-            daterange_month = row.get("dateRange").get("start").get("month")
-            daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(
-                daterange_year,
-                daterange_month,
-                daterange_day,
-            )
-            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d").astimezone(UTC)
-        except:
-            pass
-        try:
-            creative_column = row.get("pivotValue")
-            creative_column = int(creative_column.split(":")[3])
+            creative_column = int(pivot_value.split(":")[3])
             row["creative_id"] = creative_column
-        except:
+        except IndexError:
             pass
 
         return super().post_process(row, context)
