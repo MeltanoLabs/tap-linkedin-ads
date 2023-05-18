@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import typing as t
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
 
+import pendulum
 from singer_sdk import typing as th  # JSON Schema typing helpers
+
+from tap_linkedin_ads.client import LinkedInAdsStream
 
 PropertiesList = th.PropertiesList
 Property = th.Property
@@ -16,20 +20,12 @@ ArrayType = th.ArrayType
 BooleanType = th.BooleanType
 IntegerType = th.IntegerType
 
-
-from tap_linkedin_ads.client import LinkedInAdsStream
-
-import pendulum
-
-from datetime import datetime
-
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+UTC = timezone.utc
 
 
 class Accounts(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -77,13 +73,15 @@ class Accounts(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -122,9 +120,9 @@ class Accounts(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -149,9 +147,7 @@ class Accounts(LinkedInAdsStream):
 
 
 class AdAnalyticsByCampaignInit(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -281,21 +277,19 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     ).to_dict()
 
     @property
-    def adanalyticscolumns(self):
-        columns = [
+    def adanalyticscolumns(self) -> list[str]:
+        return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
             "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
         ]
 
-        return columns
-
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -305,7 +299,6 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -329,28 +322,34 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         params["dateRange.end.year"] = end_date.year
 
         params["fields"] = columns[0]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
+            "campaign",
+        )
 
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
         # These values are aprsed with datetime function and the date is added to the day column
+        date_range = row.get("dateRange", {})
+        start_date = date_range.get("start", {})
+
+        if start_date:
+            row["day"] = datetime.strptime(
+                "{}-{}-{}".format(
+                    start_date.get("year"),
+                    start_date.get("month"),
+                    start_date.get("day"),
+                ),
+                "%Y-%m-%d",
+            ).astimezone(UTC)
+
+        pivot_value = row.get("pivotValue", "")
+
         try:
-            daterange_day = row.get("dateRange").get("start").get("day")
-            daterange_month = row.get("dateRange").get("start").get("month")
-            daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(
-                daterange_year, daterange_month, daterange_day
-            )
-            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
-        except:
-            pass
-        try:
-            campaign_column = row.get("pivotValue")
-            campaign_column = int(campaign_column.split(":")[3])
+            campaign_column = int(pivot_value.split(":")[3])
             row["campaign_id"] = campaign_column
-        except:
+        except IndexError:
             pass
 
         return super().post_process(row, context)
@@ -361,9 +360,9 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -373,7 +372,6 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -397,19 +395,21 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
 
-    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        """Return a dictionary of records from adAanalytics classes
+    def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
+        """Return a dictionary of records from adAanalytics classes.
 
-        Combines request columns from multiple calls to the api, which are limited to 20 columns each
-        Uses merge_dicts to combine responses from each class
+        Combines request columns from multiple calls to the api, which are limited to 20 columns
+        each.
+
+        Uses `merge_dicts` to combine responses from each class
         super().get_records calls only the records from the adAnalyticsByCampaign class
-        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
-        list() converts each stream context into lists
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts()
+        function list() converts each stream context into lists
 
         Args:
             context: The stream context.
@@ -418,15 +418,18 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
             A dictionary of records given from adAnalytics streams
         """
         adanalyticsinit_stream = AdAnalyticsByCampaignInit(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsthird_stream = AdAnalyticsByCampaignThird(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
-        adanalytics_records = [
+        return [
             self.merge_dicts(x, y, z, p)
             for x, y, z, p in zip(
                 list(adanalyticsinit_stream.get_records(context)),
@@ -436,10 +439,8 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
             )
         ]
 
-        return adanalytics_records
-
-    def merge_dicts(self, *dict_args):
-        """Return a merged dictionary of adAnalytics responses
+    def merge_dicts(self, *dict_args: dict) -> dict:
+        """Return a merged dictionary of adAnalytics responses.
 
         Args:
             *dict_args: dictionaries with adAnalytics response data.
@@ -458,9 +459,9 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -470,7 +471,6 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -494,7 +494,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -505,9 +505,9 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -517,7 +517,6 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -541,16 +540,14 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
 
 
 class VideoAds(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -576,13 +573,15 @@ class VideoAds(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -598,9 +597,9 @@ class VideoAds(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -625,9 +624,7 @@ class VideoAds(LinkedInAdsStream):
 
 
 class AccountUsers(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -666,13 +663,15 @@ class AccountUsers(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -686,9 +685,9 @@ class AccountUsers(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -712,9 +711,7 @@ class AccountUsers(LinkedInAdsStream):
 
 
 class CampaignGroups(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -751,13 +748,15 @@ class CampaignGroups(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -774,7 +773,8 @@ class CampaignGroups(LinkedInAdsStream):
         Property(
             "total_budget",
             ObjectType(
-                Property("currency_code", StringType), Property("amount", StringType)
+                Property("currency_code", StringType),
+                Property("amount", StringType),
             ),
         ),
         Property("test", BooleanType),
@@ -787,9 +787,9 @@ class CampaignGroups(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -814,9 +814,7 @@ class CampaignGroups(LinkedInAdsStream):
 
 
 class Campaigns(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -992,13 +990,15 @@ class Campaigns(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType), additional_properties=False
+                        Property("time", StringType),
+                        additional_properties=False,
                     ),
                 ),
             ),
@@ -1039,7 +1039,8 @@ class Campaigns(LinkedInAdsStream):
                             ),
                         ),
                         Property(
-                            "include", th.ArrayType(Property("items", StringType))
+                            "include",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
@@ -1047,7 +1048,8 @@ class Campaigns(LinkedInAdsStream):
                     "publisherRestrictionFiles",
                     ObjectType(
                         Property(
-                            "exclude", th.ArrayType(Property("items", StringType))
+                            "exclude",
+                            th.ArrayType(Property("items", StringType)),
                         ),
                     ),
                 ),
@@ -1071,9 +1073,9 @@ class Campaigns(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1098,9 +1100,7 @@ class Campaigns(LinkedInAdsStream):
 
 
 class Creatives(LinkedInAdsStream):
-    """
-    https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives
-    """
+    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -1150,9 +1150,9 @@ class Creatives(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1177,9 +1177,7 @@ class Creatives(LinkedInAdsStream):
 
 
 class AdAnalyticsByCreativeInit(LinkedInAdsStream):
-    """
-    https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder
-    """
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -1310,21 +1308,20 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
     ).to_dict()
 
     @property
-    def adanalyticscolumns(self):
-        columns = [
+    def adanalyticscolumns(self) -> list[str]:
+        """List of columns for adanalytics endpoint."""
+        return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
             "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
         ]
 
-        return columns
-
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1358,7 +1355,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -1366,21 +1363,25 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
         # These values are aprsed with datetime function and the date is added to the day column
+        date_range = row.get("dateRange", {})
+        start_date = date_range.get("start", {})
+
+        if start_date:
+            row["day"] = datetime.strptime(
+                "{}-{}-{}".format(
+                    start_date.get("year"),
+                    start_date.get("month"),
+                    start_date.get("day"),
+                ),
+                "%Y-%m-%d",
+            ).astimezone(UTC)
+
+        pivot_value = row.get("pivotValue", "")
+
         try:
-            daterange_day = row.get("dateRange").get("start").get("day")
-            daterange_month = row.get("dateRange").get("start").get("month")
-            daterange_year = row.get("dateRange").get("start").get("year")
-            daterange_column = "{}-{}-{}".format(
-                daterange_year, daterange_month, daterange_day
-            )
-            row["day"] = datetime.strptime(daterange_column, "%Y-%m-%d")
-        except:
-            pass
-        try:
-            creative_column = row.get("pivotValue")
-            creative_column = int(creative_column.split(":")[3])
+            creative_column = int(pivot_value.split(":")[3])
             row["creative_id"] = creative_column
-        except:
+        except IndexError:
             pass
 
         return super().post_process(row, context)
@@ -1391,9 +1392,9 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1403,7 +1404,6 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -1427,19 +1427,21 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
 
-    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        """Return a dictionary of records from adAnalytics classes
+    def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
+        """Return a dictionary of records from adAnalytics classes.
 
-        Combines request columns from multiple calls to the api, which are limited to 20 columns each
-        Uses merge_dicts to combine responses from each class
+        Combines request columns from multiple calls to the api, which are limited to 20 columns
+        each.
+
+        Uses `merge_dicts` to combine responses from each class
         super().get_records calls only the records from adAnalyticsByCreative class
-        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts() function
-        list() converts each stream context into lists
+        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts()
+        function list() converts each stream context into lists
 
         Args:
             context: The stream context.
@@ -1448,15 +1450,18 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
             A dictionary of records given from adAnalytics streams
         """
         adanalyticsinit_stream = AdAnalyticsByCreativeInit(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
         adanalyticsthird_stream = AdAnalyticsByCreativeThird(
-            self._tap, schema={"properties": {}}
+            self._tap,
+            schema={"properties": {}},
         )
-        adanalytics_records = [
+        return [
             self.merge_dicts(x, y, z, p)
             for x, y, z, p in zip(
                 list(adanalyticsinit_stream.get_records(context)),
@@ -1466,10 +1471,8 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
             )
         ]
 
-        return adanalytics_records
-
-    def merge_dicts(self, *dict_args):
-        """Return a merged dictionary of adAnalytics responses
+    def merge_dicts(self, *dict_args: dict) -> dict:
+        """Return a merged dictionary of adAnalytics responses.
 
         Args:
             *dict_args: dictionaries with adAnalytics response data.
@@ -1488,9 +1491,9 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1500,7 +1503,6 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -1524,7 +1526,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params
@@ -1535,9 +1537,9 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -1547,7 +1549,6 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of URL query parameters.
         """
-
         columns = self.adanalyticscolumns
 
         params: dict = {}
@@ -1571,7 +1572,7 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign"
+            "campaign",
         )
 
         return params

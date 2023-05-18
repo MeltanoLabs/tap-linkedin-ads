@@ -5,9 +5,7 @@ from singer_sdk.testing import get_standard_tap_tests
 from tap_linkedin_ads.tap import TapLinkedInAds
 
 SAMPLE_CONFIG = {
-
     "start_date": "2023-01-01T00:00:00Z",
-
 }
 
 
