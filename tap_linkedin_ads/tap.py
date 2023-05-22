@@ -21,7 +21,6 @@ class TapLinkedInAds(Tap):
 
     name = "tap-linkedin-ads"
 
-    # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
         th.Property(
             "access_token",
@@ -87,7 +86,6 @@ class TapLinkedInAds(Tap):
         Returns:
             A list of discovered streams.
         """
-        # TODO: RESOLVE SDK ENCODING ISSUE FOR CREATIVES STREAM: [LINK TO GITHUB ISSUE]
         return [
             streams.Accounts(self),
             streams.VideoAds(self),
