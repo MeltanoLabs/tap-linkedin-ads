@@ -1169,7 +1169,9 @@ class Creatives(LinkedInAdsStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        ## TODO: Resolve issue with parentheses in campaigns parameter being encoded by rest.py
+        # TODO(edgarrmondragon): Resolve issue with parentheses in campaigns parameter being
+        # encoded by rest.py
+        # https://github.com/meltano/sdk/issues/1666
         params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
         params["q"] = "criteria"
 
