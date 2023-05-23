@@ -1,6 +1,6 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
-from singer_sdk.testing import get_standard_tap_tests
+from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
 from tap_linkedin_ads.tap import TapLinkedInAds
 
@@ -9,9 +9,10 @@ SAMPLE_CONFIG = {
 }
 
 
-# Run standard built-in tap tests from the SDK:
-def test_standard_tap_tests():
-    """Run standard tap tests from the SDK."""
-    tests = get_standard_tap_tests(TapLinkedInAds, config=SAMPLE_CONFIG)
-    for test in tests:
-        test()
+TestTapLinkedInAds = get_tap_test_class(
+    TapLinkedInAds,
+    config=SAMPLE_CONFIG,
+    suite_config=SuiteConfig(
+        ignore_no_records_for_streams=["video_ads"],
+    ),
+)
