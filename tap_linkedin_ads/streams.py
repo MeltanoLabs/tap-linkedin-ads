@@ -308,8 +308,8 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
@@ -322,9 +322,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         params["dateRange.end.year"] = end_date.year
 
         params["fields"] = columns[0]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -381,8 +379,8 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
@@ -394,9 +392,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -480,8 +476,8 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
@@ -493,9 +489,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -526,8 +520,8 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CAMPAIGN"
@@ -539,10 +533,8 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
-
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:"
+        + self.config["campaign"],
         return params
 
 
@@ -617,8 +609,8 @@ class VideoAds(LinkedInAdsStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "account"
-        params["account"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
-        params["owner"] = "urn:li:organization:" + self.config.get("owner")
+        params["account"] = "urn:li:sponsoredAccount:" + self.config["accounts"]
+        params["owner"] = "urn:li:organization:" + self.config["owner"]
 
         return params
 
@@ -705,7 +697,7 @@ class AccountUsers(LinkedInAdsStream):
             params["order_by"] = self.replication_key
 
         params["q"] = "accounts"
-        params["accounts"] = "urn:li:sponsoredAccount:" + self.config.get("accounts")
+        params["accounts"] = "urn:li:sponsoredAccount:" + self.config["accounts"]
 
         return params
 
@@ -1172,7 +1164,7 @@ class Creatives(LinkedInAdsStream):
         # TODO(edgarrmondragon): Resolve issue with parentheses in campaigns parameter being
         # encoded by rest.py
         # https://github.com/meltano/sdk/issues/1666
-        params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config.get("campaign")
+        params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
         params["q"] = "criteria"
 
         return params
@@ -1344,8 +1336,8 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
         params["fields"] = columns[0]
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
@@ -1356,9 +1348,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         params["dateRange.end.day"] = end_date.day
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -1415,8 +1405,8 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
@@ -1428,9 +1418,7 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[1]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -1514,8 +1502,8 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
@@ -1527,9 +1515,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[2]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
 
@@ -1560,8 +1546,8 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config.get("start_date"))
-        end_date = pendulum.parse(self.config.get("end_date"))
+        start_date = pendulum.parse(self.config["start_date"])
+        end_date = pendulum.parse(self.config["end_date"])
 
         params["q"] = "analytics"
         params["pivot"] = "CREATIVE"
@@ -1573,8 +1559,6 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config.get(
-            "campaign",
-        )
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params

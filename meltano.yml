@@ -14,12 +14,7 @@ plugins:
     settings:
     - name: access_token
       kind: password
-    - name: refresh_token
-      kind: password
-    - name: client_secret
-      kind: password
     - name: accounts
-    - name: client_id
     - name: user_agent
       value: 'meltano'
     - name: linkedin_version

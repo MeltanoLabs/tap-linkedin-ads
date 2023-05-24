@@ -1,6 +1,6 @@
 # `tap-linkedin-ads`
 
-LinkedInAds tap class.
+Singer tap for extracting data from the LinkedIn Ads Marketing API.
 
 Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
@@ -18,15 +18,13 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 | Setting             | Required | Default | Description |
 |:--------------------|:--------:|:-------:|:------------|
 | access_token        | True     | None    | The token to authenticate against the API service |
-| refresh_token       | False    | None    | Generated token, bearer auth |
-| start_date          | False    | None    | The earliest record date to sync |
+| start_date          | True     | None    | The earliest record date to sync |
 | end_date            | False    | 2023-05-09 02:04:18.151589 | The latest record date to sync |
-| client_secret       | False    | None    | client secret key |
-| user_agent          | False    | tap-linkedin-ads-ads <api_user_email@your_company.com> | API ID      |
+| user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID      |
 | api_version         | False    | 202207  | LinkedInAds API Version |
-| accounts            | False    | None    | LinkedInAds Account ID |
-| campaign            | False    | None    | LinkedInAds Campaign ID |
-| owner               | False    | None    | LinkedInAds Owner ID |
+| accounts            | True     | None    | LinkedInAds Account ID |
+| campaign            | True     | None    | LinkedInAds Campaign ID |
+| owner               | True     | None    | LinkedInAds Owner ID |
 | stream_maps         | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
 | stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
 | flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
@@ -40,45 +38,6 @@ A full list of supported settings and capabilities is available by running: `tap
 ```bash
 pipx install git+https://github.com/MeltanoLabs/tap-linkedin-ads.git@main
 ```
-
-
-## Configuration
-
-### Accepted Config Options
-
-This tap requires the following environmental variables to be set in ```.env```
-
-- [ ] `TAP_LINKEDIN_ADS_ACCOUNTS:` linkedin account ID
-- [ ] `TAP_LINKEDIN_ADS_ACCESS_TOKEN:` linkedin access token
-- [ ] `TAP_LINKEDIN_ADS_REFRESH_TOKEN:` refresh token
-- [ ] `TAP_LINKEDIN_ADS_CLIENT_ID:` client ID
-- [ ] `TAP_LINKEDIN_ADS_OWNER:` owner ID
-- [ ] `TAP_LINKEDIN_ADS_CAMPAIGN:` campaign ID
-- [ ] `TAP_LINKEDIN_ADS_CLIENT_SECRET:` client secret
-
-## Meltano Variables
-
-The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via
-```meltano config tap-linkedin-ads set --interactive```, or via the env var mappings shown above.
-
-- [ ] `account_id:` linkedin account id
-- [ ] `access_token:` linkedin access token
-- [ ] `refresh_token:` linkedin api refresh token
-- [ ] `client_id:` client id
-- [ ] `owner_id:` owner id
-- [ ] `campaign_id:` campaign id
-- [ ] `client_secret:` client secret
-- [ ] `user_agent:` user agent
-- [ ] `linkedin_version:` linkedin api version
-- [ ] `start_date:` start date
-- [ ] `end_date:` end_date
-
-A full list of supported settings and capabilities is available by running:
-
-```bash
-tap-linkedin-ads --about
-```
-
 ### Authentication
 
 The tap requires a LinkedInAds OAuth 2.0 access token to make API requests
@@ -106,7 +65,7 @@ encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. An SD
 
 ### Metadata Columns
 
-- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
+- `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
 
 ### Elastic License 2.0
 

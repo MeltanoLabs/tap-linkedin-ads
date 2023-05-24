@@ -34,9 +34,6 @@ jobs:
       env:
          TAP_LINKEDIN_ADS_ACCESS_TOKEN: ${{ secrets.access_token }}
          TAP_LINKEDIN_ADS_ACCOUNTS: ${{ secrets.accounts }}
-         TAP_LINKEDIN_ADS_REFRESH_TOKEN: ${{ secrets.refresh_token }}
-         TAP_LINKEDIN_ADS_CLIENT_ID: ${{ secrets.client_id }}
-         TAP_LINKEDIN_ADS_CLIENT_SECRET: ${{ secrets.client_secret }}
          TAP_LINKEDIN_ADS_OWNER: ${{ secrets.owner }}
          TAP_LINKEDIN_ADS_CAMPAIGN: ${{ secrets.campaign }}
       run: |
