@@ -17,7 +17,7 @@ NOW = datetime.datetime.now(tz=datetime.timezone.utc)
 
 
 class TapLinkedInAds(Tap):
-    """LinkedInAds tap class."""
+    """Singer tap for extracting data from the LinkedIn Ads Marketing API."""
 
     name = "tap-linkedin-ads"
 
@@ -29,14 +29,9 @@ class TapLinkedInAds(Tap):
             description="The token to authenticate against the API service",
         ),
         th.Property(
-            "refresh_token",
-            th.StringType,
-            description="Generated token, bearer auth",
-        ),
-        th.Property(
             "start_date",
             th.DateTimeType,
-            required=False,
+            required=True,
             description="The earliest record date to sync",
         ),
         th.Property(
@@ -45,11 +40,6 @@ class TapLinkedInAds(Tap):
             required=False,
             default=NOW.isoformat(),
             description="The latest record date to sync",
-        ),
-        th.Property(
-            "client_secret",
-            th.StringType,
-            description="client secret key",
         ),
         th.Property(
             "user_agent",
@@ -66,16 +56,19 @@ class TapLinkedInAds(Tap):
         th.Property(
             "accounts",
             th.StringType,
+            required=True,
             description="LinkedInAds Account ID",
         ),
         th.Property(
             "campaign",
             th.StringType,
+            required=True,
             description="LinkedInAds Campaign ID",
         ),
         th.Property(
             "owner",
             th.StringType,
+            required=True,
             description="LinkedInAds Owner ID",
         ),
     ).to_dict()
