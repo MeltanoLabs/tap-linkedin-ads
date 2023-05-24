@@ -35,7 +35,7 @@ A full list of supported settings and capabilities is available by running: `tap
 
 ### Owner
 
-The ```owner``` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a 
+The ```owner``` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a
 request to the adAccounts endpoint:
 
  https://api.linkedin.com/rest/adAccounts?q=search&start=0&count=10
