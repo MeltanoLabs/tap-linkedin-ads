@@ -533,8 +533,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["dateRange.end.month"] = end_date.month
         params["dateRange.end.year"] = end_date.year
         params["fields"] = columns[3]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:"
-        + self.config["campaign"]
+        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
         return params
 
 
