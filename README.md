@@ -33,6 +33,16 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 A full list of supported settings and capabilities is available by running: `tap-linkedin-ads --about`
 
 
+### Owner
+
+The ```owner``` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a
+request to the adAccounts endpoint:
+
+ https://api.linkedin.com/rest/adAccounts?q=search&start=0&count=10
+
+ The owner ID can be found in the response under "reference": "urn:li:organization:```{OWNER}```"
+
+
 ## Installation
 
 ```bash
