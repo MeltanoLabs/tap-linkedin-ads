@@ -50,7 +50,7 @@ class TapLinkedInAds(Tap):
         th.Property(
             "api_version",
             th.StringType,
-            default="202207",
+            default="202211",
             description="LinkedInAds API Version",
         ),
         th.Property(
