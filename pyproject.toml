@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tap-linkedin-ads"
+name = "meltano-tap-linkedin-ads"
 version = "0.0.0"
 description = "`tap-linkedin-ads` is a Singer tap for linkedin, built with the Meltano SDK for Singer Taps."
 authors = ["Meltano <hello@meltano.com>"]
@@ -7,7 +7,11 @@ keywords = [
     "ELT",
     "linkedin",
 ]
-license = "Apache 2.0"
+license = "Elastic-2.0"
+packages = [
+    { include = "tap_linkedin_ads" },
+]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "<3.11,>=3.7.1"

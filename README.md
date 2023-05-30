@@ -35,12 +35,12 @@ A full list of supported settings and capabilities is available by running: `tap
 
 ### Owner
 
-The ```owner``` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a
+The `owner` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a
 request to the adAccounts endpoint:
 
  https://api.linkedin.com/rest/adAccounts?q=search&start=0&count=10
 
- The owner ID can be found in the response under "reference": "urn:li:organization:```{OWNER}```"
+ The owner ID can be found in the response under "reference": "urn:li:organization:`{OWNER}`"
 
 
 ## Installation
@@ -54,9 +54,9 @@ The tap requires a LinkedInAds OAuth 2.0 access token to make API requests
 
 The access token requires the following permissions:
 
-```r_ads```: read ads
-```rw_ads```: read-write ads
-```r_ads_reporting```: read ads reporting
+`r_ads`: read ads
+`rw_ads`: read-write ads
+`r_ads_reporting`: read ads reporting
 
 Access tokens expire after 60 days and require a user to manually authenticate
 again. See the [LinkedInAds API docs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/postman-getting-started) for more info
