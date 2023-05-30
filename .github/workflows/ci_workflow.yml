@@ -3,7 +3,13 @@
 
 name: Test tap-linkedin-ads
 
-on: [push]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs: {}
 
 jobs:
   pytest:
@@ -22,9 +28,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.4.2
+      run: |
+        pipx install poetry
+        poetry --version
     - name: Install dependencies
       run: |
         poetry install
