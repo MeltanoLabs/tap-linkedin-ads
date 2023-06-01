@@ -893,7 +893,8 @@ class Campaigns(LinkedInAdsStream):
                                             "urn:li:adTargetingFacet",
                                             th.ArrayType(
                                                 Property(
-                                                    "urn:li:adSlotSize", StringType
+                                                    "urn:li:adSlotSize",
+                                                    StringType,
                                                 ),
                                             ),
                                         ),
