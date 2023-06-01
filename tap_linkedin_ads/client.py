@@ -70,7 +70,7 @@ class LinkedInAdsStream(RESTStream):
 
         elements = resp_json.get("elements")
 
-        if len(elements) == 0 or len(elements) == previous_token:
+        if len(elements) == 0 or len(elements) == previous_token + 1:
             return None
 
         return previous_token + 1

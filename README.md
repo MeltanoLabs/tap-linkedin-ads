@@ -21,7 +21,7 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 | start_date          | True     | None    | The earliest record date to sync |
 | end_date            | False    | 2023-05-09 02:04:18.151589 | The latest record date to sync |
 | user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID      |
-| api_version         | False    | 202207  | LinkedInAds API Version |
+| api_version         | False    | 202211  | LinkedInAds API Version |
 | accounts            | True     | None    | LinkedInAds Account ID |
 | campaign            | True     | None    | LinkedInAds Campaign ID |
 | owner               | True     | None    | LinkedInAds Owner ID |

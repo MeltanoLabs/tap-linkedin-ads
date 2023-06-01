@@ -873,30 +873,27 @@ class Campaigns(LinkedInAdsStream):
                     ObjectType(
                         Property(
                             "and",
-                            th.ArrayType(
+                            ObjectType(
                                 Property(
-                                    "items",
+                                    "or",
                                     ObjectType(
-                                        Property("type", StringType),
                                         Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property("urn:li:title", StringType),
+                                            ),
                                         ),
-                                        additional_properties=False,
-                                    ),
-                                ),
-                            ),
-                        ),
-                        Property(
-                            "or",
-                            th.ArrayType(
-                                Property(
-                                    "items",
-                                    ObjectType(
-                                        Property("type", StringType),
                                         Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property("urn:li:geo", StringType),
+                                            ),
+                                        ),
+                                        Property(
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property("urn:li:adSlotSize", StringType),
+                                            ),
                                         ),
                                         additional_properties=False,
                                     ),
