@@ -18,7 +18,7 @@ plugins:
     - name: user_agent
       value: 'meltano'
     - name: linkedin_version
-      value: '202207'
+      value: '202211'
     - name: campaign
     - name: owner
     - name: start_date

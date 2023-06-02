@@ -238,7 +238,6 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivot", StringType),
         Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
@@ -280,9 +279,9 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     def adanalyticscolumns(self) -> list[str]:
         return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
-            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,viralDocumentThirdQuartileCompletions,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
-            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,approximateUniqueImpressions,viralDownloadClicks,impressions",
         ]
 
     def get_url_params(
@@ -873,30 +872,30 @@ class Campaigns(LinkedInAdsStream):
                     ObjectType(
                         Property(
                             "and",
-                            th.ArrayType(
+                            ObjectType(
                                 Property(
-                                    "items",
+                                    "or",
                                     ObjectType(
-                                        Property("type", StringType),
                                         Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property("urn:li:title", StringType),
+                                            ),
                                         ),
-                                        additional_properties=False,
-                                    ),
-                                ),
-                            ),
-                        ),
-                        Property(
-                            "or",
-                            th.ArrayType(
-                                Property(
-                                    "items",
-                                    ObjectType(
-                                        Property("type", StringType),
                                         Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property("urn:li:geo", StringType),
+                                            ),
+                                        ),
+                                        Property(
+                                            "urn:li:adTargetingFacet",
+                                            th.ArrayType(
+                                                Property(
+                                                    "urn:li:adSlotSize",
+                                                    StringType,
+                                                ),
+                                            ),
                                         ),
                                         additional_properties=False,
                                     ),
@@ -1263,7 +1262,6 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivot", StringType),
         Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
@@ -1305,9 +1303,9 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         """List of columns for adanalytics endpoint."""
         return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
-            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,pivot,viralLikes",
+            "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,viralDocumentThirdQuartileCompletions,viralLikes",
             "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
-            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,viralDocumentThirdQuartileCompletions,viralDownloadClicks,impressions",
+            "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,approximateUniqueImpressions,viralDownloadClicks,impressions",
         ]
 
     def get_url_params(
