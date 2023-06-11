@@ -16,7 +16,7 @@ plugins:
       kind: password
     - name: accounts
     - name: user_agent
-      value: 'meltano'
+      value: meltano
     - name: linkedin_version
       value: '202305'
     - name: campaign
@@ -57,5 +57,9 @@ plugins:
     inherit_from: tap-linkedin-ads
     select:
     - video_ads
+  loaders:
+  - name: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
 environments:
 - name: dev

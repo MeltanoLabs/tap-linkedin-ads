@@ -8,6 +8,7 @@ from pathlib import Path
 
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.streams import RESTStream
+from singer_sdk.helpers.jsonpath import extract_jsonpath
 
 if t.TYPE_CHECKING:
     import requests
@@ -21,7 +22,7 @@ class LinkedInAdsStream(RESTStream):
 
     url_base = "https://api.linkedin.com/rest/"
 
-    records_jsonpath = "$.elements[*]"  # Or override `parse_response`.
+    records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
         "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
     )
@@ -53,27 +54,6 @@ class LinkedInAdsStream(RESTStream):
         headers["X-Restli-Protocol-Version"] = "1.0.0"
 
         return headers
-
-    def get_next_page_token(
-        self,
-        response: requests.Response,
-        previous_token: t.Any | None,
-    ) -> t.Any | None:
-        """Return a token for identifying next page or None if no more pages."""
-        # If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
-
-        resp_json = response.json()
-        if previous_token is None:
-            previous_token = 0
-
-        elements = resp_json.get("elements")
-
-        if len(elements) == 0 or len(elements) == previous_token + 1:
-            return None
-
-        return previous_token + 1
 
     def get_url_params(
         self,
@@ -110,8 +90,9 @@ class LinkedInAdsStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        resp_json = response.json()
-
+        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+       # resp_json = response.json()
+"""
         if isinstance(resp_json, list):
             results = resp_json
         elif resp_json.get("elements") is not None:
@@ -166,3 +147,4 @@ class LinkedInAdsStream(RESTStream):
             results = resp_json
 
         yield from results
+"""

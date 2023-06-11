@@ -6,6 +6,11 @@ import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
 
+import json
+import os
+from dotenv import load_dotenv
+load_dotenv(".env")
+
 import pendulum
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -713,10 +718,11 @@ class CampaignGroups(LinkedInAdsStream):
     """
 
     name = "campaign_groups"
-    replication_keys = ["last_modified_time"]
+    #replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id", "status"]
-    path = "adCampaignGroups"
+    primary_keys = ["id", "status"]
+    path = "adAccounts/{}/adCampaignGroups/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS")
+                                                      , os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN_GROUPS"))
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -790,15 +796,6 @@ class CampaignGroups(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "search"
-        params["sort.field"] = "ID"
-        params["sort.order"] = "ASCENDING"
 
         return params
 
@@ -816,12 +813,14 @@ class Campaigns(LinkedInAdsStream):
     """
 
     name = "campaign"
-    replication_keys = ["last_modified_time"]
+    #replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id", "status"]
-    path = "adAccounts/510799602/adCampaigns/211290954"
+    primary_keys = ["id", "status"]
+    #path = "adAccounts/510799602/adCampaigns/211290954"
+    path = "adAccounts/{}/adCampaigns/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN"))
 
     schema = PropertiesList(
+        Property("storyDeliveryEnabled", BooleanType),
         Property(
             "targeting",
             ObjectType(
@@ -1076,19 +1075,12 @@ class Campaigns(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
 
         return params
 
 
 class Creatives(LinkedInAdsStream):
-    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives."""
-
-    """
+    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives.
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -1098,10 +1090,11 @@ class Creatives(LinkedInAdsStream):
     """
 
     name = "creatives"
-    replication_keys = ["last_modified_time"]
+    #replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
-    path = "creatives"
+    primary_keys = ["id"]
+    #path = "adAccounts/510799602/creatives/urn%3Ali%3AsponsoredCreative%3A204930534"
+    path = "adAccounts/{}/creatives/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CREATIVES"))
 
     schema = PropertiesList(
         Property("account", StringType),
@@ -1149,17 +1142,6 @@ class Creatives(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        # TODO(edgarrmondragon): Resolve issue with parentheses in campaigns parameter being
-        # encoded by rest.py
-        # https://github.com/meltano/sdk/issues/1666
-        params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-        params["q"] = "criteria"
 
         return params
 
