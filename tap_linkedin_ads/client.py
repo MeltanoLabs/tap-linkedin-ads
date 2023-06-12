@@ -55,6 +55,28 @@ class LinkedInAdsStream(RESTStream):
 
         return headers
 
+    def get_next_page_token(
+            self,
+            response: requests.Response,
+            previous_token: t.Any | None,
+    ) -> t.Any | None:
+        """Return a token for identifying next page or None if no more pages."""
+        # If pagination is required, return a token which can be used to get the
+        #       next page. If this is the final page, return "None" to end the
+        #       pagination loop.
+        resp_json = response.json()
+        if previous_token is None:
+            previous_token = 0
+        try:
+            elements = resp_json.get("elements")
+            if len(elements) == 0 or len(elements) == previous_token + 1:
+                return None
+        except:
+            page = resp_json
+            if len(page) == 0 or len(page) == previous_token + 1:
+                return None
+        return previous_token + 1
+    
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -79,8 +101,8 @@ class LinkedInAdsStream(RESTStream):
         return params
 
     def parse_response(  # noqa: PLR0912
-        self,
-        response: requests.Response,
+            self,
+            response: requests.Response,
     ) -> t.Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
@@ -90,61 +112,60 @@ class LinkedInAdsStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-       # resp_json = response.json()
-"""
-        if isinstance(resp_json, list):
-            results = resp_json
-        elif resp_json.get("elements") is not None:
+        resp_json = response.json()
+        if resp_json.get("elements") is not None:
             results = resp_json["elements"]
-            try:
-                columns = results[0]
-                created_time = (
-                    columns.get("changeAuditStamps").get("created").get("time")
-                )
-                last_modified_time = (
-                    columns.get("changeAuditStamps").get("lastModified").get("time")
-                )
-                columns["created_time"] = datetime.fromtimestamp(
-                    int(created_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-                columns["last_modified_time"] = datetime.fromtimestamp(
-                    int(last_modified_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-                try:
-                    account_column = columns.get("account")
-                    account_id = int(account_column.split(":")[3])
-                    columns["account_id"] = account_id
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    campaign_column = columns.get("campaignGroup")
-                    campaign = int(campaign_column.split(":")[3])
-                    columns["campaign_group_id"] = campaign
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    user_column = columns.get("user")
-                    user = user_column.split(":")[3]
-                    columns["user_person_id"] = user
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    schedule_column = columns.get("runSchedule").get("start")
-                    columns[
-                        "run_schedule_start"
-                    ] = datetime.fromtimestamp(  # noqa: DTZ006
-                        int(schedule_column) / 1000,
-                    ).isoformat()
-                except:  # noqa: E722, S110
-                    pass
-                results = [columns]
-            except:  # noqa: E722, S110
-                pass
         else:
             results = resp_json
+        try:
+            columns = results[0]
+            created_time = (
+                columns.get("changeAuditStamps").get("created").get("time")
+            )
+            last_modified_time = (
+                columns.get("changeAuditStamps").get("lastModified").get("time")
+            )
+            columns["created_time"] = datetime.fromtimestamp(
+                int(created_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+            columns["last_modified_time"] = datetime.fromtimestamp(
+                int(last_modified_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            columns = results
+            columns["last_modified_time"] = None
+            pass
+
+        try:
+            account_column = columns.get("account")
+            account_id = int(account_column.split(":")[3])
+            columns["account_id"] = account_id
+        except:  # noqa: E722, S110
+            pass
+        try:
+            campaign_column = columns.get("campaignGroup")
+            campaign = int(campaign_column.split(":")[3])
+            columns["campaign_group_id"] = campaign
+        except:  # noqa: E722, S110
+            pass
+        try:
+            user_column = columns.get("user")
+            user = user_column.split(":")[3]
+            columns["user_person_id"] = user
+        except:  # noqa: E722, S110
+            pass
+        try:
+            schedule_column = columns.get("runSchedule").get("start")
+            columns[
+                "run_schedule_start"
+            ] = datetime.fromtimestamp(  # noqa: DTZ006
+                int(schedule_column) / 1000,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        results = [columns]
 
         yield from results
-"""
