@@ -1099,27 +1099,30 @@ class Creatives(LinkedInAdsStream):
         Property(
             "content",
             ObjectType(
-                Property("reference", StringType),
                 Property(
-                    "text_ad",
+                    "spotlight",
                     ObjectType(
-                        Property("headline", StringType),
+                        Property("showMemberProfilePhoto", BooleanType),
+                        Property("organizationName", StringType),
+                        Property("landingPage", StringType),
                         Property("description", StringType),
-                        Property("landing_page", StringType),
+                        Property("logo", StringType),
+                        Property("headline", StringType),
+                        Property("callToAction", StringType),
                         additional_properties=False,
                     ),
                 ),
             ),
         ),
-        Property("created_at", StringType),
-        Property("created_by", StringType),
-        Property("last_modified_at", StringType),
-        Property("last_modified_by", StringType),
+        Property("createdAt", StringType),
+        Property("createdBy", StringType),
+        Property("lastModifiedAt", StringType),
+        Property("lastModifiedBy", StringType),
         Property("id", StringType),
-        Property("intended_status", StringType),
-        Property("is_serving", BooleanType),
-        Property("is_test", BooleanType),
-        Property("serving_hold_reasons", th.ArrayType(Property("items", StringType))),
+        Property("intendedStatus", StringType),
+        Property("isServing", BooleanType),
+        Property("isTest", BooleanType),
+        Property("servingHoldReasons", th.ArrayType(Property("items", StringType))),
     ).to_dict()
 
     def get_url_params(
