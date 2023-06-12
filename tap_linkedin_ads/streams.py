@@ -717,8 +717,7 @@ class CampaignGroups(LinkedInAdsStream):
     #replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["id", "status"]
-    path = "adAccounts/{}/adCampaignGroups/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS")
-                                                      , os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN_GROUPS"))
+    path = "adAccounts/{}/adCampaignGroups/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN_GROUP"))
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -1090,7 +1089,7 @@ class Creatives(LinkedInAdsStream):
     replication_method = "incremental"
     primary_keys = ["id"]
     #path = "adAccounts/510799602/creatives/urn%3Ali%3AsponsoredCreative%3A204930534"
-    path = "adAccounts/{}/creatives/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CREATIVES"))
+    path = "adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CREATIVE"))
 
     schema = PropertiesList(
         Property("account", StringType),
