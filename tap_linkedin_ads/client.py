@@ -76,7 +76,7 @@ class LinkedInAdsStream(RESTStream):
             if len(page) == 0 or len(page) == previous_token + 1:
                 return None
         return previous_token + 1
-    
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -115,28 +115,49 @@ class LinkedInAdsStream(RESTStream):
         resp_json = response.json()
         if resp_json.get("elements") is not None:
             results = resp_json["elements"]
+            try:
+                columns = results[0]
+            except:  # noqa: E722, S110
+                columns = results
+                pass
+            try:
+                created_time = (
+                    columns.get("changeAuditStamps").get("created").get("time")
+                )
+                last_modified_time = (
+                    columns.get("changeAuditStamps").get("lastModified").get("time")
+                )
+                columns["created_time"] = datetime.fromtimestamp(
+                    int(created_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+                columns["last_modified_time"] = datetime.fromtimestamp(
+                    int(last_modified_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+            except:  # noqa: E722, S110
+                pass
         else:
             results = resp_json
-        try:
-            columns = results[0]
-            created_time = (
-                columns.get("changeAuditStamps").get("created").get("time")
-            )
-            last_modified_time = (
-                columns.get("changeAuditStamps").get("lastModified").get("time")
-            )
-            columns["created_time"] = datetime.fromtimestamp(
-                int(created_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-            columns["last_modified_time"] = datetime.fromtimestamp(
-                int(last_modified_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-        except:  # noqa: E722, S110
-            columns = results
-            columns["last_modified_time"] = None
-            pass
+            try:
+                columns = results
+                created_time = (
+                    columns.get("changeAuditStamps").get("created").get("time")
+                )
+                last_modified_time = (
+                    columns.get("changeAuditStamps").get("lastModified").get("time")
+                )
+                columns["created_time"] = datetime.fromtimestamp(
+                    int(created_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+                columns["last_modified_time"] = datetime.fromtimestamp(
+                    int(last_modified_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+            except:  # noqa: E722, S110
+                columns = results
+                pass
 
         try:
             account_column = columns.get("account")
@@ -166,6 +187,9 @@ class LinkedInAdsStream(RESTStream):
         except:  # noqa: E722, S110
             pass
 
-        results = [columns]
+        if resp_json.get("elements") is not None:
+            results = resp_json["elements"]
+        else:
+            results = [columns]
 
         yield from results

@@ -164,9 +164,9 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     """
 
     name = "AdAnalyticsByCampaignInit"
-    replication_keys = ["dateRange"]
+    replication_keys = ["day"]
     replication_method = "incremental"
-    primary_keys = ["campaign_id", "dateRange"]
+    primary_keys = ["campaign_id", "day"]
     path = "adAnalytics"
 
     schema = PropertiesList(
@@ -714,9 +714,9 @@ class CampaignGroups(LinkedInAdsStream):
     """
 
     name = "campaign_groups"
-    #replication_keys = ["last_modified_time"]
+    replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["id", "status"]
+    primary_keys = ["last_modified_time", "id", "status"]
     path = "adAccounts/{}/adCampaignGroups/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN_GROUP"))
 
     PropertiesList = th.PropertiesList
@@ -808,9 +808,9 @@ class Campaigns(LinkedInAdsStream):
     """
 
     name = "campaign"
-    #replication_keys = ["last_modified_time"]
+    replication_keys = ["last_modified_time"]
     replication_method = "incremental"
-    primary_keys = ["id", "status"]
+    primary_keys = ["last_modified_time", "id", "status"]
     #path = "adAccounts/510799602/adCampaigns/211290954"
     path = "adAccounts/{}/adCampaigns/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN"))
 
@@ -1085,9 +1085,9 @@ class Creatives(LinkedInAdsStream):
     """
 
     name = "creatives"
-    #replication_keys = ["last_modified_time"]
+    replication_keys = ["lastModifiedAt"]
     replication_method = "incremental"
-    primary_keys = ["id"]
+    primary_keys = ["lastModifiedAt", "id"]
     #path = "adAccounts/510799602/creatives/urn%3Ali%3AsponsoredCreative%3A204930534"
     path = "adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CREATIVE"))
 

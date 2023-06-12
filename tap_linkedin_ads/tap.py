@@ -80,14 +80,14 @@ class TapLinkedInAds(Tap):
             A list of discovered streams.
         """
         return [
-            #streams.Accounts(self),
+            streams.Accounts(self),
             #streams.VideoAds(self),
             #streams.AccountUsers(self),
             streams.Creatives(self),  # noqa: ERA001
-            #streams.Campaigns(self),
-            #streams.CampaignGroups(self),
-            #streams.AdAnalyticsByCampaign(self),
-            #streams.AdAnalyticsByCreative(self),
+            streams.Campaigns(self),
+            streams.CampaignGroups(self),
+            streams.AdAnalyticsByCampaign(self),
+            streams.AdAnalyticsByCreative(self),
         ]
 
 
