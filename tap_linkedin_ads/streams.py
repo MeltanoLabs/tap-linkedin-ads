@@ -243,7 +243,6 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -345,12 +344,9 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
                 ),
                 "%Y-%m-%d",
             ).astimezone(UTC)
-
-        pivot_value = row.get("pivotValue", "")
-
+            
         try:
-            campaign_column = int(pivot_value.split(":")[3])
-            row["campaign_id"] = campaign_column
+            row["campaign_id"] = os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN")# campaign_column
         except IndexError:
             pass
 
@@ -1240,7 +1236,6 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -1343,11 +1338,9 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        pivot_value = row.get("pivotValue", "")
 
         try:
-            creative_column = int(pivot_value.split(":")[3])
-            row["creative_id"] = creative_column
+            row["creative_id"] = os.getenv("TAP_LINKEDIN_ADS_CREATIVE")
         except IndexError:
             pass
 
