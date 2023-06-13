@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
@@ -340,10 +341,8 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        try:
+        with contextlib.suppress(IndexError):
             row["campaign_id"] = self.config["campaign"]
-        except IndexError:
-            pass
 
         return super().post_process(row, context)
 
@@ -823,7 +822,8 @@ class CampaignGroups(LinkedInAdsStream):
     def url_base(self) -> str:
         base_url = (
             "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
-                self.config["accounts"], self.config["campaign_group"]
+                self.config["accounts"],
+                self.config["campaign_group"],
             )
         )
 
@@ -1109,7 +1109,8 @@ class Campaigns(LinkedInAdsStream):
     @property
     def url_base(self) -> str:
         base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(
-            self.config["accounts"], self.config["campaign"]
+            self.config["accounts"],
+            self.config["campaign"],
         )
 
         return base_url
@@ -1140,7 +1141,7 @@ class Creatives(LinkedInAdsStream):
     path: path which will be added to api url in client.py
     schema: instream schema
     primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
+    replication_keys = datetime keys for replication.
     """
 
     name = "creatives"
@@ -1186,7 +1187,8 @@ class Creatives(LinkedInAdsStream):
     @property
     def url_base(self) -> str:
         base_url = "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(
-            self.config["accounts"], self.config["creative"]
+            self.config["accounts"],
+            self.config["creative"],
         )
 
         return base_url
@@ -1406,10 +1408,8 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        try:
+        with contextlib.suppress(IndexError):
             row["creative_id"] = self.config["creative"]
-        except IndexError:
-            pass
 
         return super().post_process(row, context)
 

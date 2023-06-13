@@ -8,7 +8,6 @@ from pathlib import Path
 
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.streams import RESTStream
-from singer_sdk.helpers.jsonpath import extract_jsonpath
 
 if t.TYPE_CHECKING:
     import requests
@@ -117,7 +116,7 @@ class LinkedInAdsStream(RESTStream):
             results = resp_json["elements"]
             try:
                 columns = results[0]
-            except:  # noqa: E722, S110
+            except:  # noqa: E722
                 columns = results
                 pass
             try:
@@ -155,7 +154,7 @@ class LinkedInAdsStream(RESTStream):
                     int(last_modified_time) / 1000,
                     tz=UTC,
                 ).isoformat()
-            except:  # noqa: E722, S110
+            except:  # noqa: E722
                 columns = results
                 pass
 
@@ -179,9 +178,10 @@ class LinkedInAdsStream(RESTStream):
         except:  # noqa: E722, S110
             pass
 
-        if resp_json.get("elements") is not None:
-            results = resp_json["elements"]
-        else:
-            results = [columns]
+        results = (
+            resp_json["elements"]
+            if resp_json.get("elements") is not None
+            else [columns]
+        )
 
         yield from results
