@@ -829,7 +829,7 @@ class CampaignGroups(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(self.config["accounts"], self.config["campaigngroup"])
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(self.config["accounts"], self.config["campaign_group"])
 
         return base_url
     def get_url_params(

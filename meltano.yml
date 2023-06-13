@@ -21,7 +21,7 @@ plugins:
       value: '202305'
     - name: campaign
     - name: owner
-    - name: campaigngroup
+    - name: campaign_group
     - name: creative
     - name: start_date
       value: '2023-01-01T00:00:00Z'

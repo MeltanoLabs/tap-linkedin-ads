@@ -72,7 +72,7 @@ class TapLinkedInAds(Tap):
             description="LinkedInAds Owner ID",
         ),
         th.Property(
-            "campaigngroup",
+            "campaign_group",
             th.StringType,
             required=True,
             description="LinkedInAds Campaign Group ID",
