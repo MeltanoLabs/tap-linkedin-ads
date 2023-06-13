@@ -172,12 +172,6 @@ class LinkedInAdsStream(RESTStream):
         except:  # noqa: E722, S110
             pass
         try:
-            user_column = columns.get("user")
-            user = user_column.split(":")[3]
-            columns["user_person_id"] = user
-        except:  # noqa: E722, S110
-            pass
-        try:
             schedule_column = columns.get("runSchedule").get("start")
             columns[
                 "run_schedule_start"
