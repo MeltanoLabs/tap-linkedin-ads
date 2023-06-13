@@ -612,6 +612,29 @@ class VideoAds(LinkedInAdsStream):
         params["owner"] = "urn:li:organization:" + self.config["owner"]
 
         return params
+    
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
+        try:
+            created_time = (
+                row.get("changeAuditStamps").get("created").get("time")
+            )
+            last_modified_time = (
+                row.get("changeAuditStamps").get("lastModified").get("time")
+            )
+            row["created_time"] = datetime.fromtimestamp(
+                int(created_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+            row["last_modified_time"] = datetime.fromtimestamp(
+                int(last_modified_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        return super().post_process(row, context)
 
 
 class AccountUsers(LinkedInAdsStream):
@@ -700,6 +723,34 @@ class AccountUsers(LinkedInAdsStream):
 
         return params
 
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are aprsed with datetime function and the date is added to the day column
+        try:
+            account_user = row.get("user", {})
+            user = account_user.split(":")[3]
+            row["user_person_id"] = user
+        except:  # noqa: E722, S110
+            pass
+        try:
+            created_time = (
+                row.get("changeAuditStamps").get("created").get("time")
+            )
+            last_modified_time = (
+                row.get("changeAuditStamps").get("lastModified").get("time")
+            )
+            row["created_time"] = datetime.fromtimestamp(
+                int(created_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+            row["last_modified_time"] = datetime.fromtimestamp(
+                int(last_modified_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        return super().post_process(row, context)
 
 class CampaignGroups(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
@@ -717,8 +768,8 @@ class CampaignGroups(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = "adAccounts/{}/adCampaignGroups/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN_GROUP"))
-
+    path = None
+    
     PropertiesList = th.PropertiesList
     Property = th.Property
     ObjectType = th.ObjectType
@@ -776,6 +827,11 @@ class CampaignGroups(LinkedInAdsStream):
 
     schema = jsonschema
 
+    @property
+    def url_base(self) -> str:
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(self.config["accounts"], self.config["campaigngroup"])
+
+        return base_url
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -811,9 +867,7 @@ class Campaigns(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    #path = "adAccounts/510799602/adCampaigns/211290954"
-    path = "adAccounts/{}/adCampaigns/{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN"))
-
+    path = None
     schema = PropertiesList(
         Property("storyDeliveryEnabled", BooleanType),
         Property(
@@ -1055,6 +1109,13 @@ class Campaigns(LinkedInAdsStream):
         Property("run_schedule_end", StringType),
     ).to_dict()
 
+
+    @property
+    def url_base(self) -> str:
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(self.config["accounts"], self.config["campaign"])
+
+        return base_url
+    
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -1088,9 +1149,8 @@ class Creatives(LinkedInAdsStream):
     replication_keys = ["lastModifiedAt"]
     replication_method = "incremental"
     primary_keys = ["lastModifiedAt", "id"]
-    #path = "adAccounts/510799602/creatives/urn%3Ali%3AsponsoredCreative%3A204930534"
-    path = "adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(os.getenv("TAP_LINKEDIN_ADS_ACCOUNTS"), os.getenv("TAP_LINKEDIN_ADS_CREATIVE"))
-
+    path = ""
+    
     schema = PropertiesList(
         Property("account", StringType),
         Property("account_id", IntegerType),
@@ -1124,6 +1184,12 @@ class Creatives(LinkedInAdsStream):
         Property("isTest", BooleanType),
         Property("servingHoldReasons", th.ArrayType(Property("items", StringType))),
     ).to_dict()
+
+    @property
+    def url_base(self) -> str:
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(self.config["accounts"], self.config["creative"])
+        
+        return base_url
 
     def get_url_params(
         self,

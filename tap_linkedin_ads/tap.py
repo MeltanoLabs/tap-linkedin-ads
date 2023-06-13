@@ -71,6 +71,18 @@ class TapLinkedInAds(Tap):
             required=True,
             description="LinkedInAds Owner ID",
         ),
+        th.Property(
+            "campaigngroup",
+            th.StringType,
+            required=True,
+            description="LinkedInAds Campaign Group ID",
+        ),
+        th.Property(
+            "creative",
+            th.StringType,
+            required=True,
+            description="LinkedInAds Creative ID",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[LinkedInAdsStream]:
@@ -81,8 +93,8 @@ class TapLinkedInAds(Tap):
         """
         return [
             streams.Accounts(self),
-            #streams.VideoAds(self),
-            #streams.AccountUsers(self),
+            streams.VideoAds(self),
+            streams.AccountUsers(self),
             streams.Creatives(self),  # noqa: ERA001
             streams.Campaigns(self),
             streams.CampaignGroups(self),
