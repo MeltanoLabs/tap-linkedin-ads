@@ -238,7 +238,6 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -280,7 +279,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,viralDocumentThirdQuartileCompletions,viralLikes",
-            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
             "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,approximateUniqueImpressions,viralDownloadClicks,impressions",
         ]
 
@@ -327,7 +326,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
@@ -341,11 +340,8 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        pivot_value = row.get("pivotValue", "")
-
         try:
-            campaign_column = int(pivot_value.split(":")[3])
-            row["campaign_id"] = campaign_column
+            row["campaign_id"] = self.config["campaign"]
         except IndexError:
             pass
 
@@ -612,6 +608,27 @@ class VideoAds(LinkedInAdsStream):
 
         return params
 
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are parse with datetime function and the date is added to the day column
+        try:
+            created_time = row.get("changeAuditStamps").get("created").get("time")
+            last_modified_time = (
+                row.get("changeAuditStamps").get("lastModified").get("time")
+            )
+            row["created_time"] = datetime.fromtimestamp(
+                int(created_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+            row["last_modified_time"] = datetime.fromtimestamp(
+                int(last_modified_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        return super().post_process(row, context)
+
 
 class AccountUsers(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
@@ -699,6 +716,33 @@ class AccountUsers(LinkedInAdsStream):
 
         return params
 
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date rannge column
+        # These values are parsed with datetime function and the date is added to the day column
+        try:
+            account_user = row.get("user", {})
+            user = account_user.split(":")[3]
+            row["user_person_id"] = user
+        except:  # noqa: E722, S110
+            pass
+        try:
+            created_time = row.get("changeAuditStamps").get("created").get("time")
+            last_modified_time = (
+                row.get("changeAuditStamps").get("lastModified").get("time")
+            )
+            row["created_time"] = datetime.fromtimestamp(
+                int(created_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+            row["last_modified_time"] = datetime.fromtimestamp(
+                int(last_modified_time) / 1000,
+                tz=UTC,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        return super().post_process(row, context)
+
 
 class CampaignGroups(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
@@ -716,7 +760,7 @@ class CampaignGroups(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = "adCampaignGroups"
+    path = None
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -775,6 +819,16 @@ class CampaignGroups(LinkedInAdsStream):
 
     schema = jsonschema
 
+    @property
+    def url_base(self) -> str:
+        base_url = (
+            "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
+                self.config["accounts"], self.config["campaign_group"]
+            )
+        )
+
+        return base_url
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -790,15 +844,6 @@ class CampaignGroups(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "search"
-        params["sort.field"] = "ID"
-        params["sort.order"] = "ASCENDING"
 
         return params
 
@@ -819,9 +864,9 @@ class Campaigns(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = "adCampaigns"
-
+    path = None
     schema = PropertiesList(
+        Property("storyDeliveryEnabled", BooleanType),
         Property(
             "targeting",
             ObjectType(
@@ -1061,6 +1106,14 @@ class Campaigns(LinkedInAdsStream):
         Property("run_schedule_end", StringType),
     ).to_dict()
 
+    @property
+    def url_base(self) -> str:
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(
+            self.config["accounts"], self.config["campaign"]
+        )
+
+        return base_url
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -1076,23 +1129,12 @@ class Campaigns(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "search"
-        params["sort.field"] = "ID"
-        params["sort.order"] = "ASCENDING"
 
         return params
 
 
 class Creatives(LinkedInAdsStream):
-    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-01&tabs=http#search-for-creatives."""
-
-    """
+    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives.
     columns: columns which will be added to fields parameter in api
     name: stream name
     path: path which will be added to api url in client.py
@@ -1102,10 +1144,10 @@ class Creatives(LinkedInAdsStream):
     """
 
     name = "creatives"
-    replication_keys = ["last_modified_time"]
+    replication_keys = ["lastModifiedAt"]
     replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id"]
-    path = "creatives"
+    primary_keys = ["lastModifiedAt", "id"]
+    path = ""
 
     schema = PropertiesList(
         Property("account", StringType),
@@ -1115,28 +1157,39 @@ class Creatives(LinkedInAdsStream):
         Property(
             "content",
             ObjectType(
-                Property("reference", StringType),
                 Property(
-                    "text_ad",
+                    "spotlight",
                     ObjectType(
-                        Property("headline", StringType),
+                        Property("showMemberProfilePhoto", BooleanType),
+                        Property("organizationName", StringType),
+                        Property("landingPage", StringType),
                         Property("description", StringType),
-                        Property("landing_page", StringType),
+                        Property("logo", StringType),
+                        Property("headline", StringType),
+                        Property("callToAction", StringType),
                         additional_properties=False,
                     ),
                 ),
             ),
         ),
-        Property("created_at", StringType),
-        Property("created_by", StringType),
-        Property("last_modified_at", StringType),
-        Property("last_modified_by", StringType),
+        Property("createdAt", StringType),
+        Property("createdBy", StringType),
+        Property("lastModifiedAt", StringType),
+        Property("lastModifiedBy", StringType),
         Property("id", StringType),
-        Property("intended_status", StringType),
-        Property("is_serving", BooleanType),
-        Property("is_test", BooleanType),
-        Property("serving_hold_reasons", th.ArrayType(Property("items", StringType))),
+        Property("intendedStatus", StringType),
+        Property("isServing", BooleanType),
+        Property("isTest", BooleanType),
+        Property("servingHoldReasons", th.ArrayType(Property("items", StringType))),
     ).to_dict()
+
+    @property
+    def url_base(self) -> str:
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(
+            self.config["accounts"], self.config["creative"]
+        )
+
+        return base_url
 
     def get_url_params(
         self,
@@ -1153,17 +1206,6 @@ class Creatives(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        # TODO(edgarrmondragon): Resolve issue with parentheses in campaigns parameter being
-        # encoded by rest.py
-        # https://github.com/meltano/sdk/issues/1666
-        params["campaigns"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-        params["q"] = "criteria"
 
         return params
 
@@ -1262,7 +1304,6 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         Property("oneClickLeads", IntegerType),
         Property("opens", IntegerType),
         Property("otherEngagements", IntegerType),
-        Property("pivotValue", StringType),
         Property("sends", IntegerType),
         Property("shares", IntegerType),
         Property("textUrlClicks", IntegerType),
@@ -1304,7 +1345,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         return [
             "viralLandingPageClicks,viralExternalWebsitePostClickConversions,externalWebsiteConversions,viralVideoFirstQuartileCompletions,leadGenerationMailContactInfoShares,clicks,viralClicks,shares,viralFullScreenPlays,videoMidpointCompletions,viralCardClicks,viralExternalWebsitePostViewConversions,viralTotalEngagements,viralCompanyPageClicks,actionClicks,viralShares,videoCompletions,comments,externalWebsitePostViewConversions,dateRange",
             "costInUsd,landingPageClicks,oneClickLeadFormOpens,talentLeads,sends,viralOneClickLeadFormOpens,conversionValueInLocalCurrency,viralFollows,otherEngagements,viralVideoCompletions,cardImpressions,leadGenerationMailInterestedClicks,opens,totalEngagements,videoViews,viralImpressions,viralVideoViews,commentLikes,viralDocumentThirdQuartileCompletions,viralLikes",
-            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,pivotValue,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
+            "adUnitClicks,videoThirdQuartileCompletions,cardClicks,likes,viralComments,viralVideoMidpointCompletions,viralVideoThirdQuartileCompletions,oneClickLeads,fullScreenPlays,viralCardImpressions,follows,videoStarts,videoFirstQuartileCompletions,textUrlClicks,reactions,viralReactions,externalWebsitePostClickConversions,viralOtherEngagements,costInLocalCurrency",
             "viralVideoStarts,viralRegistrations,viralJobApplyClicks,viralJobApplications,jobApplications,jobApplyClicks,viralExternalWebsiteConversions,postViewRegistrations,companyPageClicks,documentCompletions,documentFirstQuartileCompletions,documentMidpointCompletions,documentThirdQuartileCompletions,downloadClicks,viralDocumentCompletions,viralDocumentFirstQuartileCompletions,viralDocumentMidpointCompletions,approximateUniqueImpressions,viralDownloadClicks,impressions",
         ]
 
@@ -1351,7 +1392,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
@@ -1365,11 +1406,8 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        pivot_value = row.get("pivotValue", "")
-
         try:
-            creative_column = int(pivot_value.split(":")[3])
-            row["creative_id"] = creative_column
+            row["creative_id"] = self.config["creative"]
         except IndexError:
             pass
 

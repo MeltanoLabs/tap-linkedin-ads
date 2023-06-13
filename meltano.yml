@@ -16,11 +16,13 @@ plugins:
       kind: password
     - name: accounts
     - name: user_agent
-      value: 'meltano'
+      value: meltano
     - name: linkedin_version
-      value: '202211'
+      value: '202305'
     - name: campaign
     - name: owner
+    - name: campaign_group
+    - name: creative
     - name: start_date
       value: '2023-01-01T00:00:00Z'
     - name: end_date
@@ -57,5 +59,9 @@ plugins:
     inherit_from: tap-linkedin-ads
     select:
     - video_ads
+  loaders:
+  - name: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
 environments:
 - name: dev

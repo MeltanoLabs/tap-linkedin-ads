@@ -15,20 +15,22 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
 ## Settings
 
-| Setting             | Required | Default | Description |
-|:--------------------|:--------:|:-------:|:------------|
-| access_token        | True     | None    | The token to authenticate against the API service |
-| start_date          | True     | None    | The earliest record date to sync |
-| end_date            | False    | 2023-05-09 02:04:18.151589 | The latest record date to sync |
-| user_agent          | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID      |
-| api_version         | False    | 202211  | LinkedInAds API Version |
-| accounts            | True     | None    | LinkedInAds Account ID |
-| campaign            | True     | None    | LinkedInAds Campaign ID |
-| owner               | True     | None    | LinkedInAds Owner ID |
-| stream_maps         | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
-| stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
-| flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
-| flattening_max_depth| False    | None    | The max depth to flatten schemas. |
+| Setting              | Required |                      Default                       | Description                                                                                                                                 |
+|:---------------------|:--------:|:--------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------|
+| access_token         | True     |                        None                        | The token to authenticate against the API service                                                                                           |
+| start_date           | True     |                        None                        | The earliest record date to sync                                                                                                            |
+| end_date             | False    |             2023-05-09 02:04:18.151589             | The latest record date to sync                                                                                                              |
+| user_agent           | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID                                                                                                                                      |
+| api_version          | False    |                       202305                       | LinkedInAds API Version                                                                                                                     |
+| accounts             | True     |                        None                        | LinkedInAds Account ID                                                                                                                      |
+| campaign             | True     |                        None                        | LinkedInAds Campaign ID                                                                                                                     |
+| creative             | True     |                        None                        | LinkedInAds Creative ID                                                                                                                     |
+| campaign_group       | True     |                        None                        | LinkedInAds Campaign Group ID                                                                                                               |
+| owner                | True     |                        None                        | LinkedInAds Owner ID                                                                                                                        |
+| stream_maps          | False    |                        None                        | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
+| stream_map_config    | False    |                        None                        | User-defined config values to be used within map expressions.                                                                               |
+| flattening_enabled   | False    |                        None                        | 'True' to enable schema flattening and automatically expand nested properties.                                                              |
+| flattening_max_depth | False    |                        None                        | The max depth to flatten schemas.                                                                                                           |
 
 A full list of supported settings and capabilities is available by running: `tap-linkedin-ads --about`
 
