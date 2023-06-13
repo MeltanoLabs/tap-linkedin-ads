@@ -56,9 +56,9 @@ class LinkedInAdsStream(RESTStream):
         return headers
 
     def get_next_page_token(
-            self,
-            response: requests.Response,
-            previous_token: t.Any | None,
+        self,
+        response: requests.Response,
+        previous_token: t.Any | None,
     ) -> t.Any | None:
         """Return a token for identifying next page or None if no more pages."""
         # If pagination is required, return a token which can be used to get the
@@ -101,8 +101,8 @@ class LinkedInAdsStream(RESTStream):
         return params
 
     def parse_response(  # noqa: PLR0912
-            self,
-            response: requests.Response,
+        self,
+        response: requests.Response,
     ) -> t.Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
@@ -173,9 +173,7 @@ class LinkedInAdsStream(RESTStream):
             pass
         try:
             schedule_column = columns.get("runSchedule").get("start")
-            columns[
-                "run_schedule_start"
-            ] = datetime.fromtimestamp(  # noqa: DTZ006
+            columns["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
                 int(schedule_column) / 1000,
             ).isoformat()
         except:  # noqa: E722, S110

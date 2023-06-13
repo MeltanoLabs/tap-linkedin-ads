@@ -326,7 +326,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
@@ -339,7 +339,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
                 ),
                 "%Y-%m-%d",
             ).astimezone(UTC)
-            
+
         try:
             row["campaign_id"] = self.config["campaign"]
         except IndexError:
@@ -607,14 +607,12 @@ class VideoAds(LinkedInAdsStream):
         params["owner"] = "urn:li:organization:" + self.config["owner"]
 
         return params
-    
+
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parse with datetime function and the date is added to the day column
         try:
-            created_time = (
-                row.get("changeAuditStamps").get("created").get("time")
-            )
+            created_time = row.get("changeAuditStamps").get("created").get("time")
             last_modified_time = (
                 row.get("changeAuditStamps").get("lastModified").get("time")
             )
@@ -720,7 +718,7 @@ class AccountUsers(LinkedInAdsStream):
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parsed with datetime function and the date is added to the day column
         try:
             account_user = row.get("user", {})
             user = account_user.split(":")[3]
@@ -728,9 +726,7 @@ class AccountUsers(LinkedInAdsStream):
         except:  # noqa: E722, S110
             pass
         try:
-            created_time = (
-                row.get("changeAuditStamps").get("created").get("time")
-            )
+            created_time = row.get("changeAuditStamps").get("created").get("time")
             last_modified_time = (
                 row.get("changeAuditStamps").get("lastModified").get("time")
             )
@@ -746,6 +742,7 @@ class AccountUsers(LinkedInAdsStream):
             pass
 
         return super().post_process(row, context)
+
 
 class CampaignGroups(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
@@ -764,7 +761,7 @@ class CampaignGroups(LinkedInAdsStream):
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
     path = None
-    
+
     PropertiesList = th.PropertiesList
     Property = th.Property
     ObjectType = th.ObjectType
@@ -824,9 +821,14 @@ class CampaignGroups(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(self.config["accounts"], self.config["campaign_group"])
+        base_url = (
+            "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
+                self.config["accounts"], self.config["campaign_group"]
+            )
+        )
 
         return base_url
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -1104,13 +1106,14 @@ class Campaigns(LinkedInAdsStream):
         Property("run_schedule_end", StringType),
     ).to_dict()
 
-
     @property
     def url_base(self) -> str:
-        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(self.config["accounts"], self.config["campaign"])
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(
+            self.config["accounts"], self.config["campaign"]
+        )
 
         return base_url
-    
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -1145,7 +1148,7 @@ class Creatives(LinkedInAdsStream):
     replication_method = "incremental"
     primary_keys = ["lastModifiedAt", "id"]
     path = ""
-    
+
     schema = PropertiesList(
         Property("account", StringType),
         Property("account_id", IntegerType),
@@ -1182,8 +1185,10 @@ class Creatives(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        base_url = "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(self.config["accounts"], self.config["creative"])
-        
+        base_url = "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(
+            self.config["accounts"], self.config["creative"]
+        )
+
         return base_url
 
     def get_url_params(
@@ -1387,7 +1392,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
-        # These values are aprsed with datetime function and the date is added to the day column
+        # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
@@ -1400,7 +1405,6 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 ),
                 "%Y-%m-%d",
             ).astimezone(UTC)
-
 
         try:
             row["creative_id"] = self.config["creative"]
