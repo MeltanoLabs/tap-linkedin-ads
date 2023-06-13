@@ -6,11 +6,6 @@ import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
 
-import json
-import os
-from dotenv import load_dotenv
-load_dotenv(".env")
-
 import pendulum
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -346,7 +341,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
             ).astimezone(UTC)
             
         try:
-            row["campaign_id"] = os.getenv("TAP_LINKEDIN_ADS_CAMPAIGN")# campaign_column
+            row["campaign_id"] = self.config["campaign"]
         except IndexError:
             pass
 
@@ -1408,7 +1403,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
 
         try:
-            row["creative_id"] = os.getenv("TAP_LINKEDIN_ADS_CREATIVE")
+            row["creative_id"] = self.config["creative"]
         except IndexError:
             pass
 
