@@ -42,5 +42,7 @@ jobs:
          TAP_LINKEDIN_ADS_ACCOUNTS: ${{ secrets.accounts }}
          TAP_LINKEDIN_ADS_OWNER: ${{ secrets.owner }}
          TAP_LINKEDIN_ADS_CAMPAIGN: ${{ secrets.campaign }}
+         TAP_LINKEDIN_ADS_CAMPAIGN_GROUP: ${{ secrets.campaigngroup }}
+         TAP_LINKEDIN_ADS_CREATIVE: ${{ secrets.creative }}
       run: |
         poetry run pytest --capture=no
