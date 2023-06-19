@@ -74,14 +74,14 @@ class Accounts(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
@@ -558,14 +558,14 @@ class VideoAds(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
@@ -669,14 +669,14 @@ class AccountUsers(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
@@ -773,7 +773,7 @@ class CampaignGroups(LinkedInAdsStream):
     jsonschema = PropertiesList(
         Property(
             "runSchedule",
-            ObjectType(Property("start", DateTimeType), Property("end", DateTimeType)),
+            ObjectType(Property("start", IntegerType), Property("end", IntegerType)),
         ),
         Property(
             "changeAuditStamps",
@@ -781,14 +781,14 @@ class CampaignGroups(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
@@ -917,32 +917,37 @@ class Campaigns(LinkedInAdsStream):
                     ObjectType(
                         Property(
                             "and",
-                            ObjectType(
-                                Property(
-                                    "or",
-                                    ObjectType(
-                                        Property(
-                                            "urn:li:adTargetingFacet",
-                                            th.ArrayType(
-                                                Property("urn:li:title", StringType),
-                                            ),
-                                        ),
-                                        Property(
-                                            "urn:li:adTargetingFacet",
-                                            th.ArrayType(
-                                                Property("urn:li:geo", StringType),
-                                            ),
-                                        ),
-                                        Property(
-                                            "urn:li:adTargetingFacet",
-                                            th.ArrayType(
-                                                Property(
-                                                    "urn:li:adSlotSize",
-                                                    StringType,
+                            ArrayType(
+                                ObjectType(
+                                    Property(
+                                        "or",
+                                        ObjectType(
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                th.ArrayType(
+                                                    Property(
+                                                        "urn:li:title",
+                                                        StringType,
+                                                    ),
                                                 ),
                                             ),
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                th.ArrayType(
+                                                    Property("urn:li:geo", StringType),
+                                                ),
+                                            ),
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                th.ArrayType(
+                                                    Property(
+                                                        "urn:li:adSlotSize",
+                                                        StringType,
+                                                    ),
+                                                ),
+                                            ),
+                                            additional_properties=False,
                                         ),
-                                        additional_properties=False,
                                     ),
                                 ),
                             ),
@@ -1013,8 +1018,8 @@ class Campaigns(LinkedInAdsStream):
         Property(
             "runSchedule",
             ObjectType(
-                Property("start", StringType),
-                Property("end", StringType),
+                Property("start", IntegerType),
+                Property("end", IntegerType),
                 additional_properties=False,
             ),
         ),
@@ -1025,14 +1030,14 @@ class Campaigns(LinkedInAdsStream):
                 Property(
                     "created",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
                 Property(
                     "lastModified",
                     ObjectType(
-                        Property("time", StringType),
+                        Property("time", IntegerType),
                         additional_properties=False,
                     ),
                 ),
@@ -1410,6 +1415,10 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
         with contextlib.suppress(IndexError):
             row["creative_id"] = self.config["creative"]
+
+        viral_registrations = row.pop("viralRegistrations", None)
+        if viral_registrations:
+            row["viralRegistrations"] = int(viral_registrations)
 
         return super().post_process(row, context)
 
