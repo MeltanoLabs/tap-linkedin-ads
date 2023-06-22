@@ -75,13 +75,13 @@ class TapLinkedInAds(Tap):
             "campaign_group",
             th.StringType,
             required=True,
-            description="LinkedInAds Campaign Group ID",
+            description="LinkedInAds Campaign Group ID. Used for the campaign_group stream",
         ),
         th.Property(
             "creative",
             th.StringType,
             required=True,
-            description="LinkedInAds Creative ID",
+            description="LinkedInAds Creative ID. Used for the creative stream",
         ),
     ).to_dict()
 
