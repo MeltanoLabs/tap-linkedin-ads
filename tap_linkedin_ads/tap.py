@@ -48,12 +48,6 @@ class TapLinkedInAds(Tap):
             description="API ID",
         ),
         th.Property(
-            "api_version",
-            th.StringType,
-            default="202305",
-            description="LinkedInAds API Version",
-        ),
-        th.Property(
             "accounts",
             th.StringType,
             required=True,
