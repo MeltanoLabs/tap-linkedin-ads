@@ -70,7 +70,7 @@ class LinkedInAdsStream(RESTStream):
             elements = resp_json.get("elements")
             if len(elements) == 0 or len(elements) == previous_token + 1:
                 return None
-        except:
+        except (ValueError, Exception):
             page = resp_json
             if len(page) == 0 or len(page) == previous_token + 1:
                 return None
