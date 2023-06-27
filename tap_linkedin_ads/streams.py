@@ -820,12 +820,9 @@ class CampaignGroups(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-
-        return (
-            "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
-                self.config["accounts"],
-                self.config["campaign_group"],
-            )
+        return "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
+            self.config["accounts"],
+            self.config["campaign_group"],
         )
 
     def get_url_params(
@@ -1117,7 +1114,6 @@ class Campaigns(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-
         return "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(
             self.config["accounts"],
             self.config["campaign"],
@@ -1149,6 +1145,7 @@ class Campaigns(LinkedInAdsStream):
 
 class Creatives(LinkedInAdsStream):
     """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives."""
+
     """
     columns: columns which will be added to fields parameter in api
     name: stream name
@@ -1200,7 +1197,6 @@ class Creatives(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-
         return "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(
             self.config["accounts"],
             self.config["creative"],
