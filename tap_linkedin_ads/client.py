@@ -15,6 +15,7 @@ if t.TYPE_CHECKING:
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 UTC = timezone.utc
 
+
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
 
@@ -73,7 +74,7 @@ class LinkedInAdsStream(RESTStream):
             page = resp_json
             if len(page) == 0 or len(page) == previous_token + 1:
                 return None
-            
+
         return previous_token + 1
 
     def get_url_params(

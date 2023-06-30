@@ -123,7 +123,6 @@ class Accounts(LinkedInAdsStream):
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
 
-
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -350,7 +349,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
             row["campaign_id"] = self.config["campaign"]
 
         return super().post_process(row, context)
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
@@ -451,7 +450,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
@@ -499,7 +498,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
@@ -546,7 +545,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
         return params
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
@@ -632,7 +631,9 @@ class VideoAds(LinkedInAdsStream):
         # This function extracts day, month, and year from date rannge column
         # These values are parse with datetime function and the date is added to the day column
         try:
-            created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            created_time = (
+                row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            )
             last_modified_time = (
                 row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
             )
@@ -648,11 +649,12 @@ class VideoAds(LinkedInAdsStream):
             pass
 
         return super().post_process(row, context)
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
- 
+
+
 class AccountUsers(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
 
@@ -749,7 +751,9 @@ class AccountUsers(LinkedInAdsStream):
         except:  # noqa: E722, S110
             pass
         try:
-            created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            created_time = (
+                row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            )
             last_modified_time = (
                 row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
             )
@@ -765,7 +769,7 @@ class AccountUsers(LinkedInAdsStream):
             pass
 
         return super().post_process(row, context)
-    
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
@@ -893,8 +897,8 @@ class Campaigns(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = ''
-    
+    path = ""
+
     schema = PropertiesList(
         Property("storyDeliveryEnabled", BooleanType),
         Property(
@@ -1560,10 +1564,11 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-        
+
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
+
 
 class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
@@ -1659,5 +1664,3 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
     @property
     def url_base(self) -> str:
         return "https://api.linkedin.com/rest/"
-
-        
