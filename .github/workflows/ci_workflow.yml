@@ -7,7 +7,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   push:
-    branches: [main, tests]
+    branches: [main]
   workflow_dispatch:
     inputs: {}
 
