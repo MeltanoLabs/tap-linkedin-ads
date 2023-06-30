@@ -63,14 +63,17 @@ class LinkedInAdsStream(RESTStream):
         resp_json = response.json()
         if previous_token is None:
             previous_token = 0
-        try:
-            elements = resp_json.get("elements")
+
+        elements = resp_json.get("elements")
+
+        if elements is not None:
             if len(elements) == 0 or len(elements) == previous_token + 1:
                 return None
-        except (ValueError, Exception):
+        else:
             page = resp_json
             if len(page) == 0 or len(page) == previous_token + 1:
                 return None
+            
         return previous_token + 1
 
     def get_url_params(
