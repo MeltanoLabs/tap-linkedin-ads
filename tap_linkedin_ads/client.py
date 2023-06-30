@@ -15,11 +15,8 @@ if t.TYPE_CHECKING:
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 UTC = timezone.utc
 
-
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
-
-    url_base = "https://api.linkedin.com/rest/"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (

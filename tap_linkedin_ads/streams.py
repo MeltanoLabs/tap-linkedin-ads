@@ -119,6 +119,11 @@ class Accounts(LinkedInAdsStream):
         ),
     ).to_dict()
 
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
+
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -345,6 +350,10 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
             row["campaign_id"] = self.config["campaign"]
 
         return super().post_process(row, context)
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 
 class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
@@ -442,6 +451,10 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 
 class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
@@ -486,6 +499,10 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 
 class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
@@ -529,6 +546,10 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         params["fields"] = columns[3]
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
         return params
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 
 class VideoAds(LinkedInAdsStream):
@@ -611,9 +632,9 @@ class VideoAds(LinkedInAdsStream):
         # This function extracts day, month, and year from date rannge column
         # These values are parse with datetime function and the date is added to the day column
         try:
-            created_time = row.get("changeAuditStamps").get("created").get("time")
+            created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
             last_modified_time = (
-                row.get("changeAuditStamps").get("lastModified").get("time")
+                row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
             )
             row["created_time"] = datetime.fromtimestamp(
                 int(created_time) / 1000,
@@ -627,8 +648,11 @@ class VideoAds(LinkedInAdsStream):
             pass
 
         return super().post_process(row, context)
-
-
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
+ 
 class AccountUsers(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
 
@@ -725,9 +749,9 @@ class AccountUsers(LinkedInAdsStream):
         except:  # noqa: E722, S110
             pass
         try:
-            created_time = row.get("changeAuditStamps").get("created").get("time")
+            created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
             last_modified_time = (
-                row.get("changeAuditStamps").get("lastModified").get("time")
+                row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
             )
             row["created_time"] = datetime.fromtimestamp(
                 int(created_time) / 1000,
@@ -741,6 +765,10 @@ class AccountUsers(LinkedInAdsStream):
             pass
 
         return super().post_process(row, context)
+    
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 
 class CampaignGroups(LinkedInAdsStream):
@@ -759,7 +787,7 @@ class CampaignGroups(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = None
+    path = ""
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -865,7 +893,8 @@ class Campaigns(LinkedInAdsStream):
     replication_keys = ["last_modified_time"]
     replication_method = "incremental"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = None
+    path = ''
+    
     schema = PropertiesList(
         Property("storyDeliveryEnabled", BooleanType),
         Property(
@@ -1248,7 +1277,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         Property("landingPageClicks", IntegerType),
         Property("reactions", IntegerType),
         Property("adUnitClicks", IntegerType),
-        Property("creative_id", IntegerType),
+        Property("creative_id", StringType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
         Property("clicks", IntegerType),
@@ -1406,6 +1435,10 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
         return params
 
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
+
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date rannge column
         # These values are parsed with datetime function and the date is added to the day column
@@ -1527,7 +1560,10 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-
+        
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
 
 class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
@@ -1572,6 +1608,10 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
 
         return params
 
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
+
 
 class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
@@ -1615,3 +1655,9 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
         params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
 
         return params
+
+    @property
+    def url_base(self) -> str:
+        return "https://api.linkedin.com/rest/"
+
+        
