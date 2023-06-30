@@ -166,7 +166,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     path = "adAnalytics"
 
     schema = PropertiesList(
-        Property("campaign_id", IntegerType),
+        Property("campaign_id", StringType),
         Property("documentCompletions", IntegerType),
         Property("documentFirstQuartileCompletions", IntegerType),
         Property("clicks", IntegerType),
@@ -1165,7 +1165,7 @@ class Creatives(LinkedInAdsStream):
         Property("account", StringType),
         Property("account_id", IntegerType),
         Property("campaign", StringType),
-        Property("campaign_id", IntegerType),
+        Property("campaign_id", StringType),
         Property(
             "content",
             ObjectType(
@@ -1184,9 +1184,9 @@ class Creatives(LinkedInAdsStream):
                 ),
             ),
         ),
-        Property("createdAt", StringType),
+        Property("createdAt", IntegerType),
         Property("createdBy", StringType),
-        Property("lastModifiedAt", StringType),
+        Property("lastModifiedAt", IntegerType),
         Property("lastModifiedBy", StringType),
         Property("id", StringType),
         Property("intendedStatus", StringType),
