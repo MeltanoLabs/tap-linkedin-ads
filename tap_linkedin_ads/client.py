@@ -19,8 +19,6 @@ UTC = timezone.utc
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
 
-    url_base = "https://api.linkedin.com/rest/"
-
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
         "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
@@ -66,14 +64,17 @@ class LinkedInAdsStream(RESTStream):
         resp_json = response.json()
         if previous_token is None:
             previous_token = 0
-        try:
-            elements = resp_json.get("elements")
+
+        elements = resp_json.get("elements")
+
+        if elements is not None:
             if len(elements) == 0 or len(elements) == previous_token + 1:
                 return None
-        except (ValueError, Exception):
+        else:
             page = resp_json
             if len(page) == 0 or len(page) == previous_token + 1:
                 return None
+
         return previous_token + 1
 
     def get_url_params(
