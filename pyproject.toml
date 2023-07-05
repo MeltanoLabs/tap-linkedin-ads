@@ -57,6 +57,9 @@ known-first-party = ["tap_linkedin"]
 required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.per-file-ignores]
+"tap_linkedin_ads/streams.py" = [
+    "RUF012",  # mutable-class-default
+]
 "tests/*" = [
     "ANN201",  # Missing return type annotation for public function
 ]
