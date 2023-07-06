@@ -19,9 +19,7 @@ UTC = timezone.utc
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
 
-    url_base = "https://api.linkedin.com/rest/"
-
-    records_jsonpath = "$.elements[*]"  # Or override `parse_response`.
+    records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
         "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
     )
@@ -48,7 +46,7 @@ class LinkedInAdsStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config["user_agent"]
-        headers["LinkedIn-Version"] = self.config["api_version"]
+        headers["LinkedIn-Version"] = "202305"
         headers["Content-Type"] = "application/json"
         headers["X-Restli-Protocol-Version"] = "1.0.0"
 
@@ -63,15 +61,19 @@ class LinkedInAdsStream(RESTStream):
         # If pagination is required, return a token which can be used to get the
         #       next page. If this is the final page, return "None" to end the
         #       pagination loop.
-
         resp_json = response.json()
         if previous_token is None:
             previous_token = 0
 
         elements = resp_json.get("elements")
 
-        if len(elements) == 0 or len(elements) == previous_token + 1:
-            return None
+        if elements is not None:
+            if len(elements) == 0 or len(elements) == previous_token + 1:
+                return None
+        else:
+            page = resp_json
+            if len(page) == 0 or len(page) == previous_token + 1:
+                return None
 
         return previous_token + 1
 
@@ -111,13 +113,14 @@ class LinkedInAdsStream(RESTStream):
             Each record from the source.
         """
         resp_json = response.json()
-
-        if isinstance(resp_json, list):
-            results = resp_json
-        elif resp_json.get("elements") is not None:
+        if resp_json.get("elements") is not None:
             results = resp_json["elements"]
             try:
                 columns = results[0]
+            except:  # noqa: E722
+                columns = results
+                pass
+            try:
                 created_time = (
                     columns.get("changeAuditStamps").get("created").get("time")
                 )
@@ -132,37 +135,54 @@ class LinkedInAdsStream(RESTStream):
                     int(last_modified_time) / 1000,
                     tz=UTC,
                 ).isoformat()
-                try:
-                    account_column = columns.get("account")
-                    account_id = int(account_column.split(":")[3])
-                    columns["account_id"] = account_id
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    campaign_column = columns.get("campaignGroup")
-                    campaign = int(campaign_column.split(":")[3])
-                    columns["campaign_group_id"] = campaign
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    user_column = columns.get("user")
-                    user = user_column.split(":")[3]
-                    columns["user_person_id"] = user
-                except:  # noqa: E722, S110
-                    pass
-                try:
-                    schedule_column = columns.get("runSchedule").get("start")
-                    columns[
-                        "run_schedule_start"
-                    ] = datetime.fromtimestamp(  # noqa: DTZ006
-                        int(schedule_column) / 1000,
-                    ).isoformat()
-                except:  # noqa: E722, S110
-                    pass
-                results = [columns]
             except:  # noqa: E722, S110
                 pass
         else:
             results = resp_json
+            try:
+                columns = results
+                created_time = (
+                    columns.get("changeAuditStamps").get("created").get("time")
+                )
+                last_modified_time = (
+                    columns.get("changeAuditStamps").get("lastModified").get("time")
+                )
+                columns["created_time"] = datetime.fromtimestamp(
+                    int(created_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+                columns["last_modified_time"] = datetime.fromtimestamp(
+                    int(last_modified_time) / 1000,
+                    tz=UTC,
+                ).isoformat()
+            except:  # noqa: E722
+                columns = results
+                pass
+
+        try:
+            account_column = columns.get("account")
+            account_id = int(account_column.split(":")[3])
+            columns["account_id"] = account_id
+        except:  # noqa: E722, S110
+            pass
+        try:
+            campaign_column = columns.get("campaignGroup")
+            campaign = int(campaign_column.split(":")[3])
+            columns["campaign_group_id"] = campaign
+        except:  # noqa: E722, S110
+            pass
+        try:
+            schedule_column = columns.get("runSchedule").get("start")
+            columns["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
+                int(schedule_column) / 1000,
+            ).isoformat()
+        except:  # noqa: E722, S110
+            pass
+
+        results = (
+            resp_json["elements"]
+            if resp_json.get("elements") is not None
+            else [columns]
+        )
 
         yield from results

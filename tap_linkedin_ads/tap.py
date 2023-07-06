@@ -48,12 +48,6 @@ class TapLinkedInAds(Tap):
             description="API ID",
         ),
         th.Property(
-            "api_version",
-            th.StringType,
-            default="202211",
-            description="LinkedInAds API Version",
-        ),
-        th.Property(
             "accounts",
             th.StringType,
             required=True,
@@ -71,6 +65,18 @@ class TapLinkedInAds(Tap):
             required=True,
             description="LinkedInAds Owner ID",
         ),
+        th.Property(
+            "campaign_group",
+            th.StringType,
+            required=True,
+            description="LinkedInAds Campaign Group ID. Used for the campaign_group stream",
+        ),
+        th.Property(
+            "creative",
+            th.StringType,
+            required=True,
+            description="LinkedInAds Creative ID. Used for the creative stream",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[LinkedInAdsStream]:
@@ -83,7 +89,7 @@ class TapLinkedInAds(Tap):
             streams.Accounts(self),
             streams.VideoAds(self),
             streams.AccountUsers(self),
-            # streams.Creatives(self),  # noqa: ERA001
+            streams.Creatives(self),
             streams.Campaigns(self),
             streams.CampaignGroups(self),
             streams.AdAnalyticsByCampaign(self),
