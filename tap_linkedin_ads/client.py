@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,8 +56,8 @@ class LinkedInAdsStream(RESTStream):
     def get_next_page_token(
         self,
         response: requests.Response,
-        previous_token: t.Any | None,
-    ) -> t.Any | None:
+        previous_token: t.Any | None,  # noqa: ANN401
+    ) -> t.Any | None:  # noqa: ANN401
         """Return a token for identifying next page or None if no more pages."""
         # If pagination is required, return a token which can be used to get the
         #       next page. If this is the final page, return "None" to end the
@@ -67,20 +68,19 @@ class LinkedInAdsStream(RESTStream):
 
         elements = resp_json.get("elements")
 
-        if elements is not None:
-            if len(elements) == 0 or len(elements) == previous_token + 1:
-                return None
-        else:
+        if elements is None:
             page = resp_json
-            if len(page) == 0 or len(page) == previous_token + 1:
+            if len(page) in [0, previous_token + 1]:
                 return None
 
+        elif len(elements) in [0, previous_token + 1]:
+            return None
         return previous_token + 1
 
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -100,7 +100,7 @@ class LinkedInAdsStream(RESTStream):
 
         return params
 
-    def parse_response(  # noqa: PLR0912
+    def parse_response(
         self,
         response: requests.Response,
     ) -> t.Iterable[dict]:
@@ -117,72 +117,58 @@ class LinkedInAdsStream(RESTStream):
             results = resp_json["elements"]
             try:
                 columns = results[0]
-            except:  # noqa: E722
+            except Exception:  # noqa: BLE001
                 columns = results
-                pass
-            try:
-                created_time = (
-                    columns.get("changeAuditStamps").get("created").get("time")
-                )
-                last_modified_time = (
-                    columns.get("changeAuditStamps").get("lastModified").get("time")
-                )
-                columns["created_time"] = datetime.fromtimestamp(
-                    int(created_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-                columns["last_modified_time"] = datetime.fromtimestamp(
-                    int(last_modified_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-            except:  # noqa: E722, S110
-                pass
+            with contextlib.suppress(Exception):
+                self._add_datetime_columns(columns)
+
         else:
             results = resp_json
             try:
                 columns = results
-                created_time = (
-                    columns.get("changeAuditStamps").get("created").get("time")
-                )
-                last_modified_time = (
-                    columns.get("changeAuditStamps").get("lastModified").get("time")
-                )
-                columns["created_time"] = datetime.fromtimestamp(
-                    int(created_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-                columns["last_modified_time"] = datetime.fromtimestamp(
-                    int(last_modified_time) / 1000,
-                    tz=UTC,
-                ).isoformat()
-            except:  # noqa: E722
+                self._add_datetime_columns(columns)
+            except Exception:  # noqa: BLE001
                 columns = results
-                pass
+        with contextlib.suppress(Exception):
+            self._to_id_column(columns, "account", "account_id")
 
-        try:
-            account_column = columns.get("account")
-            account_id = int(account_column.split(":")[3])
-            columns["account_id"] = account_id
-        except:  # noqa: E722, S110
-            pass
-        try:
-            campaign_column = columns.get("campaignGroup")
-            campaign = int(campaign_column.split(":")[3])
-            columns["campaign_group_id"] = campaign
-        except:  # noqa: E722, S110
-            pass
-        try:
+        with contextlib.suppress(Exception):
+            self._to_id_column(
+                columns,
+                "campaignGroup",
+                "campaign_group_id",
+            )
+        with contextlib.suppress(Exception):
             schedule_column = columns.get("runSchedule").get("start")
             columns["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
                 int(schedule_column) / 1000,
             ).isoformat()
-        except:  # noqa: E722, S110
-            pass
-
-        results = (
+        yield from (
             resp_json["elements"]
             if resp_json.get("elements") is not None
             else [columns]
         )
 
-        yield from results
+    def _to_id_column(
+        self,
+        columns,  # noqa: ANN001
+        arg1,  # noqa: ANN001
+        arg2,  # noqa: ANN001
+    ) -> None:
+        account_column = columns.get(arg1)
+        account_id = int(account_column.split(":")[3])
+        columns[arg2] = account_id
+
+    def _add_datetime_columns(self, columns):  # noqa: ANN202, ANN001
+        created_time = columns.get("changeAuditStamps").get("created").get("time")
+        last_modified_time = (
+            columns.get("changeAuditStamps").get("lastModified").get("time")
+        )
+        columns["created_time"] = datetime.fromtimestamp(
+            int(created_time) / 1000,
+            tz=UTC,
+        ).isoformat()
+        columns["last_modified_time"] = datetime.fromtimestamp(
+            int(last_modified_time) / 1000,
+            tz=UTC,
+        ).isoformat()
