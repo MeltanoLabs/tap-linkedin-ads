@@ -126,7 +126,7 @@ class Accounts(LinkedInAdsStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -291,7 +291,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -330,18 +330,14 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date rannge column
+        # This function extracts day, month, and year from date range column
         # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
         if start_date:
             row["day"] = datetime.strptime(
-                "{}-{}-{}".format(
-                    start_date.get("year"),
-                    start_date.get("month"),
-                    start_date.get("day"),
-                ),
+                f'{start_date.get("year")}-{start_date.get("month")}-{start_date.get("day")}',
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
@@ -361,7 +357,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -399,7 +395,7 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         return params
 
     def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
-        """Return a dictionary of records from adAanalytics classes.
+        """Return a dictionary of records from adAnalytics classes.
 
         Combines request columns from multiple calls to the api, which are limited to 20 columns
         each.
@@ -462,7 +458,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -510,7 +506,7 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -603,7 +599,7 @@ class VideoAds(LinkedInAdsStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -628,9 +624,9 @@ class VideoAds(LinkedInAdsStream):
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date rannge column
+        # This function extracts day, month, and year from date range column
         # These values are parse with datetime function and the date is added to the day column
-        try:
+        with contextlib.suppress(Exception):
             created_time = (
                 row.get("changeAuditStamps", {}).get("created", {}).get("time")
             )
@@ -645,9 +641,6 @@ class VideoAds(LinkedInAdsStream):
                 int(last_modified_time) / 1000,
                 tz=UTC,
             ).isoformat()
-        except:  # noqa: E722, S110
-            pass
-
         return super().post_process(row, context)
 
     @property
@@ -718,7 +711,7 @@ class AccountUsers(LinkedInAdsStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -742,15 +735,13 @@ class AccountUsers(LinkedInAdsStream):
         return params
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date rannge column
+        # This function extracts day, month, and year from date range column
         # These values are parsed with datetime function and the date is added to the day column
-        try:
+        with contextlib.suppress(Exception):
             account_user = row.get("user", {})
             user = account_user.split(":")[3]
             row["user_person_id"] = user
-        except:  # noqa: E722, S110
-            pass
-        try:
+        with contextlib.suppress(Exception):
             created_time = (
                 row.get("changeAuditStamps", {}).get("created", {}).get("time")
             )
@@ -765,9 +756,6 @@ class AccountUsers(LinkedInAdsStream):
                 int(last_modified_time) / 1000,
                 tz=UTC,
             ).isoformat()
-        except:  # noqa: E722, S110
-            pass
-
         return super().post_process(row, context)
 
     @property
@@ -852,15 +840,12 @@ class CampaignGroups(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/adAccounts/{}/adCampaignGroups/{}".format(
-            self.config["accounts"],
-            self.config["campaign_group"],
-        )
+        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/adCampaignGroups/{self.config["campaign_group"]}'
 
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1147,15 +1132,12 @@ class Campaigns(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/adAccounts/{}/adCampaigns/{}".format(
-            self.config["accounts"],
-            self.config["campaign"],
-        )
+        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/adCampaigns/{self.config["campaign"]}'
 
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1230,15 +1212,12 @@ class Creatives(LinkedInAdsStream):
 
     @property
     def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/adAccounts/{}/creatives/urn%3Ali%3AsponsoredCreative%3A{}".format(
-            self.config["accounts"],
-            self.config["creative"],
-        )
+        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/creatives/urn%3Ali%3AsponsoredCreative%3A{self.config["creative"]}'
 
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1401,7 +1380,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1444,18 +1423,14 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         return "https://api.linkedin.com/rest/"
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date rannge column
+        # This function extracts day, month, and year from date range column
         # These values are parsed with datetime function and the date is added to the day column
         date_range = row.get("dateRange", {})
         start_date = date_range.get("start", {})
 
         if start_date:
             row["day"] = datetime.strptime(
-                "{}-{}-{}".format(
-                    start_date.get("year"),
-                    start_date.get("month"),
-                    start_date.get("day"),
-                ),
+                f'{start_date.get("year")}-{start_date.get("month")}-{start_date.get("day")}',
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
@@ -1475,7 +1450,7 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1576,7 +1551,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -1624,7 +1599,7 @@ class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
