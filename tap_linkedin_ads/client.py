@@ -7,31 +7,47 @@ import typing as t
 from datetime import datetime, timezone
 from pathlib import Path
 
-from singer_sdk.authenticators import BearerTokenAuthenticator
+import requests
+from singer_sdk.authenticators import BearerTokenAuthenticator, OAuthAuthenticator, SingletonMeta
 from singer_sdk.streams import RESTStream
-
-if t.TYPE_CHECKING:
-    import requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 UTC = timezone.utc
+
+_Auth = t.Callable[[requests.PreparedRequest], requests.PreparedRequest]
+
+
+class LinkedInAdsOAuthAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
+    """Authenticator class for LinkedInAds."""
+
+    @property
+    def oauth_request_body(self):
+        return {
+            "grant_type": "refresh_token",
+            "client_id": self.config["oauth_credentials"]["client_id"],
+            "client_secret": self.config["oauth_credentials"]["client_secret"],
+            "refresh_token": self.config["oauth_credentials"]["refresh_token"],
+        }
 
 
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = (
-        "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
-    )
+    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
 
     @property
-    def authenticator(self) -> BearerTokenAuthenticator:
+    def authenticator(self) -> _Auth:
         """Return a new authenticator object.
 
         Returns:
             An authenticator instance.
         """
+        if "oauth_credentials" in self.config:
+            return LinkedInAdsOAuthAuthenticator(
+                self,
+                auth_endpoint="https://www.linkedin.com/oauth/v2/accessToken",
+            )
         return BearerTokenAuthenticator.create_for_stream(
             self,
             token=self.config["access_token"],
@@ -143,11 +159,7 @@ class LinkedInAdsStream(RESTStream):
             columns["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
                 int(schedule_column) / 1000,
             ).isoformat()
-        yield from (
-            resp_json["elements"]
-            if resp_json.get("elements") is not None
-            else [columns]
-        )
+        yield from (resp_json["elements"] if resp_json.get("elements") is not None else [columns])
 
     def _to_id_column(
         self,
@@ -161,9 +173,7 @@ class LinkedInAdsStream(RESTStream):
 
     def _add_datetime_columns(self, columns):  # noqa: ANN202, ANN001
         created_time = columns.get("changeAuditStamps").get("created").get("time")
-        last_modified_time = (
-            columns.get("changeAuditStamps").get("lastModified").get("time")
-        )
+        last_modified_time = columns.get("changeAuditStamps").get("lastModified").get("time")
         columns["created_time"] = datetime.fromtimestamp(
             int(created_time) / 1000,
             tz=UTC,
