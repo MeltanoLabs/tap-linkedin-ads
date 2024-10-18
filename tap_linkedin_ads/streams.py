@@ -1434,8 +1434,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        with contextlib.suppress(IndexError):
-            row["creative_id"] = self.config["creative"]
+        row["creative_id"] = self.config["creative"]
 
         viral_registrations = row.pop("viralRegistrations", None)
         if viral_registrations:
