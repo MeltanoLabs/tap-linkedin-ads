@@ -34,6 +34,7 @@ class TapLinkedInAds(Tap):
                 th.Property(
                     "refresh_token",
                     th.StringType,
+                    secret=True,
                     description="LinkedIn Ads Refresh Token",
                 ),
                 th.Property(
