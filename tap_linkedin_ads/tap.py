@@ -25,6 +25,7 @@ class TapLinkedInAds(Tap):
         th.Property(
             "access_token",
             th.StringType,
+            secret=True,
             description="The token to authenticate against the API service",
         ),
         # OAuth
