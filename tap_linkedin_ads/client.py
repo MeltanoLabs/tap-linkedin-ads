@@ -25,7 +25,7 @@ class LinkedInAdsOAuthAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta)
     """Authenticator class for LinkedInAds."""
 
     @property
-    def oauth_request_body(self):
+    def oauth_request_body(self) -> dict[str, t.Any]:
         return {
             "grant_type": "refresh_token",
             "client_id": self.config["oauth_credentials"]["client_id"],
