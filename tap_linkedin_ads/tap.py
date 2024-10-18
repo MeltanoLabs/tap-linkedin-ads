@@ -25,8 +25,32 @@ class TapLinkedInAds(Tap):
         th.Property(
             "access_token",
             th.StringType,
-            required=True,
+            secret=True,
             description="The token to authenticate against the API service",
+        ),
+        # OAuth
+        th.Property(
+            "oauth_credentials",
+            th.ObjectType(
+                th.Property(
+                    "refresh_token",
+                    th.StringType,
+                    secret=True,
+                    description="LinkedIn Ads Refresh Token",
+                ),
+                th.Property(
+                    "client_id",
+                    th.StringType,
+                    description="LinkedIn Ads Client ID",
+                ),
+                th.Property(
+                    "client_secret",
+                    th.StringType,
+                    secret=True,
+                    description="LinkedIn Ads Client Secret",
+                ),
+            ),
+            description="LinkedIn Ads OAuth Credentials",
         ),
         th.Property(
             "start_date",
