@@ -44,6 +44,7 @@ class TapLinkedInAds(Tap):
                 th.Property(
                     "client_secret",
                     th.StringType,
+                    secret=True,
                     description="LinkedIn Ads Client Secret",
                 ),
             ),
