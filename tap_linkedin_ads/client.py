@@ -2,58 +2,50 @@
 
 from __future__ import annotations
 
-import contextlib
 import typing as t
-from datetime import datetime, timezone
-from pathlib import Path
+from functools import cached_property
+from importlib import resources
 
-import requests
-from singer_sdk.authenticators import (
-    BearerTokenAuthenticator,
-    OAuthAuthenticator,
-    SingletonMeta,
-)
+from singer_sdk.authenticators import BearerTokenAuthenticator
+from singer_sdk.helpers.jsonpath import extract_jsonpath
+from singer_sdk.pagination import BaseAPIPaginator  # noqa: TCH002
 from singer_sdk.streams import RESTStream
+from singer_sdk.pagination import BaseAPIPaginator  # noqa: TCH002
 
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-UTC = timezone.utc
+from tap_linkedin_ads.auth import LinkedInAdsOAuthAuthenticator
 
-_Auth = t.Callable[[requests.PreparedRequest], requests.PreparedRequest]
+if t.TYPE_CHECKING:
+    import requests
+    from singer_sdk.helpers.types import Auth, Context
 
 
-class LinkedInAdsOAuthAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
-    """Authenticator class for LinkedInAds."""
-
-    @property
-    def oauth_request_body(self) -> dict[str, t.Any]:
-        return {
-            "grant_type": "refresh_token",
-            "client_id": self.config["oauth_credentials"]["client_id"],
-            "client_secret": self.config["oauth_credentials"]["client_secret"],
-            "refresh_token": self.config["oauth_credentials"]["refresh_token"],
-        }
+# TODO: Delete this is if not using json files for schema definition
+SCHEMAS_DIR = resources.files(__package__) / "schemas"
 
 
 class LinkedInAdsStream(RESTStream):
     """LinkedInAds stream class."""
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = (
-        "$.paging.start"  # Or override `get_next_page_token`.  # noqa: S105
-    )
+    # Update this value if necessary or override `parse_response`.
+    records_jsonpath = "$.elements[*]"
+
+    # Update this value if necessary or override `get_new_paginator`.
+    next_page_token_jsonpath = "$.metadata.nextPageToken"  # noqa: S105
 
     @property
-    def authenticator(self) -> _Auth:
+    def url_base(self) -> str:
+        """Return the API URL root, configurable via tap settings."""
+        return "https://api.linkedin.com/rest"
+
+    @cached_property
+    def authenticator(self) -> Auth:
         """Return a new authenticator object.
 
         Returns:
             An authenticator instance.
         """
         if "oauth_credentials" in self.config:
-            return LinkedInAdsOAuthAuthenticator(
-                self,
-                auth_endpoint="https://www.linkedin.com/oauth/v2/accessToken",
-            )
+            return LinkedInAdsOAuthAuthenticator.create_for_stream(self)
         return BearerTokenAuthenticator.create_for_stream(
             self,
             token=self.config["access_token"],
@@ -69,39 +61,19 @@ class LinkedInAdsStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config["user_agent"]
-        headers["LinkedIn-Version"] = "202305"
+        headers["LinkedIn-Version"] = "202404"
         headers["Content-Type"] = "application/json"
-        headers["X-Restli-Protocol-Version"] = "1.0.0"
+        headers["X-Restli-Protocol-Version"] = "2.0.0"
 
         return headers
 
-    def get_next_page_token(
-        self,
-        response: requests.Response,
-        previous_token: t.Any | None,  # noqa: ANN401
-    ) -> t.Any | None:  # noqa: ANN401
-        """Return a token for identifying next page or None if no more pages."""
-        # If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
-        resp_json = response.json()
-        if previous_token is None:
-            previous_token = 0
-
-        elements = resp_json.get("elements")
-
-        if elements is None:
-            page = resp_json
-            if len(page) in [0, previous_token + 1]:
-                return None
-
-        elif len(elements) in [0, previous_token + 1]:
-            return None
-        return previous_token + 1
+    def get_new_paginator(self) -> BaseAPIPaginator:
+        """Get the paginator."""
+        return super().get_new_paginator()
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: Context | None,  # noqa: ARG002
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -113,19 +85,17 @@ class LinkedInAdsStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {}
+        params: dict = {
+            "q": "search",
+        }
         if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
+            params["pageToken"] = next_page_token
+        # if self.replication_key:
+        #     params["sort"] = "asc"
+        #     params["order_by"] = self.replication_key
         return params
 
-    def parse_response(
-        self,
-        response: requests.Response,
-    ) -> t.Iterable[dict]:
+    def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
         Args:
@@ -134,63 +104,4 @@ class LinkedInAdsStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        resp_json = response.json()
-        if resp_json.get("elements") is not None:
-            results = resp_json["elements"]
-            try:
-                columns = results[0]
-            except Exception:  # noqa: BLE001
-                columns = results
-            with contextlib.suppress(Exception):
-                self._add_datetime_columns(columns)
-
-        else:
-            results = resp_json
-            try:
-                columns = results
-                self._add_datetime_columns(columns)
-            except Exception:  # noqa: BLE001
-                columns = results
-        with contextlib.suppress(Exception):
-            self._to_id_column(columns, "account", "account_id")
-
-        with contextlib.suppress(Exception):
-            self._to_id_column(
-                columns,
-                "campaignGroup",
-                "campaign_group_id",
-            )
-        with contextlib.suppress(Exception):
-            schedule_column = columns.get("runSchedule").get("start")
-            columns["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
-                int(schedule_column) / 1000,
-            ).isoformat()
-        yield from (
-            resp_json["elements"]
-            if resp_json.get("elements") is not None
-            else [columns]
-        )
-
-    def _to_id_column(
-        self,
-        columns,  # noqa: ANN001
-        arg1,  # noqa: ANN001
-        arg2,  # noqa: ANN001
-    ) -> None:
-        account_column = columns.get(arg1)
-        account_id = int(account_column.split(":")[3])
-        columns[arg2] = account_id
-
-    def _add_datetime_columns(self, columns):  # noqa: ANN202, ANN001
-        created_time = columns.get("changeAuditStamps").get("created").get("time")
-        last_modified_time = (
-            columns.get("changeAuditStamps").get("lastModified").get("time")
-        )
-        columns["created_time"] = datetime.fromtimestamp(
-            int(created_time) / 1000,
-            tz=UTC,
-        ).isoformat()
-        columns["last_modified_time"] = datetime.fromtimestamp(
-            int(last_modified_time) / 1000,
-            tz=UTC,
-        ).isoformat()
+        yield from extract_jsonpath(self.records_jsonpath, input=response.json())

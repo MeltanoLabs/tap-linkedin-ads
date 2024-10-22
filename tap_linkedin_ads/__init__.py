@@ -1,1 +1,1 @@
-"""Singer tap for LinkedIn Ads."""
+"""Tap for LinkedInAds."""

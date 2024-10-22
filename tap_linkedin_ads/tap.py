@@ -1,23 +1,17 @@
 """LinkedInAds tap class."""
 
 from __future__ import annotations
-
 import datetime
-import typing as t
 
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 from tap_linkedin_ads import streams
 
-if t.TYPE_CHECKING:
-    from tap_linkedin_ads.streams import LinkedInAdsStream
-
 NOW = datetime.datetime.now(tz=datetime.timezone.utc)
 
-
 class TapLinkedInAds(Tap):
-    """Singer tap for extracting data from the LinkedIn Ads Marketing API."""
+    """LinkedInAds tap class."""
 
     name = "tap-linkedin-ads"
 
@@ -71,53 +65,17 @@ class TapLinkedInAds(Tap):
             default="tap-linkedin-ads <api_user_email@your_company.com>",
             description="API ID",
         ),
-        th.Property(
-            "accounts",
-            th.StringType,
-            required=True,
-            description="LinkedInAds Account ID",
-        ),
-        th.Property(
-            "campaign",
-            th.StringType,
-            required=True,
-            description="LinkedInAds Campaign ID",
-        ),
-        th.Property(
-            "owner",
-            th.StringType,
-            required=True,
-            description="LinkedInAds Owner ID",
-        ),
-        th.Property(
-            "campaign_group",
-            th.StringType,
-            required=True,
-            description="LinkedInAds Campaign Group ID. Used for the campaign_group stream",
-        ),
-        th.Property(
-            "creative",
-            th.StringType,
-            required=True,
-            description="LinkedInAds Creative ID. Used for the creative stream",
-        ),
     ).to_dict()
 
-    def discover_streams(self) -> list[LinkedInAdsStream]:
+    def discover_streams(self) -> list[streams.LinkedInAdsStream]:
         """Return a list of discovered streams.
 
         Returns:
             A list of discovered streams.
         """
         return [
-            streams.Accounts(self),
-            streams.VideoAds(self),
-            streams.AccountUsers(self),
-            streams.Creatives(self),
-            streams.Campaigns(self),
-            streams.CampaignGroups(self),
-            streams.AdAnalyticsByCampaign(self),
-            streams.AdAnalyticsByCreative(self),
+            streams.AccountsStream(self),
+            streams.CampaignsStream(self),
         ]
 
 
