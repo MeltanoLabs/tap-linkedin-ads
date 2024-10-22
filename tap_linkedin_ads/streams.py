@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing as t
 from importlib import resources
 
+from singer_sdk.helpers.types import Context
 from singer_sdk.typing import (
     ArrayType,
     BooleanType,
@@ -26,7 +27,6 @@ class AccountsStream(LinkedInAdsStream):
 
     name = "accounts"
     primary_keys = ["last_modified_time", "id", "status"]
-    path = "/adAccounts"
 
     schema = PropertiesList(
         Property(
@@ -80,6 +80,10 @@ class AccountsStream(LinkedInAdsStream):
         ),
     ).to_dict()
 
+    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+        """Return a context dictionary for a child stream."""
+        return {"account_id": record["id"]}
+
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
@@ -94,35 +98,81 @@ class AccountsStream(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params = super().get_url_params(context, next_page_token)
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
 
-        params["q"] = "search"
-        params["sortOrder"] = "ASCENDING"
-        return params
 
-    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
-        """Return a context dictionary for a child stream."""
-        return {"account_id": record["id"]}
+class AccountUsersStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
 
+    name = "account_users"
+    parent_stream_type = AccountsStream
+    primary_keys = ["user_person_id", "last_modified_time"]
+    path = "/adAccountUsers"
+
+    schema = PropertiesList(
+        Property("account", StringType),
+        Property("campaign_contact", BooleanType),
+        Property("account_id", IntegerType),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("created_time", StringType),
+        Property("last_modified_time", StringType),
+        Property("role", StringType),
+        Property("user", StringType),
+        Property("user_person_id", StringType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "accounts",
+            "accounts": f"urn:li:sponsoredAccount:{context['account_id']}",
+            **super().get_url_params(context, next_page_token),
+        }
 
 
 class CampaignsStream(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns."""
 
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
     name = "campaigns"
-    path = "/adAccounts"
     primary_keys = ["last_modified_time", "id", "status"]
     parent_stream_type = AccountsStream
-    next_page_token_jsonpath = "$.metadata.nextPageToken"  # Or override `get_next_page_token`.  # noqa: S105
+    next_page_token_jsonpath = (
+        "$.metadata.nextPageToken"  # Or override `get_next_page_token`.  # noqa: S105
+    )
     schema = PropertiesList(
         Property("storyDeliveryEnabled", BooleanType),
         Property(
@@ -380,10 +430,196 @@ class CampaignsStream(LinkedInAdsStream):
         Returns:
             A URL, optionally targeted to a specific partition or context.
         """
-        self.logger.info(context["account_id"])
         return super().get_url(context) + f'/{context["account_id"]}/adCampaigns'
 
-    def get_unescaped_params(self):
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unescaped_params(self, context: Context | None) -> dict:
         return {
             "search": "(status:(values:List(ACTIVE,PAUSED,ARCHIVED,COMPLETED,CANCELED,DRAFT,PENDING_DELETION,REMOVED)))"
+        }
+
+
+class CampaignGroupsStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
+
+    name = "campaign_groups"
+    parent_stream_type = AccountsStream
+    primary_keys = ["last_modified_time", "id", "status"]
+
+    schema = PropertiesList(
+        Property(
+            "runSchedule",
+            ObjectType(Property("start", IntegerType), Property("end", IntegerType)),
+        ),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
+        Property("name", StringType),
+        Property("servingStatuses", ArrayType(StringType)),
+        Property("backfilled", BooleanType),
+        Property("id", IntegerType),
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("status", StringType),
+        Property(
+            "total_budget",
+            ObjectType(
+                Property("currency_code", StringType),
+                Property("amount", StringType),
+            ),
+        ),
+        Property("test", BooleanType),
+        Property("allowed_campaign_types", ArrayType(StringType)),
+        Property("run_schedule_start", DateTimeType),
+        Property("run_schedule_end", StringType),
+    ).to_dict()
+
+    def get_url(self, context: dict | None) -> str:
+        """Get stream entity URL.
+
+        Developers override this method to perform dynamic URL generation.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Returns:
+            A URL, optionally targeted to a specific partition or context.
+        """
+        return super().get_url(context) + f'/{context["account_id"]}/adCampaignGroups'
+
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unescaped_params(self, context: Context | None) -> dict:
+        return {
+            "search": "(status:(values:List(ACTIVE,ARCHIVED,CANCELED,DRAFT,PAUSED,PENDING_DELETION,REMOVED)))"
+        }
+
+
+class CreativesStream(LinkedInAdsStream):
+    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives."""
+
+    name = "creatives"
+    parent_stream_type = AccountsStream
+    primary_keys = ["lastModifiedAt", "id"]
+
+    schema = PropertiesList(
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("campaign", StringType),
+        Property("campaign_id", StringType),
+        Property(
+            "content",
+            ObjectType(
+                Property(
+                    "spotlight",
+                    ObjectType(
+                        Property("showMemberProfilePhoto", BooleanType),
+                        Property("organizationName", StringType),
+                        Property("landingPage", StringType),
+                        Property("description", StringType),
+                        Property("logo", StringType),
+                        Property("headline", StringType),
+                        Property("callToAction", StringType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("createdAt", IntegerType),
+        Property("createdBy", StringType),
+        Property("lastModifiedAt", IntegerType),
+        Property("lastModifiedBy", StringType),
+        Property("id", StringType),
+        Property("intendedStatus", StringType),
+        Property("isServing", BooleanType),
+        Property("isTest", BooleanType),
+        Property("servingHoldReasons", ArrayType(Property("items", StringType))),
+    ).to_dict()
+
+    def get_url(self, context: dict | None) -> str:
+        """Get stream entity URL.
+
+        Developers override this method to perform dynamic URL generation.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Returns:
+            A URL, optionally targeted to a specific partition or context.
+        """
+        # TODO: optional filter 'urn%3Ali%3AsponsoredCreative%3A{self.config["creative"]}'
+        return super().get_url(context) + f'/{context["account_id"]}/creatives'
+
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "criteria",
+            **super().get_url_params(context, next_page_token),
         }

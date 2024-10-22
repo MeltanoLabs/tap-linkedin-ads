@@ -1,6 +1,7 @@
 """LinkedInAds tap class."""
 
 from __future__ import annotations
+
 import datetime
 
 from singer_sdk import Tap
@@ -9,6 +10,7 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 from tap_linkedin_ads import streams
 
 NOW = datetime.datetime.now(tz=datetime.timezone.utc)
+
 
 class TapLinkedInAds(Tap):
     """LinkedInAds tap class."""
@@ -75,7 +77,10 @@ class TapLinkedInAds(Tap):
         """
         return [
             streams.AccountsStream(self),
+            streams.AccountUsersStream(self),
             streams.CampaignsStream(self),
+            streams.CampaignGroupsStream(self),
+            streams.CreativesStream(self),
         ]
 
 
