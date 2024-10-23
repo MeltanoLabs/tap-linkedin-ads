@@ -78,12 +78,12 @@ class TapLinkedInAds(Tap):
         return [
             streams.AccountsStream(self),
             streams.AccountUsersStream(self),
+            streams.AdAnalyticsByCampaignStream(self),
+            streams.AdAnalyticsByCreativeStream(self),
             streams.CampaignsStream(self),
             streams.CampaignGroupsStream(self),
             streams.CreativesStream(self),
             streams.VideoAdsStream(self),
-            streams.AdAnalyticsByCampaignStream(self),
-            streams.AdAnalyticsByCreativeStream(self),
         ]
 
 
