@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import typing as t
 from datetime import datetime, timezone
 from importlib import resources
