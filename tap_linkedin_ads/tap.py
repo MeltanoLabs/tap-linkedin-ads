@@ -81,6 +81,7 @@ class TapLinkedInAds(Tap):
             streams.CampaignsStream(self),
             streams.CampaignGroupsStream(self),
             streams.CreativesStream(self),
+            streams.VideoAdsStream(self),
         ]
 
 
