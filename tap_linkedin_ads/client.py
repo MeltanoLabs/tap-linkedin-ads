@@ -131,20 +131,19 @@ class LinkedInAdsStream(RESTStream):
                     context,
                     next_page_token=paginator.current_value,
                 )
-                resp = decorated_request(prepared_request, context)
                 # Patch to add unescaped params to the path and url
                 if self.get_unescaped_params(context):
                     prepared_request.url = (
                         prepared_request.url
-                        + "?"
+                        + "&"
                         + "&".join(
                             [
                                 f"{k}={v}"
-                                for k, v in self.get_unescaped_params().items()
+                                for k, v in self.get_unescaped_params(context).items()
                             ],
                         )
                     )
-
+                resp = decorated_request(prepared_request, context)
                 request_counter.increment()
                 self.update_sync_costs(prepared_request, resp, context)
                 records = iter(self.parse_response(resp))
