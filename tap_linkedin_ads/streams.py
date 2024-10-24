@@ -165,8 +165,12 @@ class AccountUsersStream(LinkedInAdsStream):
         """
         return {
             "q": "accounts",
-            "accounts": f"urn:li:sponsoredAccount:{context['account_id']}",
             **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unescaped_params(self, context: Context | None) -> dict:
+        return {
+            "accounts": f"urn:li:sponsoredAccount:{context['account_id']}",
         }
 
 
