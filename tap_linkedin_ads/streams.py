@@ -755,7 +755,7 @@ class VideoAdsStream(LinkedInAdsStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCampaignInit(LinkedInAdsStream):
+class _AdAnalyticsByCampaignInit(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
 
     name = "AdAnalyticsByCampaignInit"
@@ -934,7 +934,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
+class _AdAnalyticsByCampaignSecond(_AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
@@ -953,7 +953,7 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
         }
 
 
-class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
+class _AdAnalyticsByCampaignThird(_AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_third"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
@@ -972,7 +972,9 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
         }
 
 
-class AdAnalyticsByCampaignStream(AdAnalyticsByCampaignInit):
+class AdAnalyticsByCampaignStream(_AdAnalyticsByCampaignInit):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
+
     name = "ad_analytics_by_campaign"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
@@ -1007,15 +1009,15 @@ class AdAnalyticsByCampaignStream(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of records given from adAnalytics streams
         """
-        adanalyticsinit_stream = AdAnalyticsByCampaignInit(
+        adanalyticsinit_stream = _AdAnalyticsByCampaignInit(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
+        adanalyticsecond_stream = _AdAnalyticsByCampaignSecond(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsthird_stream = AdAnalyticsByCampaignThird(
+        adanalyticsthird_stream = _AdAnalyticsByCampaignThird(
             self._tap,
             schema={"properties": {}},
         )
@@ -1044,9 +1046,7 @@ class AdAnalyticsByCampaignStream(AdAnalyticsByCampaignInit):
         return result
 
 
-class AdAnalyticsByCreativeInit(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
-
+class _AdAnalyticsByCreativeInit(LinkedInAdsStream):
     name = "AdAnalyticsByCreativeInit"
     path = "/adAnalytics"
     parent_stream_type = CreativesStream
@@ -1231,7 +1231,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCreativeStream(AdAnalyticsByCreativeInit):
+class AdAnalyticsByCreativeStream(_AdAnalyticsByCreativeInit):
     name = "ad_analytics_by_creative"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
@@ -1266,15 +1266,15 @@ class AdAnalyticsByCreativeStream(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of records given from adAnalytics streams
         """
-        adanalyticsinit_stream = AdAnalyticsByCreativeInit(
+        adanalyticsinit_stream = _AdAnalyticsByCreativeInit(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
+        adanalyticsecond_stream = _AdAnalyticsByCreativeSecond(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsthird_stream = AdAnalyticsByCreativeThird(
+        adanalyticsthird_stream = _AdAnalyticsByCreativeThird(
             self._tap,
             schema={"properties": {}},
         )
@@ -1303,7 +1303,7 @@ class AdAnalyticsByCreativeStream(AdAnalyticsByCreativeInit):
         return result
 
 
-class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
+class _AdAnalyticsByCreativeSecond(_AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
@@ -1322,7 +1322,7 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
         }
 
 
-class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
+class _AdAnalyticsByCreativeThird(_AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
 
     def get_unencoded_params(self, context: Context | None) -> dict:
