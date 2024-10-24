@@ -105,7 +105,15 @@ class LinkedInAdsStream(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {}
 
     def request_records(self, context: Context | None) -> t.Iterable[dict]:
@@ -131,15 +139,15 @@ class LinkedInAdsStream(RESTStream):
                     context,
                     next_page_token=paginator.current_value,
                 )
-                # Patch to add unescaped params to the path and url
-                if self.get_unescaped_params(context):
+                # Patch to add unencoded params to the path and url
+                if self.get_unencoded_params(context):
                     prepared_request.url = (
                         prepared_request.url
                         + "&"
                         + "&".join(
                             [
                                 f"{k}={v}"
-                                for k, v in self.get_unescaped_params(context).items()
+                                for k, v in self.get_unencoded_params(context).items()
                             ],
                         )
                     )

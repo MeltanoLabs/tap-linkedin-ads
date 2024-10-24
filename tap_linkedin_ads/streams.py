@@ -168,7 +168,15 @@ class AccountUsersStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
             "accounts": f"urn:li:sponsoredAccount:{context['account_id']}",
         }
@@ -462,7 +470,15 @@ class CampaignsStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
             "search": "(status:(values:List(ACTIVE,PAUSED,ARCHIVED,COMPLETED,CANCELED,DRAFT,PENDING_DELETION,REMOVED)))"
         }
@@ -560,7 +576,15 @@ class CampaignGroupsStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
             "search": "(status:(values:List(ACTIVE,ARCHIVED,CANCELED,DRAFT,PAUSED,PENDING_DELETION,REMOVED)))"
         }
@@ -876,7 +900,15 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         start_date = pendulum.parse(self.config["start_date"])
         end_date = pendulum.parse(self.config["end_date"])
         return {
@@ -905,9 +937,17 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
 class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[0],
         }
@@ -916,9 +956,17 @@ class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
 class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_third"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[3],
         }
@@ -927,9 +975,17 @@ class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
 class AdAnalyticsByCampaignStream(AdAnalyticsByCampaignInit):
     name = "ad_analytics_by_campaign"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[1],
         }
@@ -1135,7 +1191,15 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         start_date = pendulum.parse(self.config["start_date"])
         end_date = pendulum.parse(self.config["end_date"])
         creative_urn = context["creative_urn"]
@@ -1170,9 +1234,17 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 class AdAnalyticsByCreativeStream(AdAnalyticsByCreativeInit):
     name = "ad_analytics_by_creative"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[1],
         }
@@ -1234,9 +1306,17 @@ class AdAnalyticsByCreativeStream(AdAnalyticsByCreativeInit):
 class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[2],
         }
@@ -1245,9 +1325,17 @@ class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
 class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
 
-    def get_unescaped_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         return {
-            **super().get_unescaped_params(context),
+            **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
             "fields": self.adanalyticscolumns[3],
         }
