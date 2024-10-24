@@ -1,71 +1,35 @@
-"""Stream type classes for tap-linkedin-ads-sdk."""
+"""Stream type classes for tap-linkedin-ads."""
 
 from __future__ import annotations
 
-import contextlib
 import typing as t
 from datetime import datetime, timezone
-from pathlib import Path
+from importlib import resources
 
 import pendulum
-from singer_sdk import typing as th  # JSON Schema typing helpers
+from singer_sdk.helpers.types import Context
+from singer_sdk.typing import (
+    ArrayType,
+    BooleanType,
+    DateTimeType,
+    IntegerType,
+    ObjectType,
+    PropertiesList,
+    Property,
+    StringType,
+)
 
 from tap_linkedin_ads.client import LinkedInAdsStream
 
-PropertiesList = th.PropertiesList
-Property = th.Property
-ObjectType = th.ObjectType
-DateTimeType = th.DateTimeType
-StringType = th.StringType
-ArrayType = th.ArrayType
-BooleanType = th.BooleanType
-IntegerType = th.IntegerType
-
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+SCHEMAS_DIR = resources.files(__package__) / "schemas"
 UTC = timezone.utc
 
 
-class Accounts(LinkedInAdsStream):
+class AccountsStream(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-accounts#search-for-accounts."""
 
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
-    columns = [
-        "CHANGE_AUDIT_STAMPS",
-        "CREATED_TIME",
-        "CURRENCY",
-        "ID",
-        "LAST_MODIFIED_TIME",
-        "NAME",
-        "NOTIFIED_ON_CAMPAIGN_OPTIMIZATION",
-        "NOTIFIED_ON_CREATIVE_APPROVAL",
-        "NOTIFIED_ON_CREATIVE_REJECTION",
-        "NOTIFIED_ON_END_OF_CAMPAIGN",
-        "NOTIFIED_ON_NEW_FEATURES_ENABLED",
-        "REFERENCE",
-        "REFERENCE_ORGANIZATION_ID",
-        "REFERENCE_PERSON_ID",
-        "SERVING_STATUSES",
-        "STATUS",
-        "TEST",
-        "TOTAL_BUDGET",
-        "TOTAL_BUDGET_ENDS_AT",
-        "TYPE",
-        "VERSION",
-    ]
-
-    name = "account"
-    replication_keys = ["last_modified_time"]
-    primary_keys = ["last_modified_time", "id", "status"]
-    replication_method = "incremental"
-    path = "adAccounts"
+    name = "accounts"
+    primary_keys: t.ClassVar[list[str]] = ["id"]
 
     schema = PropertiesList(
         Property(
@@ -100,7 +64,7 @@ class Accounts(LinkedInAdsStream):
         Property("reference", StringType),
         Property("reference_organization_id", IntegerType),
         Property("reference_person_id", StringType),
-        Property("servingStatuses", th.ArrayType(Property("items", StringType))),
+        Property("servingStatuses", ArrayType(Property("items", StringType))),
         Property("status", StringType),
         Property(
             "total_budget",
@@ -119,13 +83,16 @@ class Accounts(LinkedInAdsStream):
         ),
     ).to_dict()
 
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
+    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+        """Return a context dictionary for a child stream."""
+        return {
+            "account_id": record["id"],
+            "owner_urn": record["reference"],
+        }
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: dict | None,
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -137,37 +104,663 @@ class Accounts(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "search"
-        params["sort.field"] = "ID"
-        params["sort.order"] = "ASCENDING"
-
-        return params
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
 
 
-class AdAnalyticsByCampaignInit(LinkedInAdsStream):
+class AccountUsersStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
+
+    name = "account_users"
+    parent_stream_type = AccountsStream
+    primary_keys: t.ClassVar[list[str]] = ["account"]
+    path = "/adAccountUsers"
+
+    schema = PropertiesList(
+        Property("account", StringType),
+        Property("campaign_contact", BooleanType),
+        Property("account_id", IntegerType),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("created_time", StringType),
+        Property("last_modified_time", StringType),
+        Property("role", StringType),
+        Property("user", StringType),
+        Property("user_person_id", StringType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "accounts",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "accounts": f"urn:li:sponsoredAccount:{context['account_id']}",
+        }
+
+
+class CampaignsStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns."""
+
+    name = "campaigns"
+    primary_keys: t.ClassVar[list[str]] = ["id"]
+    parent_stream_type = AccountsStream
+    next_page_token_jsonpath = (
+        "$.metadata.nextPageToken"  # Or override `get_next_page_token`.  # noqa: S105
+    )
+    schema = PropertiesList(
+        Property("storyDeliveryEnabled", BooleanType),
+        Property(
+            "targeting",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property(
+                            "included_targeting_facets",
+                            ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Property(
+                            "excluded_targeting_facets",
+                            ArrayType(
+                                Property(
+                                    "items",
+                                    ObjectType(
+                                        Property("type", StringType),
+                                        Property(
+                                            "values",
+                                            ArrayType(Property("items", StringType)),
+                                        ),
+                                        additional_properties=False,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        Property(
+            "targetingCriteria",
+            ObjectType(
+                Property(
+                    "include",
+                    ObjectType(
+                        Property(
+                            "and",
+                            ArrayType(
+                                ObjectType(
+                                    Property(
+                                        "or",
+                                        ObjectType(
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                ArrayType(
+                                                    Property(
+                                                        "urn:li:title",
+                                                        StringType,
+                                                    ),
+                                                ),
+                                            ),
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                ArrayType(
+                                                    Property("urn:li:geo", StringType),
+                                                ),
+                                            ),
+                                            Property(
+                                                "urn:li:adTargetingFacet",
+                                                ArrayType(
+                                                    Property(
+                                                        "urn:li:adSlotSize",
+                                                        StringType,
+                                                    ),
+                                                ),
+                                            ),
+                                            additional_properties=False,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                Property(
+                    "exclude",
+                    ObjectType(
+                        Property(
+                            "or",
+                            ObjectType(
+                                Property(
+                                    "urn:li:ad_targeting_facet:titles",
+                                    ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:staff_count_ranges",
+                                    ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:followed_companies",
+                                    ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                                Property(
+                                    "urn:li:ad_targeting_facet:seniorities",
+                                    ArrayType(
+                                        Property("items", StringType),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        Property("servingStatuses", ArrayType(Property("items", StringType))),
+        Property(
+            "totalBudget",
+            ObjectType(
+                Property("amount", StringType),
+                Property("currencyCode", StringType),
+                additional_properties=False,
+            ),
+        ),
+        Property("version_tag", StringType),
+        Property(
+            "locale",
+            ObjectType(
+                Property("country", StringType),
+                Property("language", StringType),
+                additional_properties=False,
+            ),
+        ),
+        Property(
+            "version",
+            ObjectType(Property("versionTag", StringType), additional_properties=False),
+        ),
+        Property("associatedEntity", StringType),
+        Property("associated_entity_organization_id", IntegerType),
+        Property("associated_entity_person_id", IntegerType),
+        Property(
+            "runSchedule",
+            ObjectType(
+                Property("start", IntegerType),
+                Property("end", IntegerType),
+                additional_properties=False,
+            ),
+        ),
+        Property("optimizationTargetType", StringType),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("campaignGroup", StringType),
+        Property("campaign_group_id", IntegerType),
+        Property(
+            "dailyBudget",
+            ObjectType(
+                Property("amount", StringType),
+                Property("currencyCode", StringType),
+                additional_properties=False,
+            ),
+        ),
+        Property(
+            "unitCost",
+            ObjectType(
+                Property("amount", StringType),
+                Property("currencyCode", StringType),
+                additional_properties=False,
+            ),
+        ),
+        Property("creativeSelection", StringType),
+        Property("costType", StringType),
+        Property("name", StringType),
+        Property("objectiveType", StringType),
+        Property("offsiteDeliveryEnabled", BooleanType),
+        Property(
+            "offsitePreferences",
+            ObjectType(
+                Property(
+                    "iabCategories",
+                    ObjectType(
+                        Property(
+                            "exclude",
+                            ArrayType(
+                                Property("items", StringType),
+                            ),
+                        ),
+                        Property(
+                            "include",
+                            ArrayType(Property("items", StringType)),
+                        ),
+                    ),
+                ),
+                Property(
+                    "publisherRestrictionFiles",
+                    ObjectType(
+                        Property(
+                            "exclude",
+                            ArrayType(Property("items", StringType)),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        Property("id", IntegerType),
+        Property("audienceExpansionEnabled", BooleanType),
+        Property("test", BooleanType),
+        Property("format", StringType),
+        Property("pacingStrategy", StringType),
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("status", StringType),
+        Property("type", StringType),
+        Property("storyDeliveryEnabled", BooleanType),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
+        Property("run_schedule_start", DateTimeType),
+        Property("run_schedule_end", StringType),
+    ).to_dict()
+
+    def get_url(self, context: dict | None) -> str:
+        """Get stream entity URL.
+
+        Developers override this method to perform dynamic URL generation.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Returns:
+            A URL, optionally targeted to a specific partition or context.
+        """
+        return super().get_url(context) + f'/{context["account_id"]}/adCampaigns'
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "search": "(status:(values:List(ACTIVE,PAUSED,ARCHIVED,COMPLETED,CANCELED,DRAFT,PENDING_DELETION,REMOVED)))"
+        }
+
+    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+        """Return a context dictionary for a child stream."""
+        return {
+            "campaign_id": record["id"],
+        }
+
+
+class CampaignGroupsStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
+
+    name = "campaign_groups"
+    parent_stream_type = AccountsStream
+    primary_keys: t.ClassVar[list[str]] = ["id"]
+
+    schema = PropertiesList(
+        Property(
+            "runSchedule",
+            ObjectType(Property("start", IntegerType), Property("end", IntegerType)),
+        ),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
+        Property("name", StringType),
+        Property("servingStatuses", ArrayType(StringType)),
+        Property("backfilled", BooleanType),
+        Property("id", IntegerType),
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("status", StringType),
+        Property(
+            "total_budget",
+            ObjectType(
+                Property("currency_code", StringType),
+                Property("amount", StringType),
+            ),
+        ),
+        Property("test", BooleanType),
+        Property("allowed_campaign_types", ArrayType(StringType)),
+        Property("run_schedule_start", DateTimeType),
+        Property("run_schedule_end", StringType),
+    ).to_dict()
+
+    def get_url(self, context: dict | None) -> str:
+        """Get stream entity URL.
+
+        Developers override this method to perform dynamic URL generation.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Returns:
+            A URL, optionally targeted to a specific partition or context.
+        """
+        return super().get_url(context) + f'/{context["account_id"]}/adCampaignGroups'
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "search",
+            "sortOrder": "ASCENDING",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "search": "(status:(values:List(ACTIVE,ARCHIVED,CANCELED,DRAFT,PAUSED,PENDING_DELETION,REMOVED)))"
+        }
+
+
+class CreativesStream(LinkedInAdsStream):
+    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives."""
+
+    name = "creatives"
+    parent_stream_type = AccountsStream
+    primary_keys: t.ClassVar[list[str]] = ["id"]
+
+    schema = PropertiesList(
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property("campaign", StringType),
+        Property("campaign_id", StringType),
+        Property(
+            "content",
+            ObjectType(
+                Property(
+                    "spotlight",
+                    ObjectType(
+                        Property("showMemberProfilePhoto", BooleanType),
+                        Property("organizationName", StringType),
+                        Property("landingPage", StringType),
+                        Property("description", StringType),
+                        Property("logo", StringType),
+                        Property("headline", StringType),
+                        Property("callToAction", StringType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("createdAt", IntegerType),
+        Property("createdBy", StringType),
+        Property("lastModifiedAt", IntegerType),
+        Property("lastModifiedBy", StringType),
+        Property("id", StringType),
+        Property("intendedStatus", StringType),
+        Property("isServing", BooleanType),
+        Property("isTest", BooleanType),
+        Property("servingHoldReasons", ArrayType(Property("items", StringType))),
+    ).to_dict()
+
+    def get_url(self, context: dict | None) -> str:
+        """Get stream entity URL.
+
+        Developers override this method to perform dynamic URL generation.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Returns:
+            A URL, optionally targeted to a specific partition or context.
+        """
+        # TODO: optional filter 'urn%3Ali%3AsponsoredCreative%3A{self.config["creative"]}'
+        return super().get_url(context) + f'/{context["account_id"]}/creatives'
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "criteria",
+            **super().get_url_params(context, next_page_token),
+        }
+
+    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+        """Return a context dictionary for a child stream."""
+        return {
+            "creative_urn": record["id"],
+        }
+
+
+class VideoAdsStream(LinkedInAdsStream):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders."""
+
+    name = "video_ads"
+    path = "/adDirectSponsoredContents"
+    parent_stream_type = AccountsStream
+
+    schema = PropertiesList(
+        Property("account", StringType),
+        Property("account_id", IntegerType),
+        Property(
+            "changeAuditStamps",
+            ObjectType(
+                Property(
+                    "created",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+                Property(
+                    "lastModified",
+                    ObjectType(
+                        Property("time", IntegerType),
+                        additional_properties=False,
+                    ),
+                ),
+            ),
+        ),
+        Property("created_time", StringType),
+        Property("last_modified_time", StringType),
+        Property("content_reference", StringType),
+        Property("content_reference_ucg_post_id", IntegerType),
+        Property("content_reference_share_id", IntegerType),
+        Property("name", StringType),
+        Property("type", StringType),
+    ).to_dict()
+
+    @property
+    def url_base(self) -> str:
+        """Return the API URL root, configurable via tap settings."""
+        return "https://api.linkedin.com/v2"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            "q": "account",
+            "account": f"urn:li:sponsoredAccount:{context['account_id']}",
+            "owner": context["owner_urn"],
+            **super().get_url_params(context, next_page_token),
+        }
+
+    # TODO: handle timestamp parsing more generically
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        # This function extracts day, month, and year from date range column
+        # These values are parse with datetime function and the date is added to the day column
+        # with contextlib.suppress(Exception):
+        #     created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
+        #     last_modified_time = (
+        #         row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
+        #     )
+        #     row["created_time"] = datetime.fromtimestamp(
+        #         int(created_time) / 1000,
+        #         tz=UTC,
+        #     ).isoformat()
+        #     row["last_modified_time"] = datetime.fromtimestamp(
+        #         int(last_modified_time) / 1000,
+        #         tz=UTC,
+        #     ).isoformat()
+        return super().post_process(row, context)
+
+
+class _AdAnalyticsByCampaignInit(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
 
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
     name = "AdAnalyticsByCampaignInit"
-    replication_keys = ["dateRange"]
-    replication_method = "incremental"
-    primary_keys = ["campaign_id", "dateRange"]
-    path = "adAnalytics"
+    path = "/adAnalytics"
+    parent_stream_type = CampaignsStream
 
     schema = PropertiesList(
         Property("campaign_id", StringType),
@@ -290,7 +883,7 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: dict | None,
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -302,32 +895,29 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
+        return {
+            "q": "analytics",
+            **super().get_url_params(context, next_page_token),
+        }
 
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
         start_date = pendulum.parse(self.config["start_date"])
         end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CAMPAIGN"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-
-        params["fields"] = columns[0]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
+        return {
+            "pivot": "(value:CAMPAIGN)",
+            "timeGranularity": "(value:DAILY)",
+            "campaigns": f"List(urn%3Ali%3AsponsoredCampaign%3A{context['campaign_id']})",
+            "dateRange": f"(start:(year:{start_date.year},month:{start_date.month},day:{start_date.day}),end:(year:{end_date.year},month:{end_date.month},day:{end_date.day}))",
+            "fields": self.adanalyticscolumns[0],
+        }
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date range column
@@ -341,58 +931,66 @@ class AdAnalyticsByCampaignInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        with contextlib.suppress(IndexError):
-            row["campaign_id"] = self.config["campaign"]
-
         return super().post_process(row, context)
 
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
 
+class _AdAnalyticsByCampaignSecond(_AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_second"
 
-class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
-    name = "ad_analytics_by_campaign"
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
         Args:
             context: The stream context.
-            next_page_token: The next page index or value.
 
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[0],
+        }
 
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
 
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
+class _AdAnalyticsByCampaignThird(_AdAnalyticsByCampaignInit):
+    name = "adanalyticsbycampaign_third"
 
-        params["q"] = "analytics"
-        params["pivot"] = "CAMPAIGN"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[1]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
-        return params
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[3],
+        }
+
+
+class AdAnalyticsByCampaignStream(_AdAnalyticsByCampaignInit):
+    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
+
+    name = "ad_analytics_by_campaign"
+
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
+
+        Args:
+            context: The stream context.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[1],
+        }
 
     def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
         """Return a dictionary of records from adAnalytics classes.
@@ -411,15 +1009,15 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
         Returns:
             A dictionary of records given from adAnalytics streams
         """
-        adanalyticsinit_stream = AdAnalyticsByCampaignInit(
+        adanalyticsinit_stream = _AdAnalyticsByCampaignInit(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsecond_stream = AdAnalyticsByCampaignSecond(
+        adanalyticsecond_stream = _AdAnalyticsByCampaignSecond(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsthird_stream = AdAnalyticsByCampaignThird(
+        adanalyticsthird_stream = _AdAnalyticsByCampaignThird(
             self._tap,
             schema={"properties": {}},
         )
@@ -447,814 +1045,11 @@ class AdAnalyticsByCampaign(AdAnalyticsByCampaignInit):
             result.update(dictionary)
         return result
 
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
 
-
-class AdAnalyticsByCampaignSecond(AdAnalyticsByCampaignInit):
-    name = "adanalyticsbycampaign_second"
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        columns = self.adanalyticscolumns
-
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CAMPAIGN"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[2]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
-
-
-class AdAnalyticsByCampaignThird(AdAnalyticsByCampaignInit):
-    name = "adanalyticsbycampaign_third"
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        columns = self.adanalyticscolumns
-
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CAMPAIGN"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[3]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-        return params
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
-
-
-class VideoAds(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/advertising-targeting/create-and-manage-video#finders."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
-    name = "video_ads"
-    replication_keys = ["last_modified_time"]
-    replication_method = "incremental"
-    primary_keys = ["last_modified_time"]
-    path = "adDirectSponsoredContents"
-
-    schema = PropertiesList(
-        Property("account", StringType),
-        Property("account_id", IntegerType),
-        Property(
-            "changeAuditStamps",
-            ObjectType(
-                Property(
-                    "created",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-                Property(
-                    "lastModified",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-            ),
-        ),
-        Property("created_time", StringType),
-        Property("last_modified_time", StringType),
-        Property("content_reference", StringType),
-        Property("content_reference_ucg_post_id", IntegerType),
-        Property("content_reference_share_id", IntegerType),
-        Property("name", StringType),
-        Property("type", StringType),
-    ).to_dict()
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "account"
-        params["account"] = "urn:li:sponsoredAccount:" + self.config["accounts"]
-        params["owner"] = "urn:li:organization:" + self.config["owner"]
-
-        return params
-
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date range column
-        # These values are parse with datetime function and the date is added to the day column
-        with contextlib.suppress(Exception):
-            created_time = (
-                row.get("changeAuditStamps", {}).get("created", {}).get("time")
-            )
-            last_modified_time = (
-                row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
-            )
-            row["created_time"] = datetime.fromtimestamp(
-                int(created_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-            row["last_modified_time"] = datetime.fromtimestamp(
-                int(last_modified_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-        return super().post_process(row, context)
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
-
-
-class AccountUsers(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-account-users#find-ad-account-users-by-accounts."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
-    columns = [
-        "ACCOUNT",
-        "ACCOUNT_ID",
-        "CAMPAIGN_CONTACT",
-        "CHANGE_AUDIT_STAMPS",
-        "CREATED_TIME",
-        "LAST_MODIFIED_TIME",
-        "ROLE",
-        "USER",
-        "USER_PERSON_ID",
-    ]
-
-    name = "account_user"
-    replication_keys = ["user_person_id"]
-    replication_method = "incremental"
-    primary_keys = ["user_person_id", "last_modified_time"]
-    path = "adAccountUsers"
-
-    schema = PropertiesList(
-        Property("account", StringType),
-        Property("campaign_contact", BooleanType),
-        Property("account_id", IntegerType),
-        Property(
-            "changeAuditStamps",
-            ObjectType(
-                Property(
-                    "created",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-                Property(
-                    "lastModified",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-            ),
-        ),
-        Property("created_time", StringType),
-        Property("last_modified_time", StringType),
-        Property("role", StringType),
-        Property("user", StringType),
-        Property("user_person_id", StringType),
-    ).to_dict()
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        params["q"] = "accounts"
-        params["accounts"] = "urn:li:sponsoredAccount:" + self.config["accounts"]
-
-        return params
-
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date range column
-        # These values are parsed with datetime function and the date is added to the day column
-        with contextlib.suppress(Exception):
-            account_user = row.get("user", {})
-            user = account_user.split(":")[3]
-            row["user_person_id"] = user
-        with contextlib.suppress(Exception):
-            created_time = (
-                row.get("changeAuditStamps", {}).get("created", {}).get("time")
-            )
-            last_modified_time = (
-                row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
-            )
-            row["created_time"] = datetime.fromtimestamp(
-                int(created_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-            row["last_modified_time"] = datetime.fromtimestamp(
-                int(last_modified_time) / 1000,
-                tz=UTC,
-            ).isoformat()
-        return super().post_process(row, context)
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
-
-
-class CampaignGroups(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
-    name = "campaign_groups"
-    replication_keys = ["last_modified_time"]
-    replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id", "status"]
-    path = ""
-
-    PropertiesList = th.PropertiesList
-    Property = th.Property
-    ObjectType = th.ObjectType
-    DateTimeType = th.DateTimeType
-    StringType = th.StringType
-    ArrayType = th.ArrayType
-    BooleanType = th.BooleanType
-    IntegerType = th.IntegerType
-
-    jsonschema = PropertiesList(
-        Property(
-            "runSchedule",
-            ObjectType(Property("start", IntegerType), Property("end", IntegerType)),
-        ),
-        Property(
-            "changeAuditStamps",
-            ObjectType(
-                Property(
-                    "created",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-                Property(
-                    "lastModified",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-            ),
-        ),
-        Property("created_time", DateTimeType),
-        Property("last_modified_time", DateTimeType),
-        Property("name", StringType),
-        Property("servingStatuses", ArrayType(StringType)),
-        Property("backfilled", BooleanType),
-        Property("id", IntegerType),
-        Property("account", StringType),
-        Property("account_id", IntegerType),
-        Property("status", StringType),
-        Property(
-            "total_budget",
-            ObjectType(
-                Property("currency_code", StringType),
-                Property("amount", StringType),
-            ),
-        ),
-        Property("test", BooleanType),
-        Property("allowed_campaign_types", ArrayType(StringType)),
-        Property("run_schedule_start", DateTimeType),
-        Property("run_schedule_end", StringType),
-    ).to_dict()
-
-    schema = jsonschema
-
-    @property
-    def url_base(self) -> str:
-        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/adCampaignGroups/{self.config["campaign_group"]}'
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        return params
-
-
-class Campaigns(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaigns#search-for-campaigns."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
-    name = "campaign"
-    replication_keys = ["last_modified_time"]
-    replication_method = "incremental"
-    primary_keys = ["last_modified_time", "id", "status"]
-    path = ""
-
-    schema = PropertiesList(
-        Property("storyDeliveryEnabled", BooleanType),
-        Property(
-            "targeting",
-            ObjectType(
-                Property(
-                    "created",
-                    ObjectType(
-                        Property(
-                            "included_targeting_facets",
-                            th.ArrayType(
-                                Property(
-                                    "items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
-                                        ),
-                                        additional_properties=False,
-                                    ),
-                                ),
-                            ),
-                        ),
-                        Property(
-                            "excluded_targeting_facets",
-                            th.ArrayType(
-                                Property(
-                                    "items",
-                                    ObjectType(
-                                        Property("type", StringType),
-                                        Property(
-                                            "values",
-                                            th.ArrayType(Property("items", StringType)),
-                                        ),
-                                        additional_properties=False,
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-        Property(
-            "targetingCriteria",
-            ObjectType(
-                Property(
-                    "include",
-                    ObjectType(
-                        Property(
-                            "and",
-                            ArrayType(
-                                ObjectType(
-                                    Property(
-                                        "or",
-                                        ObjectType(
-                                            Property(
-                                                "urn:li:adTargetingFacet",
-                                                th.ArrayType(
-                                                    Property(
-                                                        "urn:li:title",
-                                                        StringType,
-                                                    ),
-                                                ),
-                                            ),
-                                            Property(
-                                                "urn:li:adTargetingFacet",
-                                                th.ArrayType(
-                                                    Property("urn:li:geo", StringType),
-                                                ),
-                                            ),
-                                            Property(
-                                                "urn:li:adTargetingFacet",
-                                                th.ArrayType(
-                                                    Property(
-                                                        "urn:li:adSlotSize",
-                                                        StringType,
-                                                    ),
-                                                ),
-                                            ),
-                                            additional_properties=False,
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-                Property(
-                    "exclude",
-                    ObjectType(
-                        Property(
-                            "or",
-                            ObjectType(
-                                Property(
-                                    "urn:li:ad_targeting_facet:titles",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    ),
-                                ),
-                                Property(
-                                    "urn:li:ad_targeting_facet:staff_count_ranges",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    ),
-                                ),
-                                Property(
-                                    "urn:li:ad_targeting_facet:followed_companies",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    ),
-                                ),
-                                Property(
-                                    "urn:li:ad_targeting_facet:seniorities",
-                                    th.ArrayType(
-                                        Property("items", StringType),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-        Property("servingStatuses", th.ArrayType(Property("items", StringType))),
-        Property(
-            "totalBudget",
-            ObjectType(
-                Property("amount", StringType),
-                Property("currencyCode", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property("version_tag", StringType),
-        Property(
-            "locale",
-            ObjectType(
-                Property("country", StringType),
-                Property("language", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "version",
-            ObjectType(Property("versionTag", StringType), additional_properties=False),
-        ),
-        Property("associatedEntity", StringType),
-        Property("associated_entity_organization_id", IntegerType),
-        Property("associated_entity_person_id", IntegerType),
-        Property(
-            "runSchedule",
-            ObjectType(
-                Property("start", IntegerType),
-                Property("end", IntegerType),
-                additional_properties=False,
-            ),
-        ),
-        Property("optimizationTargetType", StringType),
-        Property(
-            "changeAuditStamps",
-            ObjectType(
-                Property(
-                    "created",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-                Property(
-                    "lastModified",
-                    ObjectType(
-                        Property("time", IntegerType),
-                        additional_properties=False,
-                    ),
-                ),
-            ),
-        ),
-        Property("campaignGroup", StringType),
-        Property("campaign_group_id", IntegerType),
-        Property(
-            "dailyBudget",
-            ObjectType(
-                Property("amount", StringType),
-                Property("currencyCode", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property(
-            "unitCost",
-            ObjectType(
-                Property("amount", StringType),
-                Property("currencyCode", StringType),
-                additional_properties=False,
-            ),
-        ),
-        Property("creativeSelection", StringType),
-        Property("costType", StringType),
-        Property("name", StringType),
-        Property("objectiveType", StringType),
-        Property("offsiteDeliveryEnabled", BooleanType),
-        Property(
-            "offsitePreferences",
-            ObjectType(
-                Property(
-                    "iabCategories",
-                    ObjectType(
-                        Property(
-                            "exclude",
-                            th.ArrayType(
-                                Property("items", StringType),
-                            ),
-                        ),
-                        Property(
-                            "include",
-                            th.ArrayType(Property("items", StringType)),
-                        ),
-                    ),
-                ),
-                Property(
-                    "publisherRestrictionFiles",
-                    ObjectType(
-                        Property(
-                            "exclude",
-                            th.ArrayType(Property("items", StringType)),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-        Property("id", IntegerType),
-        Property("audienceExpansionEnabled", BooleanType),
-        Property("test", BooleanType),
-        Property("format", StringType),
-        Property("pacingStrategy", StringType),
-        Property("account", StringType),
-        Property("account_id", IntegerType),
-        Property("status", StringType),
-        Property("type", StringType),
-        Property("storyDeliveryEnabled", BooleanType),
-        Property("created_time", DateTimeType),
-        Property("last_modified_time", DateTimeType),
-        Property("run_schedule_start", DateTimeType),
-        Property("run_schedule_end", StringType),
-    ).to_dict()
-
-    @property
-    def url_base(self) -> str:
-        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/adCampaigns/{self.config["campaign"]}'
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        return params
-
-
-class Creatives(LinkedInAdsStream):
-    """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication.
-    """
-
-    name = "creatives"
-    replication_keys = ["lastModifiedAt"]
-    replication_method = "incremental"
-    primary_keys = ["lastModifiedAt", "id"]
-    path = ""
-
-    schema = PropertiesList(
-        Property("account", StringType),
-        Property("account_id", IntegerType),
-        Property("campaign", StringType),
-        Property("campaign_id", StringType),
-        Property(
-            "content",
-            ObjectType(
-                Property(
-                    "spotlight",
-                    ObjectType(
-                        Property("showMemberProfilePhoto", BooleanType),
-                        Property("organizationName", StringType),
-                        Property("landingPage", StringType),
-                        Property("description", StringType),
-                        Property("logo", StringType),
-                        Property("headline", StringType),
-                        Property("callToAction", StringType),
-                        additional_properties=False,
-                    ),
-                ),
-            ),
-        ),
-        Property("createdAt", IntegerType),
-        Property("createdBy", StringType),
-        Property("lastModifiedAt", IntegerType),
-        Property("lastModifiedBy", StringType),
-        Property("id", StringType),
-        Property("intendedStatus", StringType),
-        Property("isServing", BooleanType),
-        Property("isTest", BooleanType),
-        Property("servingHoldReasons", th.ArrayType(Property("items", StringType))),
-    ).to_dict()
-
-    @property
-    def url_base(self) -> str:
-        return f'https://api.linkedin.com/rest/adAccounts/{self.config["accounts"]}/creatives/urn%3Ali%3AsponsoredCreative%3A{self.config["creative"]}'
-
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        return params
-
-
-class AdAnalyticsByCreativeInit(LinkedInAdsStream):
-    """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/ads-reporting#analytics-finder."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_keys = datetime keys for replication
-    """
-
+class _AdAnalyticsByCreativeInit(LinkedInAdsStream):
     name = "AdAnalyticsByCreativeInit"
-    replication_keys = ["dateRange"]
-    replication_method = "incremental"
-    primary_keys = ["creative_id", "dateRange"]
-    path = "adAnalytics"
+    path = "/adAnalytics"
+    parent_stream_type = CreativesStream
 
     schema = PropertiesList(
         Property("landingPageClicks", IntegerType),
@@ -1379,7 +1174,7 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: dict | None,
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -1391,36 +1186,31 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
+        return {
+            "q": "analytics",
+            **super().get_url_params(context, next_page_token),
+        }
 
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
-        params["fields"] = columns[0]
+        Args:
+            context: The stream context.
 
+        Returns:
+            A dictionary of URL query parameters.
+        """
         start_date = pendulum.parse(self.config["start_date"])
         end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CREATIVE"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
+        creative_urn = context["creative_urn"]
+        creative_id = creative_urn.split(":")[-1]
+        return {
+            "pivot": "(value:CREATIVE)",
+            "timeGranularity": "(value:DAILY)",
+            "creatives": f"List(urn%3Ali%3AsponsoredCreative%3A{creative_id})",
+            "dateRange": f"(start:(year:{start_date.year},month:{start_date.month},day:{start_date.day}),end:(year:{end_date.year},month:{end_date.month},day:{end_date.day}))",
+            "fields": self.adanalyticscolumns[0],
+        }
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date range column
@@ -1434,8 +1224,6 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
-        row["creative_id"] = self.config["creative"]
-
         viral_registrations = row.pop("viralRegistrations", None)
         if viral_registrations:
             row["viralRegistrations"] = int(viral_registrations)
@@ -1443,48 +1231,23 @@ class AdAnalyticsByCreativeInit(LinkedInAdsStream):
         return super().post_process(row, context)
 
 
-class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
+class AdAnalyticsByCreativeStream(_AdAnalyticsByCreativeInit):
     name = "ad_analytics_by_creative"
 
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
         Args:
             context: The stream context.
-            next_page_token: The next page index or value.
 
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
-
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CREATIVE"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[1]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[1],
+        }
 
     def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
         """Return a dictionary of records from adAnalytics classes.
@@ -1503,15 +1266,15 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
         Returns:
             A dictionary of records given from adAnalytics streams
         """
-        adanalyticsinit_stream = AdAnalyticsByCreativeInit(
+        adanalyticsinit_stream = _AdAnalyticsByCreativeInit(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsecond_stream = AdAnalyticsByCreativeSecond(
+        adanalyticsecond_stream = _AdAnalyticsByCreativeSecond(
             self._tap,
             schema={"properties": {}},
         )
-        adanalyticsthird_stream = AdAnalyticsByCreativeThird(
+        adanalyticsthird_stream = _AdAnalyticsByCreativeThird(
             self._tap,
             schema={"properties": {}},
         )
@@ -1539,102 +1302,40 @@ class AdAnalyticsByCreative(AdAnalyticsByCreativeInit):
             result.update(dictionary)
         return result
 
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
 
-
-class AdAnalyticsByCreativeSecond(AdAnalyticsByCreativeInit):
+class _AdAnalyticsByCreativeSecond(_AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_second"
 
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
         Args:
             context: The stream context.
-            next_page_token: The next page index or value.
 
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
-
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CREATIVE"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[2]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[2],
+        }
 
 
-class AdAnalyticsByCreativeThird(AdAnalyticsByCreativeInit):
+class _AdAnalyticsByCreativeThird(_AdAnalyticsByCreativeInit):
     name = "adanalyticsbycreative_third"
 
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    def get_unencoded_params(self, context: Context | None) -> dict:
+        """Return a dictionary of unencoded params.
 
         Args:
             context: The stream context.
-            next_page_token: The next page index or value.
 
         Returns:
             A dictionary of URL query parameters.
         """
-        columns = self.adanalyticscolumns
-
-        params: dict = {}
-        if next_page_token:
-            params["start"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
-
-        start_date = pendulum.parse(self.config["start_date"])
-        end_date = pendulum.parse(self.config["end_date"])
-
-        params["q"] = "analytics"
-        params["pivot"] = "CREATIVE"
-        params["timeGranularity"] = "DAILY"
-        params["dateRange.start.day"] = start_date.day
-        params["dateRange.start.month"] = start_date.month
-        params["dateRange.start.year"] = start_date.year
-        params["dateRange.end.day"] = end_date.day
-        params["dateRange.end.month"] = end_date.month
-        params["dateRange.end.year"] = end_date.year
-        params["fields"] = columns[3]
-        params["campaigns[0]"] = "urn:li:sponsoredCampaign:" + self.config["campaign"]
-
-        return params
-
-    @property
-    def url_base(self) -> str:
-        return "https://api.linkedin.com/rest/"
+        return {
+            **super().get_unencoded_params(context),
+            # Overwrite fields with this column subset
+            "fields": self.adanalyticscolumns[3],
+        }

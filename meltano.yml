@@ -1,61 +1,47 @@
 version: 1
-default_environment: dev
 send_anonymous_usage_stats: true
-project_id: linkedin_sdk
+project_id: "tap-linkedin-ads"
+default_environment: test
+environments:
+- name: test
 plugins:
   extractors:
-  - name: tap-linkedin-ads
-    namespace: tap_linkedin_ads
+  - name: "tap-linkedin-ads"
+    namespace: "tap_linkedin_ads"
     pip_url: -e .
     capabilities:
     - state
     - catalog
     - discover
+    - about
+    - stream-maps
+
+    # TODO: Declare settings and their types here:
     settings:
-    - name: access_token
+    - name: username
+      label: Username
+      description: The username to use for authentication
+
+    - name: password
       kind: password
-    - name: accounts
-    - name: user_agent
-      value: 'meltano'
-    - name: campaign
-    - name: owner
-    - name: campaign_group
-    - name: creative
+      label: Password
+      description: The password to use for authentication
+      sensitive: true
+
     - name: start_date
-      value: '2023-01-01T00:00:00Z'
-    - name: end_date
-      value: '2023-04-01T00:00:00Z'
-  - name: Linkedin-Accounts
-    inherit_from: tap-linkedin-ads
-    select:
-    - accounts
-  - name: Linkedin-AdAccountsUsers
-    inherit_from: tap-linkedin-ads
-    select:
-    - account_user
-  - name: Linkedin-Creatives
-    inherit_from: tap-linkedin-ads
-    select:
-    - creatives
-  - name: Linkedin-Campaigns
-    inherit_from: tap-linkedin-ads
-    select:
-    - campaign
-  - name: Linkedin-CampaignGroups
-    inherit_from: tap-linkedin-ads
-    select:
-    - campaign_groups
-  - name: Linkedin-AdAnalyticsByCreative
-    inherit_from: tap-linkedin-ads
-    select:
-    - ad_analytics_by_creative
-  - name: Linkedin-AdAnalyticsByCampaign
-    inherit_from: tap-linkedin-ads
-    select:
-    - ad_analytics_by_campaign
-  - name: Linkedin-VideoAds
-    inherit_from: tap-linkedin-ads
-    select:
-    - video_ads
-environments:
-- name: dev
+      kind: date_iso8601
+      label: Start Date
+      description: Initial date to start extracting data from
+
+    # TODO: Declare required settings here:
+    settings_group_validation:
+    - [username, password]
+
+    # TODO: Declare default configuration values here:
+    config:
+      start_date: '2010-01-01T00:00:00Z'
+
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl

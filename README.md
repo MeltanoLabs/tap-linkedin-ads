@@ -1,6 +1,6 @@
 # `tap-linkedin-ads`
 
-Singer tap for extracting data from the LinkedIn Ads Marketing API.
+LinkedInAds tap class.
 
 Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
@@ -12,44 +12,46 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 * `about`
 * `stream-maps`
 * `schema-flattening`
+* `batch`
 
 ## Settings
 
-| Setting              | Required |                      Default                       | Description                                                                                                                                 |
-|:---------------------|:--------:|:--------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| access_token         | True     |                        None                        | The token to authenticate against the API service                                                                                           |
-| start_date           | True     |                        None                        | The earliest record date to sync                                                                                                            |
-| end_date             | False    |             2023-05-09 02:04:18.151589             | The latest record date to sync                                                                                                              |
-| user_agent           | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID                                                                                                                                      |
-| accounts             | True     |                        None                        | LinkedInAds Account ID                                                                                                                      |
-| campaign             | True     |                        None                        | LinkedInAds Campaign ID                                                                                                                     |
-| creative             | True     |                        None                        | LinkedInAds Creative ID                                                                                                                     |
-| campaign_group       | True     |                        None                        | LinkedInAds Campaign Group ID                                                                                                               |
-| owner                | True     |                        None                        | LinkedInAds Owner ID                                                                                                                        |
-| stream_maps          | False    |                        None                        | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
-| stream_map_config    | False    |                        None                        | User-defined config values to be used within map expressions.                                                                               |
-| flattening_enabled   | False    |                        None                        | 'True' to enable schema flattening and automatically expand nested properties.                                                              |
-| flattening_max_depth | False    |                        None                        | The max depth to flatten schemas.                                                                                                           |
+| Setting | Required | Default | Description |
+|:--------|:--------:|:-------:|:------------|
+| access_token | False    | None    | The token to authenticate against the API service |
+| oauth_credentials | False    | None    | LinkedIn Ads OAuth Credentials |
+| oauth_credentials.refresh_token | False    | None    | LinkedIn Ads Refresh Token |
+| oauth_credentials.client_id | False    | None    | LinkedIn Ads Client ID |
+| oauth_credentials.client_secret | False    | None    | LinkedIn Ads Client Secret |
+| start_date | True     | None    | The earliest record date to sync |
+| end_date | False    | 2024-10-23T22:57:56.958248+00:00 | The latest record date to sync |
+| user_agent | False    | tap-linkedin-ads <api_user_email@your_company.com> | API ID      |
+| stream_maps | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
+| stream_map_config | False    | None    | User-defined config values to be used within map expressions. |
+| faker_config | False    | None    | Config for the [`Faker`](https://faker.readthedocs.io/en/master/) instance variable `fake` used within map expressions. Only applicable if the plugin specifies `faker` as an addtional dependency (through the `singer-sdk` `faker` extra or directly). |
+| faker_config.seed | False    | None    | Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator |
+| faker_config.locale | False    | None    | One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization |
+| flattening_enabled | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth | False    | None    | The max depth to flatten schemas. |
+| batch_config | False    | None    |             |
+| batch_config.encoding | False    | None    | Specifies the format and compression of the batch files. |
+| batch_config.encoding.format | False    | None    | Format to use for batch files. |
+| batch_config.encoding.compression | False    | None    | Compression format to use for batch files. |
+| batch_config.storage | False    | None    | Defines the storage layer to use when writing batch files |
+| batch_config.storage.root | False    | None    | Root path to use when writing batch files. |
+| batch_config.storage.prefix | False    | None    | Prefix to use when writing batch files. |
 
 A full list of supported settings and capabilities is available by running: `tap-linkedin-ads --about`
 
 
-### Owner
+### Configure using environment variables
 
-The `owner` setting is required for pulling data from the VideoAds endpoint. You can find the owner ID by making a
-request to the adAccounts endpoint:
+This Singer tap will automatically import any environment variables within the working directory's
+`.env` if the `--config=ENV` is provided, such that config values will be considered if a matching
+environment variable is set either in the terminal context or in the `.env` file.
 
- https://api.linkedin.com/rest/adAccounts?q=search&start=0&count=10
+### Source Authentication and Authorization
 
- The owner ID can be found in the response under "reference": "urn:li:organization:`{OWNER}`"
-
-
-## Installation
-
-```bash
-pipx install git+https://github.com/MeltanoLabs/tap-linkedin-ads.git@main
-```
-### Authentication
 
 The tap requires a LinkedInAds OAuth 2.0 access token to make API requests
 
@@ -60,23 +62,13 @@ The access token requires the following permissions:
 `r_ads_reporting`: read ads reporting
 
 Access tokens expire after 60 days and require a user to manually authenticate
-again. See the [LinkedInAds API docs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/postman-getting-started) for more info
+again. See the [LinkedInAds API docs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/postman-getting-started) for more info.
 
 ## Usage
 
 ### AdAnalytics API Column Limitation
 
 The AdAnalytics endpoint in the LinkedInAds API can call up to 20 columns at a time, we can create child classes which have 20 columns in them, we can merge their output with get records function.
-
-### SDK X-Restli-Protocol Limitation
-
-The creatives endpoint requires X-Restli-Protocol to be set to 2.0.0. The request URL for tap-linkedin-ads uses parentheses ‘()’. '(' and ')' are typically
-encoded in a request URL, but are not when the X-Restli-Protocol is 2.0.0. An SDK update for expanded escape characters is currently WIP [link github issue]
-
-
-### Metadata Columns
-
-- `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
 
 ### Elastic License 2.0
 
@@ -90,7 +82,9 @@ tap-linkedin-ads --help
 tap-linkedin-ads --config CONFIG --discover > ./catalog.json
 ```
 
-## Contributing
+## Developer Resources
+
+Follow these instructions to contribute to this project.
 
 This project uses parent-child streams. Learn more about them [here](https://gitlab.com/meltano/sdk/-/blob/main/docs/parent_streams.md).
 
@@ -103,7 +97,7 @@ poetry install
 
 ### Create and Run Tests
 
-Create tests within the `lib_tap_linkedin_ads_sdk/tests` subfolder and
+Create tests within the `tests` subfolder and
   then run:
 
 ```bash
