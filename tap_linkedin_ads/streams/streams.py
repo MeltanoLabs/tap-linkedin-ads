@@ -6,7 +6,6 @@ import typing as t
 from datetime import datetime, timezone
 from importlib import resources
 
-import pendulum
 from singer_sdk.helpers.types import Context
 from singer_sdk.typing import (
     ArrayType,
@@ -30,7 +29,9 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
         # This function extracts day, month, and year from date range column
         # These values are parse with datetime function and the date is added to the day column
         if "changeAuditStamps" in row:
-            created_time = row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            created_time = (
+                row.get("changeAuditStamps", {}).get("created", {}).get("time")
+            )
             last_modified_time = (
                 row.get("changeAuditStamps", {}).get("lastModified", {}).get("time")
             )
@@ -52,11 +53,17 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
                 tz=UTC,
             ).isoformat()
         else:
-            raise Exception("No changeAuditStamps or createdAt/lastModifiedAt fields found")
+            raise Exception(
+                "No changeAuditStamps or createdAt/lastModifiedAt fields found"
+            )
         # Manual date filtering
         date = datetime.fromisoformat(row["last_modified_time"])
-        start_date = datetime.fromisoformat(self.config["start_date"]).replace(tzinfo=timezone.utc)
-        end_date = datetime.fromisoformat(self.config["end_date"]).replace(tzinfo=timezone.utc)
+        start_date = datetime.fromisoformat(self.config["start_date"]).replace(
+            tzinfo=timezone.utc
+        )
+        end_date = datetime.fromisoformat(self.config["end_date"]).replace(
+            tzinfo=timezone.utc
+        )
         if date >= start_date and date <= end_date:
             return super().post_process(row, context)
         return None
@@ -534,6 +541,7 @@ class CampaignsStream(LinkedInAdsStream):
         row["campaign_group_id"] = int(row["campaignGroup"].split(":")[3])
         return super().post_process(row, context)
 
+
 class CampaignGroupsStream(LinkedInAdsStream):
     """https://docs.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-campaign-groups#search-for-campaign-groups."""
 
@@ -639,6 +647,7 @@ class CampaignGroupsStream(LinkedInAdsStream):
             int(schedule_column) / 1000,
         ).isoformat()
         return super().post_process(row, context)
+
 
 class CreativesStream(LinkedInAdsStream):
     """https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads/account-structure/create-and-manage-creatives?view=li-lms-2023-05&tabs=http%2Chttp-update-a-creative#search-for-creatives."""
@@ -785,8 +794,3 @@ class VideoAdsStream(LinkedInAdsStream):
             "owner": context["owner_urn"],
             **super().get_url_params(context, next_page_token),
         }
-
-
-
-
-

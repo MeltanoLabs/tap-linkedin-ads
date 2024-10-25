@@ -54,4 +54,3 @@ class AdAnalyticsBase(LinkedInAdsStreamBase):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-
