@@ -63,7 +63,9 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
         # Manual date filtering
         date = datetime.fromisoformat(row["last_modified_time"])
         start_date = self.get_starting_timestamp(context)
-        end_date = datetime.fromisoformat(self.config["end_date"]).replace(tzinfo=timezone.utc)
+        end_date = datetime.fromisoformat(self.config["end_date"]).replace(
+            tzinfo=timezone.utc
+        )
         if date >= start_date and date <= end_date:
             return super().post_process(row, context)
         return None
