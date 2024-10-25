@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from datetime import datetime, timezone
 from functools import cached_property
 
 from singer_sdk import metrics
