@@ -7,7 +7,13 @@ import datetime
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-from tap_linkedin_ads import streams
+from tap_linkedin_ads.streams import streams
+from tap_linkedin_ads.streams.ad_analytics.ad_analytics_by_campaign import (
+    AdAnalyticsByCampaignStream,
+)
+from tap_linkedin_ads.streams.ad_analytics.ad_analytics_by_creative import (
+    AdAnalyticsByCreativeStream,
+)
 
 NOW = datetime.datetime.now(tz=datetime.timezone.utc)
 
@@ -78,8 +84,8 @@ class TapLinkedInAds(Tap):
         return [
             streams.AccountsStream(self),
             streams.AccountUsersStream(self),
-            streams.AdAnalyticsByCampaignStream(self),
-            streams.AdAnalyticsByCreativeStream(self),
+            AdAnalyticsByCampaignStream(self),
+            AdAnalyticsByCreativeStream(self),
             streams.CampaignsStream(self),
             streams.CampaignGroupsStream(self),
             streams.CreativesStream(self),

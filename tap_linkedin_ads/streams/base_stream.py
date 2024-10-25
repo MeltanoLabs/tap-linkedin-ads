@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import typing as t
+from datetime import datetime, timezone
 from functools import cached_property
-from importlib import resources
 
 from singer_sdk import metrics
 from singer_sdk.authenticators import BearerTokenAuthenticator
@@ -19,11 +19,7 @@ if t.TYPE_CHECKING:
     from singer_sdk.helpers.types import Auth, Context
 
 
-# TODO: Delete this is if not using json files for schema definition
-SCHEMAS_DIR = resources.files(__package__) / "schemas"
-
-
-class LinkedInAdsStream(RESTStream):
+class LinkedInAdsStreamBase(RESTStream):
     """LinkedInAds stream class."""
 
     # Update this value if necessary or override `parse_response`.
