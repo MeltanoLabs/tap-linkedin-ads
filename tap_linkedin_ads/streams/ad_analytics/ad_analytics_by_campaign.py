@@ -176,7 +176,7 @@ class _AdAnalyticsByCampaignInit(AdAnalyticsBase):
         Returns:
             A dictionary of URL query parameters.
         """
-        start_date = pendulum.parse(self.config["start_date"])
+        start_date = self.get_starting_timestamp(context)
         end_date = pendulum.parse(self.config["end_date"])
         return {
             "pivot": "(value:CAMPAIGN)",

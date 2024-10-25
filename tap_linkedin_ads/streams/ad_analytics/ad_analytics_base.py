@@ -16,6 +16,8 @@ class AdAnalyticsBase(LinkedInAdsStreamBase):
     """LinkedInAds stream class for ad analytics."""
 
     path = "/adAnalytics"
+    replication_key = "day"
+    replication_method = "INCREMENTAL"
 
     substreams: t.ClassVar[list] = []
 

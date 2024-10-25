@@ -26,6 +26,10 @@ UTC = timezone.utc
 
 
 class LinkedInAdsStream(LinkedInAdsStreamBase):
+    replication_key = "last_modified_time"
+    # Note: manually filtering in post_process since the API doesnt have filter options
+    replication_method = "INCREMENTAL"
+
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         # This function extracts day, month, and year from date range column
         # These values are parse with datetime function and the date is added to the day column
@@ -55,7 +59,7 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
             raise Exception("No changeAuditStamps or createdAt/lastModifiedAt fields found")
         # Manual date filtering
         date = datetime.fromisoformat(row["last_modified_time"])
-        start_date = datetime.fromisoformat(self.config["start_date"]).replace(tzinfo=timezone.utc)
+        start_date = datetime.fromisoformat(self.get_starting_timestamp(context)).replace(tzinfo=timezone.utc)
         end_date = datetime.fromisoformat(self.config["end_date"]).replace(tzinfo=timezone.utc)
         if date >= start_date and date <= end_date:
             return super().post_process(row, context)
