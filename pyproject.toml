@@ -1,68 +1,70 @@
 [tool.poetry]
-name = "meltano-tap-linkedin-ads"
-version = "0.0.0"
-description = "`tap-linkedin-ads` is a Singer tap for linkedin, built with the Meltano SDK for Singer Taps."
-authors = ["Meltano <hello@meltano.com>"]
+name = "meltanolabs-tap-linkedin-ads"
+version = "0.0.1"
+description = "Singer tap for LinkedInAds, built with the Meltano Singer SDK."
+readme = "README.md"
+authors = ["Pat Nadolny <firstname.lastname@example.com>"]
 keywords = [
     "ELT",
-    "linkedin",
+    "LinkedInAds",
 ]
-license = "Elastic-2.0"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+license = "Apache-2.0"
 packages = [
     { include = "tap_linkedin_ads" },
 ]
-readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.7.1"
-pendulum = "^2.1.2"
-requests = "^2.31.0"
-singer-sdk = ">=0.27,<0.30"
+python = "<3.12,>=3.9"
+singer-sdk = { version="~=0.41.0", extras = [] }
+fs-s3fs = { version = "~=1.1.1", optional = true }
+requests = "~=2.32.3"
+pendulum = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
-singer-sdk = {version = "*", extras = ["testing"]}
+pytest = ">=8"
+singer-sdk = { version="~=0.41.0", extras = ["testing"] }
+
+[tool.poetry.extras]
+s3 = ["fs-s3fs"]
+
+[tool.pytest.ini_options]
+addopts = '--durations=10'
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+ignore = [
+    "ANN101",  # missing-type-self
+    "ANN102",  # missing-type-cls
+    "COM812",  # missing-trailing-comma
+    "ISC001",  # single-line-implicit-string-concatenation
+]
+select = ["ALL"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [build-system]
-requires = ["poetry-core==1.6.1", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # CLI declaration
 tap-linkedin-ads = 'tap_linkedin_ads.tap:TapLinkedInAds.cli'
-
-[tool.poetry-dynamic-versioning]
-enable = true
-
-[tool.ruff]
-ignore = [
-    "ANN101",  # Missing type annotation for self in method
-    "DJ",      # Django
-    "PD",      # Pandas
-    "D101",    # Missing docstring in public class
-    "D102",    # Missing docstring in public method
-    "FIX002",  # line-contains-todo
-]
-line-length = 100
-select = ["ALL"]
-target-version = "py37"
-
-[tool.ruff.flake8-import-conventions]
-banned-from = ["typing"]
-
-[tool.ruff.flake8-import-conventions.extend-aliases]
-typing = "t"
-
-[tool.ruff.isort]
-known-first-party = ["tap_linkedin"]
-required-imports = ["from __future__ import annotations"]
-
-[tool.ruff.per-file-ignores]
-"tap_linkedin_ads/streams.py" = [
-    "RUF012",  # mutable-class-default
-]
-"tests/*" = [
-    "ANN201",  # Missing return type annotation for public function
-]
-
-[tool.ruff.pydocstyle]
-convention = "google"
