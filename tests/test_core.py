@@ -8,7 +8,6 @@ from tap_linkedin_ads.tap import TapLinkedInAds
 
 SAMPLE_CONFIG = {
     "start_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
-    # TODO: Initialize minimal tap config
 }
 
 
@@ -17,6 +16,3 @@ TestTapLinkedInAds = get_tap_test_class(
     tap_class=TapLinkedInAds,
     config=SAMPLE_CONFIG,
 )
-
-
-# TODO: Create additional tests as appropriate for your tap.

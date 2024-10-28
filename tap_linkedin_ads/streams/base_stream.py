@@ -84,9 +84,6 @@ class LinkedInAdsStreamBase(RESTStream):
         params: dict = {}
         if next_page_token:
             params["pageToken"] = next_page_token
-        # if self.replication_key:
-        #     params["sort"] = "asc"
-        #     params["order_by"] = self.replication_key
         return params
 
     def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
@@ -100,7 +97,7 @@ class LinkedInAdsStreamBase(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:  # noqa: ARG002
         """Return a dictionary of unencoded params.
 
         Args:

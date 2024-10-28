@@ -6,7 +6,6 @@ import typing as t
 from datetime import datetime, timezone
 from importlib import resources
 
-from singer_sdk.helpers.types import Context
 from singer_sdk.typing import (
     ArrayType,
     BooleanType,
@@ -20,18 +19,22 @@ from singer_sdk.typing import (
 
 from tap_linkedin_ads.streams.base_stream import LinkedInAdsStreamBase
 
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
+
 SCHEMAS_DIR = resources.files(__package__) / "schemas"
 UTC = timezone.utc
 
 
 class LinkedInAdsStream(LinkedInAdsStreamBase):
+    """LinkedInAds stream class."""
+
     replication_key = "last_modified_time"
     # Note: manually filtering in post_process since the API doesnt have filter options
     replication_method = "INCREMENTAL"
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        # This function extracts day, month, and year from date range column
-        # These values are parse with datetime function and the date is added to the day column
+        """Post-process each record returned by the API."""
         if "changeAuditStamps" in row:
             created_time = (
                 row.get("changeAuditStamps", {}).get("created", {}).get("time")
@@ -49,17 +52,16 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
             ).isoformat()
         elif "createdAt" in row:
             row["created_time"] = datetime.fromtimestamp(
-                int(row.get("createdAt")) / 1000,
+                int(row["createdAt"]) / 1000,
                 tz=UTC,
             ).isoformat()
             row["last_modified_time"] = datetime.fromtimestamp(
-                int(row.get("lastModifiedAt")) / 1000,
+                int(row["lastModifiedAt"]) / 1000,
                 tz=UTC,
             ).isoformat()
         else:
-            raise Exception(
-                "No changeAuditStamps or createdAt/lastModifiedAt fields found"
-            )
+            msg = "No changeAuditStamps or createdAt/lastModifiedAt fields found"
+            raise Exception(msg)  # noqa: TRY002
         # Manual date filtering
         date = datetime.fromisoformat(row["last_modified_time"])
         start_date = self.get_starting_timestamp(context)
@@ -129,7 +131,7 @@ class AccountsStream(LinkedInAdsStream):
         ),
     ).to_dict()
 
-    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+    def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
         """Return a context dictionary for a child stream."""
         return {
             "account_id": record["id"],
@@ -214,7 +216,7 @@ class AccountUsersStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:
         """Return a dictionary of unencoded params.
 
         Args:
@@ -494,6 +496,9 @@ class CampaignsStream(LinkedInAdsStream):
         Returns:
             A URL, optionally targeted to a specific partition or context.
         """
+        if not context:
+            msg = "Context is required for this stream"
+            raise ValueError(msg)
         return super().get_url(context) + f'/{context["account_id"]}/adCampaigns'
 
     def get_url_params(
@@ -516,7 +521,7 @@ class CampaignsStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:  # noqa: ARG002
         """Return a dictionary of unencoded params.
 
         Args:
@@ -526,19 +531,22 @@ class CampaignsStream(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         return {
-            "search": "(status:(values:List(ACTIVE,PAUSED,ARCHIVED,COMPLETED,CANCELED,DRAFT,PENDING_DELETION,REMOVED)))"
+            "search": (
+                "(status:(values:List(ACTIVE,PAUSED,ARCHIVED,COMPLETED,"
+                "CANCELED,DRAFT,PENDING_DELETION,REMOVED)))"
+            )
         }
 
-    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+    def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
         """Return a context dictionary for a child stream."""
         return {
             "campaign_id": record["id"],
         }
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        schedule_column = row.get("runSchedule").get("start")
+        """Post-process each record returned by the API."""
         row["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
-            int(schedule_column) / 1000,
+            int(row["runSchedule"]["start"]) / 1000,
         ).isoformat()
         row["campaign_group_id"] = int(row["campaignGroup"].split(":")[3])
         return super().post_process(row, context)
@@ -608,6 +616,9 @@ class CampaignGroupsStream(LinkedInAdsStream):
         Returns:
             A URL, optionally targeted to a specific partition or context.
         """
+        if not context:
+            msg = "Context is required for this stream"
+            raise ValueError(msg)
         return super().get_url(context) + f'/{context["account_id"]}/adCampaignGroups'
 
     def get_url_params(
@@ -630,7 +641,7 @@ class CampaignGroupsStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:  # noqa: ARG002
         """Return a dictionary of unencoded params.
 
         Args:
@@ -640,13 +651,16 @@ class CampaignGroupsStream(LinkedInAdsStream):
             A dictionary of URL query parameters.
         """
         return {
-            "search": "(status:(values:List(ACTIVE,ARCHIVED,CANCELED,DRAFT,PAUSED,PENDING_DELETION,REMOVED)))"
+            "search": (
+                "(status:(values:List(ACTIVE,ARCHIVED,CANCELED,DRAFT,PAUSED,"
+                "PENDING_DELETION,REMOVED)))"
+            )
         }
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        schedule_column = row.get("runSchedule").get("start")
+        """Post-process each record returned by the API."""
         row["run_schedule_start"] = datetime.fromtimestamp(  # noqa: DTZ006
-            int(schedule_column) / 1000,
+            int(row["runSchedule"]["start"]) / 1000,
         ).isoformat()
         return super().post_process(row, context)
 
@@ -703,7 +717,9 @@ class CreativesStream(LinkedInAdsStream):
         Returns:
             A URL, optionally targeted to a specific partition or context.
         """
-        # TODO: optional filter 'urn%3Ali%3AsponsoredCreative%3A{self.config["creative"]}'
+        if not context:
+            msg = "Context is required for this stream"
+            raise ValueError(msg)
         return super().get_url(context) + f'/{context["account_id"]}/creatives'
 
     def get_url_params(
@@ -725,7 +741,7 @@ class CreativesStream(LinkedInAdsStream):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
+    def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
         """Return a context dictionary for a child stream."""
         creative_id = record["id"].split(":")[-1]
         return {
@@ -790,6 +806,9 @@ class VideoAdsStream(LinkedInAdsStream):
         Returns:
             A dictionary of URL query parameters.
         """
+        if not context:
+            msg = "Context is required for this stream"
+            raise ValueError(msg)
         return {
             "q": "account",
             "account": f"urn:li:sponsoredAccount:{context['account_id']}",

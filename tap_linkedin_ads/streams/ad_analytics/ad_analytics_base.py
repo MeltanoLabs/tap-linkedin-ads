@@ -31,8 +31,6 @@ class AdAnalyticsBase(LinkedInAdsStreamBase):
         Returns:
             The resulting record dict, or `None` if the record should be excluded.
         """
-        # This function extracts day, month, and year from date range column
-        # These values are parsed with datetime function and the date is added to the day column
         start_date = row.get("dateRange", {}).get("start", {})
 
         if start_date:

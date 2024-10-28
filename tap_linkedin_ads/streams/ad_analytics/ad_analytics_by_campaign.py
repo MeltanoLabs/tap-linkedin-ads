@@ -7,7 +7,6 @@ from datetime import timezone
 from importlib import resources
 
 import pendulum
-from singer_sdk.helpers.types import Context
 from singer_sdk.typing import (
     IntegerType,
     ObjectType,
@@ -18,6 +17,9 @@ from singer_sdk.typing import (
 
 from tap_linkedin_ads.streams.ad_analytics.ad_analytics_base import AdAnalyticsBase
 from tap_linkedin_ads.streams.streams import CampaignsStream
+
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
 
 SCHEMAS_DIR = resources.files(__package__) / "schemas"
 UTC = timezone.utc
@@ -167,7 +169,7 @@ class _AdAnalyticsByCampaignInit(AdAnalyticsBase):
             **super().get_url_params(context, next_page_token),
         }
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:
         """Return a dictionary of unencoded params.
 
         Args:
@@ -181,8 +183,13 @@ class _AdAnalyticsByCampaignInit(AdAnalyticsBase):
         return {
             "pivot": "(value:CAMPAIGN)",
             "timeGranularity": "(value:DAILY)",
-            "campaigns": f"List(urn%3Ali%3AsponsoredCampaign%3A{context['campaign_id']})",
-            "dateRange": f"(start:(year:{start_date.year},month:{start_date.month},day:{start_date.day}),end:(year:{end_date.year},month:{end_date.month},day:{end_date.day}))",
+            "campaigns": (
+                f"List(urn%3Ali%3AsponsoredCampaign%3A{context['campaign_id']})"
+            ),
+            "dateRange": (
+                f"(start:(year:{start_date.year},month:{start_date.month},day:{start_date.day}),"
+                f"end:(year:{end_date.year},month:{end_date.month},day:{end_date.day}))"
+            ),
             "fields": self.adanalyticscolumns[0],
         }
 
@@ -190,7 +197,7 @@ class _AdAnalyticsByCampaignInit(AdAnalyticsBase):
 class _AdAnalyticsByCampaignSecond(_AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_second"
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:
         """Return a dictionary of unencoded params.
 
         Args:
@@ -209,7 +216,7 @@ class _AdAnalyticsByCampaignSecond(_AdAnalyticsByCampaignInit):
 class _AdAnalyticsByCampaignThird(_AdAnalyticsByCampaignInit):
     name = "adanalyticsbycampaign_third"
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:
         """Return a dictionary of unencoded params.
 
         Args:
@@ -230,7 +237,7 @@ class AdAnalyticsByCampaignStream(_AdAnalyticsByCampaignInit):
 
     name = "ad_analytics_by_campaign"
 
-    def get_unencoded_params(self, context: Context | None) -> dict:
+    def get_unencoded_params(self, context: Context) -> dict:
         """Return a dictionary of unencoded params.
 
         Args:
@@ -248,13 +255,13 @@ class AdAnalyticsByCampaignStream(_AdAnalyticsByCampaignInit):
     def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
         """Return a dictionary of records from adAnalytics classes.
 
-        Combines request columns from multiple calls to the api, which are limited to 20 columns
-        each.
+        Combines request columns from multiple calls to the api, which are limited to 20
+        columns each.
 
         Uses `merge_dicts` to combine responses from each class
         super().get_records calls only the records from the adAnalyticsByCampaign class
-        zip() Iterates over the records of adAnalytics classes and merges them with merge_dicts()
-        function list() converts each stream context into lists
+        zip() Iterates over the records of adAnalytics classes and merges them with
+        merge_dicts() function list() converts each stream context into lists
 
         Args:
             context: The stream context.
