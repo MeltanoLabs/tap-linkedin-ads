@@ -6,6 +6,8 @@ import typing as t
 from datetime import datetime, timezone
 from importlib import resources
 
+from singer_sdk.streams.core import REPLICATION_FULL_TABLE
+
 from tap_linkedin_ads.streams.base_stream import LinkedInAdsStreamBase
 
 SCHEMAS_DIR = resources.files(__package__) / "schemas"
@@ -16,8 +18,7 @@ class AdAnalyticsBase(LinkedInAdsStreamBase):
     """LinkedInAds stream class for ad analytics."""
 
     path = "/adAnalytics"
-    replication_key = "day"
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_FULL_TABLE
 
     substreams: t.ClassVar[list] = []
 

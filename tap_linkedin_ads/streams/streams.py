@@ -21,6 +21,7 @@ from tap_linkedin_ads.streams.base_stream import LinkedInAdsStreamBase
 
 if t.TYPE_CHECKING:
     from singer_sdk.helpers.types import Context
+from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 
 SCHEMAS_DIR = resources.files(__package__) / "schemas"
 UTC = timezone.utc
@@ -31,7 +32,7 @@ class LinkedInAdsStream(LinkedInAdsStreamBase):
 
     replication_key = "last_modified_time"
     # Note: manually filtering in post_process since the API doesnt have filter options
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
         """Post-process each record returned by the API."""
