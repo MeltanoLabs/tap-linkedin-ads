@@ -697,6 +697,8 @@ class CreativesStream(LinkedInAdsStream):
             ),
         ),
         Property("createdAt", IntegerType),
+        Property("created_time", DateTimeType),
+        Property("last_modified_time", DateTimeType),
         Property("createdBy", StringType),
         Property("lastModifiedAt", IntegerType),
         Property("lastModifiedBy", StringType),
