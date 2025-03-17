@@ -36,7 +36,7 @@ class AdAnalyticsBase(LinkedInAdsStreamBase):
 
         if start_date:
             row["day"] = datetime.strptime(
-                f'{start_date.get("year")}-{start_date.get("month")}-{start_date.get("day")}',
+                f"{start_date.get('year')}-{start_date.get('month')}-{start_date.get('day')}",
                 "%Y-%m-%d",
             ).astimezone(UTC)
 
