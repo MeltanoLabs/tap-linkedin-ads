@@ -209,7 +209,7 @@ class _AdAnalyticsByCampaignSecond(_AdAnalyticsByCampaignInit):
         return {
             **super().get_unencoded_params(context),
             # Overwrite fields with this column subset
-            "fields": self.adanalyticscolumns[0],
+            "fields": self.adanalyticscolumns[2],
         }
 
 
