@@ -500,7 +500,7 @@ class CampaignsStream(LinkedInAdsStream):
         if not context:
             msg = "Context is required for this stream"
             raise ValueError(msg)
-        return super().get_url(context) + f'/{context["account_id"]}/adCampaigns'
+        return super().get_url(context) + f"/{context['account_id']}/adCampaigns"
 
     def get_url_params(
         self,
@@ -620,7 +620,7 @@ class CampaignGroupsStream(LinkedInAdsStream):
         if not context:
             msg = "Context is required for this stream"
             raise ValueError(msg)
-        return super().get_url(context) + f'/{context["account_id"]}/adCampaignGroups'
+        return super().get_url(context) + f"/{context['account_id']}/adCampaignGroups"
 
     def get_url_params(
         self,
@@ -723,7 +723,7 @@ class CreativesStream(LinkedInAdsStream):
         if not context:
             msg = "Context is required for this stream"
             raise ValueError(msg)
-        return super().get_url(context) + f'/{context["account_id"]}/creatives'
+        return super().get_url(context) + f"/{context['account_id']}/creatives"
 
     def get_url_params(
         self,
