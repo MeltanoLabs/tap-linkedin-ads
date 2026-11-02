@@ -8,7 +8,7 @@ from functools import cached_property
 from singer_sdk import metrics
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
-from singer_sdk.pagination import BaseAPIPaginator  # noqa: TCH002  # noqa: TCH002
+from singer_sdk.pagination import BaseAPIPaginator  # noqa: TC002  # noqa: TCH002
 from singer_sdk.streams import RESTStream
 
 from tap_linkedin_ads.auth import LinkedInAdsOAuthAuthenticator
